@@ -63,28 +63,8 @@ def lookup_phone(number):
             "e164": phonenumbers.format_number(p, phonenumbers.PhoneNumberFormat.E164),
             "sites_registered": []
         }
-        try:
-            import trio, httpx
-            from ignorant.modules.shopping.amazon import amazon
-            from ignorant.modules.social.instagram import instagram
-            from ignorant.modules.social.snapchat import snapchat
-            cc = str(p.country_code); nn = str(p.national_number)
-            async def check():
-                client = httpx.AsyncClient(timeout=10)
-                out = []
-                await amazon(nn, cc, client, out)
-                await instagram(nn, cc, client, out)
-                await snapchat(nn, cc, client, out)
-                await client.aclose()
-                return out
-            results = trio.run(check)
-            for r in results:
-                result["sites_registered"].append({
-                    "site": r.get("name", "Unknown"),
-                    "registered": bool(r.get("exists"))
-                })
-        except Exception as e:
-            result["ignorant_error"] = str(e)
+        # Ignorant disabilitato su Railway (dipendenze incompatibili)
+        pass
         return result
     except Exception as e:
         return {"error": str(e)}

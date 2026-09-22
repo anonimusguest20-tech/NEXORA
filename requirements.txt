@@ -6,7 +6,3 @@ phonenumbers
 requests
 python-dotenv
 gunicorn
-holehe
-ignorant
-trio
-httpx
