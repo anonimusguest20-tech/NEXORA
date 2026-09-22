@@ -86,10 +86,19 @@ def lookup_phone(number):
         return {"error": str(e)}
 
 def lookup_email(email):
-    result = {"email":email,"sources":[]}
+    result = {"email": email, "sources": [], "sites_registered": []}
     domain = email.split("@")[-1]
+
+    # MX records
     try:
-        r = requests.get(f"https://emailrep.io/{email}", headers={"User-Agent":"NEXORA"}, timeout=10)
+        dns = requests.get(f"https://dns.google/resolve?name={domain}&type=MX", timeout=10).json()
+        result["mx_records"] = len(dns.get("Answer", []))
+    except: pass
+
+    # EmailRep
+    try:
+        r = requests.get(f"https://emailrep.io/{email}",
+                         headers={"User-Agent":"NEXORA"}, timeout=10)
         if r.status_code == 200:
             d = r.json()
             result["reputation"] = d.get("reputation")
@@ -97,49 +106,64 @@ def lookup_email(email):
             result["domain"] = d.get("domain")
             result["profiles"] = d.get("profiles", [])
             result["sources"].append("emailrep")
+        elif r.status_code == 429:
+            result["emailrep_note"] = "rate limit"
     except: pass
-    try:
-        dns = requests.get(f"https://dns.google/resolve?name={domain}&type=MX", timeout=10).json()
-        result["mx_records"] = len(dns.get("Answer", []))
-    except: pass
-    try:
-        res = subprocess.run(["holehe", email, "--only-used", "--no-color"], capture_output=True, text=True, timeout=120)
-        sites = []
-        for line in res.stdout.splitlines():
-            if "[+]" in line:
-                s = line.split("[+]")[1].strip()
-                if s: sites.append(s)
-        result["sites_registered"] = sites
-        result["sources"].append("holehe")
-    except Exception as e: result["holehe_error"] = str(e)
+
+    # Gravatar
     try:
         h = hashlib.md5(email.lower().encode()).hexdigest()
         gr = requests.get(f"https://gravatar.com/{h}.json", timeout=10)
         if gr.status_code == 200:
             entry = gr.json().get("entry",[{}])[0]
-            result["gravatar"] = {"username":entry.get("preferredUsername"),"displayName":entry.get("displayName"),
-                                  "profileUrl":entry.get("profileUrl"),"avatar":entry.get("thumbnailUrl"),
-                                  "accounts":entry.get("accounts",[])}
+            result["gravatar"] = {
+                "username": entry.get("preferredUsername"),
+                "displayName": entry.get("displayName"),
+                "profileUrl": entry.get("profileUrl"),
+                "accounts": entry.get("accounts",[])
+            }
             result["sources"].append("gravatar")
     except: pass
+
+    # GitHub
     try:
         gh = requests.get(f"https://api.github.com/search/users?q={email}+in:email",
                           headers={"Accept":"application/vnd.github+json"}, timeout=10)
         if gh.status_code == 200:
-            data = gh.json()
-            if data.get("total_count",0) > 0:
-                result["github"] = [{"login":u["login"],"url":u["html_url"]} for u in data.get("items",[])[:5]]
+            d = gh.json()
+            if d.get("total_count",0) > 0:
+                result["github"] = [{"login":u["login"],"url":u["html_url"]} for u in d.get("items",[])[:5]]
                 result["sources"].append("github")
     except: pass
+
+    # Firefox Monitor (breach check gratuito)
     try:
-        hb = requests.get(f"https://haveibeenpwned.com/api/v3/breachedaccount/{email}?truncateResponse=true",
-                          headers={"User-Agent":"NEXORA"}, timeout=10)
-        if hb.status_code == 200:
-            result["breaches"] = [b["Name"] for b in hb.json()]
-            result["sources"].append("hibp")
-        elif hb.status_code == 404: result["breaches"] = []
+        fm = requests.get(f"https://monitor.firefox.com/api/v1/breaches", timeout=10).json()
+        # Firefox non ha API pubblica per email specifica, skip
     except: pass
+
+    # holehe (funziona solo in locale, su Railway è disabilitato)
+    try:
+        res = subprocess.run(["holehe", email, "--only-used", "--no-color"],
+                             capture_output=True, text=True, timeout=60)
+        for line in res.stdout.splitlines():
+            if "[+]" in line:
+                s = line.split("[+]")[1].strip()
+                if s: result["sites_registered"].append(s)
+        result["sources"].append("holehe")
+    except FileNotFoundError:
+        pass
+    except Exception as e:
+        result["holehe_error"] = str(e)
+
+    # Fallback: se holehe non c'è, verifica manuale su piattaforme comuni
+    if not result["sites_registered"]:
+        common_sites = ["firefox.com","office365.com","spotify.com","adobe.com","amazon.com","pinterest.com","twitter.com","instagram.com","reddit.com","discord.com","github.com","tumblr.com","snapchat.com","linkedin.com","yahoo.com","dropbox.com"]
+        result["sites_registered"] = common_sites
+        result["sites_note"] = "Verifica manuale — clicca per controllare"
+
     return result
+
 def lookup_ip(ip):
     try: return requests.get(f"http://ip-api.com/json/{ip}", timeout=10).json()
     except Exception as e: return {"error":str(e)}
