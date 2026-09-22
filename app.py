@@ -352,6 +352,64 @@ def api_lookup():
     if not fn: return jsonify({"error":"Tipo non valido"}), 400
     result = fn(query); log_lookup(current_user, ltype, query)
     return jsonify(result)
+@app.route('/api/search-multi', methods=['POST'])
+@login_required
+def api_search_multi():
+    data = request.get_json()
+    query = data.get('query','').strip()
+    mode = data.get('mode','auto')
+    if not query:
+        return jsonify({"error":"Query vuota"}), 400
+
+    # Auto-detect del tipo di query
+    detected = None
+    if '@' in query and '.' in query.split('@')[-1]:
+        detected = 'email'
+    elif query.replace('+','').replace(' ','').isdigit() and len(query.replace('+','').replace(' ','')) > 6:
+        detected = 'phone'
+    elif query.count('.') == 3 and all(p.isdigit() for p in query.split('.')):
+        detected = 'ip'
+    elif '.' in query and ' ' not in query:
+        detected = 'domains'
+    else:
+        detected = 'users'
+
+    if mode == 'fast':
+        modules = [detected]
+    elif mode == 'auto':
+        modules = [detected]
+    elif mode == 'deep':
+        modules = ['users','email','phone','domains','ip','breaches']
+    elif mode == 'compare':
+        modules = ['users','email','phone']
+    else:
+        modules = [detected]
+
+    results = {}
+    for m in modules:
+        # Check limiti
+        ok, msg = check_lookup(current_user, m)
+        if not ok:
+            results[m] = {"error": msg, "skipped": True}
+            continue
+        fn = LOOKUP_MAP.get(m)
+        if not fn:
+            continue
+        try:
+            res = fn(query)
+            results[m] = res
+            log_lookup(current_user, m, query)
+        except Exception as e:
+            results[m] = {"error": str(e)}
+
+    return jsonify({
+        "query": query,
+        "detected": detected,
+        "mode": mode,
+        "modules_used": modules,
+        "results": results
+    })
+
 @app.route('/pricing')
 def pricing():
     plans_db = db.session.query(PlanConfig).all()

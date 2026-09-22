@@ -229,14 +229,14 @@ const SECTIONS={
     {i:'📤',t:'Exports',d:'PDF, JSON, CSV exports.',m:'reports'},
     {i:'🤝',t:'Shared',d:'Reports shared with your team.',m:'reports'}]},
   search:{title:'SEARCH',tag:'UNIVERSAL SEARCH',desc:'Search across every module with one query.',placeholder:'Enter anything...',lookup:'users',chips:['All','Auto-detect'],cards:[
-    {i:'✨',t:'Auto Detect',d:'Automatically pick best module.',m:'users'},
-    {i:'🔎',t:'Deep Search',d:'Multiple modules at once.',m:'users'},
-    {i:'⚡',t:'Fast Query',d:'Single module, instant result.',m:'users'},
-    {i:'📊',t:'Compare',d:'Cross-reference sources.',m:'users'}]}
+    {i:'✨',t:'Auto Detect',d:'Rileva il tipo e sceglie il modulo.',m:'auto'},
+    {i:'🔎',t:'Deep Search',d:'Cerca su tutti i moduli disponibili.',m:'deep'},
+    {i:'⚡',t:'Fast Query',d:'Un solo modulo, risultato istantaneo.',m:'fast'},
+    {i:'📊',t:'Compare',d:'Confronta email, phone e username.',m:'compare'}]}
 };
 let currentLookup='users';
 function renderChips(s){document.getElementById('chipsRow').innerHTML=SECTIONS[s].chips.map((c,i)=>`<button class="chip ${i===0?'active':''}">${c}</button>`).join('');}
-function renderCards(s){document.getElementById('modulesGrid').innerHTML=SECTIONS[s].cards.map(c=>`<div class="module-card" onclick="setLookup('${c.m}')"><div class="mc-icon">${c.i}</div><div class="mc-text"><h3>${c.t}</h3><p>${c.d}</p></div><div class="mc-arrow">›</div></div>`).join('');}
+function renderCards(s){document.getElementById('modulesGrid').innerHTML=SECTIONS[s].cards.map(c=>`<div class="module-card" onclick="handleCard('${c.m}','${c.t}')"><div class="mc-icon">${c.i}</div><div class="mc-text"><h3>${c.t}</h3><p>${c.d}</p></div><div class="mc-arrow">›</div></div>`).join('');}
 function changeSection(s){
   if(!SECTIONS[s])return;
   const cfg=SECTIONS[s];
@@ -255,6 +255,71 @@ function changeSection(s){
     setTimeout(()=>hero.classList.remove('fade-in'),450);
   },250);
 }
+function handleCard(mode, title){
+  if(mode==='auto'||mode==='deep'||mode==='fast'||mode==='compare'){
+    runMultiSearch(mode);
+  } else {
+    setLookup(mode);
+  }
+}
+
+async function runMultiSearch(mode){
+  const q=document.getElementById('query').value.trim();
+  if(!q){
+    document.getElementById('result').innerHTML='<p class="empty">Inserisci una query per usare '+mode+' search.</p>';
+    return;
+  }
+  const el=document.getElementById('result');
+  el.innerHTML='<p class="loading">🔎 '+mode.toUpperCase()+' search in corso...</p>';
+  const r=await fetch('/api/search-multi',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({query:q, mode:mode})});
+  const d=await r.json();
+  if(d.error){el.innerHTML='<div class="panel-error">⚠ '+d.error+'</div>';return;}
+  renderMulti(d);
+}
+
+function renderMulti(d){
+  const el=document.getElementById('result');
+  let html='<div class="results-header">'+d.mode.toUpperCase()+' · query <b>'+d.query+'</b> · tipo rilevato <b>'+d.detected+'</b></div>';
+  const mods=Object.keys(d.results);
+  if(!mods.length){
+    el.innerHTML=html+'<p class="empty">Nessun modulo eseguito.</p>';
+    return;
+  }
+  mods.forEach(m=>{
+    const res=d.results[m];
+    html+='<div class="sites-title">'+m.toUpperCase()+'</div>';
+    if(res.skipped){
+      html+='<div class="info-cell"><span class="info-key">Saltato</span><span class="info-val" style="color:#ff8080">'+res.error+'</span></div>';
+    } else if(res.error){
+      html+='<div class="info-cell"><span class="info-key">Errore</span><span class="info-val" style="color:#ff8080">'+res.error+'</span></div>';
+    } else {
+      const rows=[];
+      for(const k in res){
+        if(k==='sites_registered'||k==='profiles'||k==='found'||k==='sources'||k==='gravatar'||k==='github'||k==='breaches')continue;
+        if(res[k]===null||res[k]===undefined)continue;
+        const v=Array.isArray(res[k])?res[k].join(', '):String(res[k]);
+        if(v.length>80)continue;
+        rows.push([k,v]);
+      }
+      if(rows.length){
+        html+='<div class="info-grid">';
+        rows.slice(0,8).forEach(p=>{html+='<div class="info-cell"><span class="info-key">'+p[0]+'</span><span class="info-val">'+p[1]+'</span></div>';});
+        html+='</div>';
+      }
+      if(res.breaches&&res.breaches.length){
+        html+='<div class="info-cell"><span class="info-key">Breach</span><span class="info-val" style="color:#ff8080">'+res.breaches.length+' trovati</span></div>';
+      }
+      if(res.found&&res.found.length){
+        html+='<div class="sites-grid" style="margin-top:10px">';
+        res.found.slice(0,6).forEach(f=>{html+='<a class="site-card" href="'+f.url+'" target="_blank"><div class="site-icon">🌐</div><div class="site-name">'+f.site+'</div><div class="site-url">Apri →</div></a>';});
+        html+='</div>';
+      }
+    }
+  });
+  el.innerHTML=html;
+}
+
 function setLookup(t){currentLookup=t;document.getElementById('typeLabel').textContent=t;document.getElementById('result').innerHTML='<p class="empty">In attesa di una ricerca...</p>';}
 document.querySelectorAll('.s-item').forEach(el=>{el.addEventListener('click',()=>{document.querySelectorAll('.s-item').forEach(x=>x.classList.remove('active'));el.classList.add('active');changeSection(el.dataset.section);});});
 document.getElementById('chipsRow').addEventListener('click',e=>{if(!e.target.classList.contains('chip'))return;document.querySelectorAll('#chipsRow .chip').forEach(x=>x.classList.remove('active'));e.target.classList.add('active');});
