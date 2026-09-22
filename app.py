@@ -9,7 +9,9 @@ from dotenv import load_dotenv
 load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'nexora-secret')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///nexora.db'
+db_path = os.getenv('DB_PATH', os.path.join(os.path.dirname(__file__), 'instance', 'nexora.db'))
+os.makedirs(os.path.dirname(db_path), exist_ok=True)
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
