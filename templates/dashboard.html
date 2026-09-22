@@ -345,10 +345,35 @@ function renderResult(data){
   }
   if(data.number){
     var num=data.number.replace(/[^0-9]/g,'');
-    html+='<div class="sites-title">Verifica manuale app</div><div class="sites-grid">';
+
+    // Siti registrati (ignorant)
+    if(data.sites_registered && data.sites_registered.length && typeof data.sites_registered[0] === 'object'){
+      html+='<div class="sites-title">Account collegati ('+data.sites_registered.length+')</div><div class="sites-grid">';
+      data.sites_registered.forEach(function(s){
+        var ic = s.site.toLowerCase().includes('amazon')?'📦':s.site.toLowerCase().includes('instagram')?'📸':s.site.toLowerCase().includes('snapchat')?'👻':'🌐';
+        if(s.registered){
+          html+='<div class="site-card registered"><div class="site-icon">'+ic+'</div><div class="site-name">'+s.site+'</div><div class="site-url" style="color:#4ade80">✓ Registrato</div></div>';
+        } else {
+          html+='<div class="site-card"><div class="site-icon">'+ic+'</div><div class="site-name">'+s.site+'</div><div class="site-url" style="color:#666">✗ Non registrato</div></div>';
+        }
+      });
+      html+='</div>';
+    }
+
+    // Verifica manuale sui siti più comuni
+    html+='<div class="sites-title">Verifica manuale</div><div class="sites-grid">';
     html+='<a class="site-card" href="https://wa.me/'+num+'" target="_blank"><div class="site-icon">💬</div><div class="site-name">WhatsApp</div><div class="site-url">Apri chat →</div></a>';
     html+='<a class="site-card" href="https://t.me/+'+num+'" target="_blank"><div class="site-icon">✈</div><div class="site-name">Telegram</div><div class="site-url">Apri chat →</div></a>';
     html+='<a class="site-card" href="https://signal.me/#p/+'+num+'" target="_blank"><div class="site-icon">🔒</div><div class="site-name">Signal</div><div class="site-url">Apri chat →</div></a>';
+    html+='<a class="site-card" href="https://www.truecaller.com/search/it/'+num+'" target="_blank"><div class="site-icon">📞</div><div class="site-name">Truecaller</div><div class="site-url">Cerca nome →</div></a>';
+    html+='<a class="site-card" href="https://www.sync.me/app/999/'+num+'" target="_blank"><div class="site-icon">☁</div><div class="site-name">Sync.me</div><div class="site-url">Cerca nome →</div></a>';
+    html+='<a class="site-card" href="https://www.facebook.com/login/identify/?ctx=recover&phone='+num+'" target="_blank"><div class="site-icon">👥</div><div class="site-name">Facebook</div><div class="site-url">Verifica account →</div></a>';
+    html+='<a class="site-card" href="https://accounts.google.com/signin/recovery" target="_blank"><div class="site-icon">📧</div><div class="site-name">Google</div><div class="site-url">Verifica account →</div></a>';
+    html+='<a class="site-card" href="https://www.paypal.com/authflow/forgotpassword" target="_blank"><div class="site-icon">💳</div><div class="site-name">PayPal</div><div class="site-url">Verifica account →</div></a>';
+    html+='<a class="site-card" href="https://twitter.com/account/begin_password_reset" target="_blank"><div class="site-icon">🐦</div><div class="site-name">Twitter</div><div class="site-url">Verifica account →</div></a>';
+    html+='<a class="site-card" href="https://www.instagram.com/accounts/password/reset/" target="_blank"><div class="site-icon">📸</div><div class="site-name">Instagram</div><div class="site-url">Verifica account →</div></a>';
+    html+='<a class="site-card" href="https://www.tiktok.com/login/phone-or-email/forget-password" target="_blank"><div class="site-icon">🎵</div><div class="site-name">TikTok</div><div class="site-url">Verifica account →</div></a>';
+    html+='<a class="site-card" href="https://accounts.snapchat.com/accounts/password_reset" target="_blank"><div class="site-icon">👻</div><div class="site-name">Snapchat</div><div class="site-url">Verifica account →</div></a>';
     html+='</div>';
   }
   if(data.found&&data.found.length){
