@@ -67,6 +67,7 @@ def lookup_phone(number):
         p = phonenumbers.parse(number, None)
         if not phonenumbers.is_valid_number(p):
             return {"error": "Numero non valido"}
+
         result = {
             "number": number,
             "operator": carrier.name_for_number(p, "it") or "Sconosciuto",
@@ -77,10 +78,83 @@ def lookup_phone(number):
             "international": phonenumbers.format_number(p, phonenumbers.PhoneNumberFormat.INTERNATIONAL),
             "national": phonenumbers.format_number(p, phonenumbers.PhoneNumberFormat.NATIONAL),
             "e164": phonenumbers.format_number(p, phonenumbers.PhoneNumberFormat.E164),
-            "sites_registered": []
+            "carrier": carrier.name_for_number(p, "en") or "Unknown",
+            "sources": []
         }
-        # Ignorant disabilitato su Railway (dipendenze incompatibili)
-        pass
+
+        # Veriphone
+        vk = os.getenv("VERIPHONE_KEY", "")
+        if vk:
+            try:
+                r = requests.get(f"https://api.veriphone.io/v2/verify",
+                                 params={"phone": number, "key": vk}, timeout=10)
+                if r.status_code == 200:
+                    d = r.json()
+                    if d.get("status") == "success":
+                        result["carrier"] = d.get("carrier") or result.get("carrier")
+                        result["type"] = d.get("phone_type") or result.get("type")
+                        result["region"] = d.get("phone_region") or result.get("region")
+                        result["country_name"] = d.get("country")
+                        result["country_code"] = d.get("country_code")
+                        result["international"] = d.get("international_number") or result.get("international")
+                        result["local"] = d.get("local_number")
+                        result["e164"] = d.get("e164") or result.get("e164")
+                        result["sources"].append("veriphone")
+            except Exception as e:
+                result["veriphone_error"] = str(e)
+
+        # Abstract API
+        ak = os.getenv("ABSTRACT_KEY", "")
+        if ak:
+            try:
+                r = requests.get("https://phonevalidation.abstractapi.com/v1/",
+                                 params={"api_key": ak, "phone": number}, timeout=10)
+                if r.status_code == 200:
+                    d = r.json()
+                    if not d.get("error"):
+                        result["abstract_valid"] = d.get("valid")
+                        result["abstract_format_int"] = d.get("format", {}).get("international")
+                        result["abstract_format_local"] = d.get("format", {}).get("local")
+                        result["abstract_country"] = d.get("country", {}).get("name")
+                        result["abstract_country_code"] = d.get("country", {}).get("code")
+                        result["abstract_location"] = d.get("location")
+                        result["abstract_type"] = d.get("type")
+                        result["abstract_carrier"] = d.get("carrier")
+                        if d.get("location"): result["region"] = d.get("location")
+                        if d.get("carrier"): result["operator"] = d.get("carrier")
+                        result["sources"].append("abstract")
+            except Exception as e:
+                result["abstract_error"] = str(e)
+
+        # Numverify
+        nk = os.getenv("NUMVERIFY_KEY", "")
+        if nk:
+            try:
+                r = requests.get("http://apilayer.net/api/validate",
+                                 params={"access_key": nk, "number": number}, timeout=10)
+                if r.status_code == 200:
+                    d = r.json()
+                    if d.get("valid"):
+                        result["numverify_valid"] = d.get("valid")
+                        result["numverify_number"] = d.get("number")
+                        result["numverify_local"] = d.get("local_format")
+                        result["numverify_international"] = d.get("international_format")
+                        result["numverify_country_prefix"] = d.get("country_prefix")
+                        result["numverify_country_code"] = d.get("country_code")
+                        result["numverify_country_name"] = d.get("country_name")
+                        result["numverify_location"] = d.get("location")
+                        result["numverify_carrier"] = d.get("carrier")
+                        result["numverify_line_type"] = d.get("line_type")
+                        if d.get("carrier") and result.get("operator") == "Sconosciuto":
+                            result["operator"] = d.get("carrier")
+                        if d.get("location") and result.get("region") == "Sconosciuta":
+                            result["region"] = d.get("location")
+                        if d.get("line_type"): result["type"] = d.get("line_type").capitalize()
+                        result["sources"].append("numverify")
+            except Exception as e:
+                result["numverify_error"] = str(e)
+
+        result["sites_registered"] = []
         return result
     except Exception as e:
         return {"error": str(e)}

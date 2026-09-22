@@ -286,6 +286,10 @@ function renderResult(data){
   if(data.timezone)info.push(['Timezone',data.timezone.join(', ')]);
   if(data.international)info.push(['Intl',data.international]);
   if(data.e164)info.push(['E.164',data.e164]);
+  if(data.country_name)info.push(['Stato',data.country_name]);
+  if(data.local)info.push(['Locale',data.local]);
+  if(data.numverify_line_type)info.push(['Linea',data.numverify_line_type]);
+  if(data.abstract_valid!==undefined)info.push(['Valido',data.abstract_valid?'Sì':'No']);
   if(data.email)info.push(['Email',data.email]);
   if(data.reputation)info.push(['Reputazione',data.reputation]);
   if(data.suspicious!==undefined)info.push(['Sospetto',data.suspicious?'Sì':'No']);
