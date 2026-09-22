@@ -1,24 +1,40 @@
 <!DOCTYPE html>
-<html lang="it"><head><meta charset="UTF-8"><title>Pricing</title><link rel="stylesheet" href="/static/style.css"></head>
+<html lang="it">
+<head><meta charset="UTF-8"><title>Pricing — NEXORA</title>
+<link rel="stylesheet" href="/static/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
 <body>
-<nav class="topnav"><div class="brand"><div class="brand-icon">N</div><div class="brand-name">NEXORA</div></div>
-<div class="nav-actions"><a href="/dashboard" class="btn-ghost">Dashboard</a><a href="/logout" class="btn-ghost">Logout</a></div></nav>
+<nav class="topnav">
+  <div class="brand"><div class="brand-icon">N</div><div class="brand-name">NEXORA</div></div>
+  <div class="nav-actions"><a href="/dashboard" class="btn-ghost">Dashboard</a><a href="/logout" class="btn-ghost">Logout</a></div>
+</nav>
 <section class="pricing-hero">
   <h1>Choose your plan</h1>
+  <p style="color:#888;margin-bottom:40px">Unlock powerful OSINT modules. Cancel anytime.</p>
   <div class="plans-grid">
     {% for key, p in plans.items() %}
-    <div class="plan-card {% if key=='elite' %}featured{% endif %}">
-      {% if key=='elite' %}<div class="ribbon">POPULAR</div>{% endif %}
+    <div class="plan-card {% if p.popular %}featured{% endif %}">
+      {% if p.popular %}<div class="ribbon">POPULAR</div>{% endif %}
       <h3>{{ p.name }}</h3>
       <div><span class="amount">{{ p.price }}€</span><span class="per">/mese</span></div>
       <ul class="plan-features">
         <li>{{ p.daily_limit if p.daily_limit < 999999 else 'Illimitati' }} lookup/giorno</li>
         {% for m in p.modules %}<li>{{ m }}</li>{% endfor %}
       </ul>
-      {% if key=='free' %}<button disabled class="plan-btn">Free</button>
-      {% else %}<button class="plan-btn primary">Scegli {{ p.name }}</button>{% endif %}
+      {% if key == 'free' %}
+        <button disabled class="plan-btn">Free</button>
+      {% else %}
+        <button onclick="buy('{{ key }}')" class="plan-btn primary">Scegli {{ p.name }}</button>
+      {% endif %}
     </div>
     {% endfor %}
   </div>
 </section>
-</body></html>
+<script>
+function buy(plan){
+  alert('Stripe non ancora configurato. Contatta l\'admin per attivare il piano ' + plan + '.');
+}
+</script>
+</body>
+</html>

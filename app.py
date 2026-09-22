@@ -28,6 +28,15 @@ class User(UserMixin, db.Model):
     plan = db.Column(db.String(20), default='free')
     is_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+class PlanConfig(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(20), unique=True)
+    name = db.Column(db.String(50))
+    price = db.Column(db.Integer, default=0)
+    daily_limit = db.Column(db.Integer, default=5)
+    modules = db.Column(db.String(500), default="users,email,phone")
+    popular = db.Column(db.Boolean, default=False)
+
 class LookupLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -40,7 +49,7 @@ def check_lookup(user, ltype):
     if user.is_admin: return True, None
     plan = PLANS.get(user.plan, PLANS['free'])
     if ltype not in plan['modules']: return False, f"Modulo '{ltype}' non incluso."
-    since = datetime.utcnow() - timedelta(days=1)
+    since = datetime.utcnow() - timedelta(hours=30)
     count = db.session.query(LookupLog).filter(LookupLog.user_id == user.id, LookupLog.created_at >= since).count()
     if count >= plan['daily_limit']: return False, f"Limite ({plan['daily_limit']}) raggiunto."
     return True, None
@@ -184,8 +193,13 @@ def logout(): logout_user(); return redirect(url_for('index'))
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    plan = PLANS.get(current_user.plan, PLANS['free'])
-    since = datetime.utcnow() - timedelta(days=1)
+    plan_db = db.session.query(PlanConfig).filter_by(key=current_user.plan).first()
+    if plan_db:
+        plan = {"name":plan_db.name,"price":plan_db.price,"daily_limit":plan_db.daily_limit,
+                "modules":plan_db.modules.split(","),"popular":plan_db.popular}
+    else:
+        plan = PLANS.get(current_user.plan, PLANS['free'])
+    since = datetime.utcnow() - timedelta(hours=30)
     used = db.session.query(LookupLog).filter(LookupLog.user_id==current_user.id, LookupLog.created_at>=since).count()
     remaining = "∞" if current_user.is_admin else max(0, plan['daily_limit']-used)
     return render_template('dashboard.html', user=current_user, plan=plan, remaining=remaining, plans=PLANS)
@@ -202,7 +216,16 @@ def api_lookup():
     result = fn(query); log_lookup(current_user, ltype, query)
     return jsonify(result)
 @app.route('/pricing')
-def pricing(): return render_template('pricing.html', plans=PLANS)
+def pricing():
+    plans_db = db.session.query(PlanConfig).all()
+    if plans_db:
+        plans = {}
+        for p in plans_db:
+            plans[p.key] = {"name":p.name,"price":p.price,"daily_limit":p.daily_limit,
+                            "modules":p.modules.split(","),"popular":p.popular}
+    else:
+        plans = PLANS
+    return render_template('pricing.html', plans=plans)
 @app.route('/admin')
 @login_required
 def admin():
@@ -218,6 +241,15 @@ if __name__ == '__main__': app.run(debug=True, host='0.0.0.0', port=5000)
 os.makedirs('instance', exist_ok=True)
 with app.app_context():
     db.create_all()
+    for k, v in PLANS.items():
+        if not db.session.query(PlanConfig).filter_by(key=k).first():
+            db.session.add(PlanConfig(
+                key=k, name=v["name"], price=v["price"],
+                daily_limit=v["daily_limit"],
+                modules=",".join(v["modules"]),
+                popular=(k == "elite")
+            ))
+    db.session.commit()
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

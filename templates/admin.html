@@ -1,13 +1,69 @@
 <!DOCTYPE html>
-<html lang="it"><head><meta charset="UTF-8"><title>Admin</title><link rel="stylesheet" href="/static/style.css"></head>
-<body><nav class="topnav"><div class="brand"><div class="brand-icon">N</div><div class="brand-name">NEXORA</div></div>
-<div class="nav-actions"><a href="/dashboard" class="btn-ghost">Dashboard</a></div></nav>
-<section style="padding:60px 40px;max-width:1000px;margin:0 auto">
-  <h1>Admin</h1>
-  <h3 style="margin:20px 0 10px;color:#aaa">Utenti ({{ users|length }})</h3>
-  <pre style="background:#0a0b0e;padding:20px;border-radius:12px;color:#8ae68a">{% for u in users %}{{ u.id }} | {{ u.email }} | {{ u.plan }} | admin={{ u.is_admin }}
-{% endfor %}</pre>
-  <h3 style="margin:20px 0 10px;color:#aaa">Ultimi Lookup</h3>
-  <pre style="background:#0a0b0e;padding:20px;border-radius:12px;color:#8ae68a">{% for l in logs %}{{ l.created_at }} | {{ l.type }} | {{ l.query }}
-{% endfor %}</pre>
-</section></body></html>
+<html lang="it">
+<head><meta charset="UTF-8"><title>Admin — NEXORA</title>
+<link rel="stylesheet" href="/static/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="topnav">
+  <div class="brand"><div class="brand-icon">N</div><div class="brand-name">NEXORA</div></div>
+  <div class="nav-actions"><a href="/dashboard" class="btn-ghost">Dashboard</a><a href="/logout" class="btn-ghost">Logout</a></div>
+</nav>
+
+<section style="padding:40px;max-width:1200px;margin:0 auto">
+  <h1 style="font-size:36px;margin-bottom:8px">Admin Panel</h1>
+  <p style="color:#888;margin-bottom:40px">Gestisci utenti, prezzi e log.</p>
+
+  <h2 style="font-size:22px;margin-bottom:16px">💰 Piani e prezzi</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:40px">
+    {% for key, p in plans.items() %}
+    <form method="POST" action="/admin/plan/{{ key }}" style="background:#0a0b0e;border:1px solid #14161c;border-radius:14px;padding:20px">
+      <h3 style="color:#ff3b3b;font-size:14px;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px">{{ key }}</h3>
+      <label style="display:block;color:#666;font-size:11px;margin-bottom:4px">Nome</label>
+      <input name="name" value="{{ p.name }}" style="width:100%;background:#050608;border:1px solid #1a1c22;color:#fff;padding:8px 10px;border-radius:8px;margin-bottom:10px;outline:none">
+      <label style="display:block;color:#666;font-size:11px;margin-bottom:4px">Prezzo (€)</label>
+      <input name="price" type="number" value="{{ p.price }}" style="width:100%;background:#050608;border:1px solid #1a1c22;color:#fff;padding:8px 10px;border-radius:8px;margin-bottom:10px;outline:none">
+      <label style="display:block;color:#666;font-size:11px;margin-bottom:4px">Lookup/giorno</label>
+      <input name="daily_limit" type="number" value="{{ p.daily_limit }}" style="width:100%;background:#050608;border:1px solid #1a1c22;color:#fff;padding:8px 10px;border-radius:8px;margin-bottom:10px;outline:none">
+      <label style="display:block;color:#666;font-size:11px;margin-bottom:4px">Moduli (csv)</label>
+      <input name="modules" value="{{ p.modules|join(',') }}" style="width:100%;background:#050608;border:1px solid #1a1c22;color:#fff;padding:8px 10px;border-radius:8px;margin-bottom:10px;outline:none">
+      <label style="display:flex;gap:8px;align-items:center;color:#888;font-size:12px;margin-bottom:12px">
+        <input type="checkbox" name="popular" {% if p.popular %}checked{% endif %}> Evidenziato (POPULAR)
+      </label>
+      <button type="submit" style="width:100%;background:#ff3b3b;color:#fff;border:none;padding:10px;border-radius:8px;font-weight:600;cursor:pointer">Salva</button>
+    </form>
+    {% endfor %}
+  </div>
+
+  <h2 style="font-size:22px;margin-bottom:16px">👥 Utenti ({{ users|length }})</h2>
+  <div style="background:#0a0b0e;border:1px solid #14161c;border-radius:12px;padding:20px;overflow-x:auto;margin-bottom:40px">
+    <table style="width:100%;color:#ccc;font-size:13px">
+      <tr style="color:#666;text-align:left">
+        <th style="padding:8px">ID</th><th style="padding:8px">Email</th><th style="padding:8px">Piano</th><th style="padding:8px">Admin</th>
+      </tr>
+      {% for u in users %}
+      <tr style="border-top:1px solid #14161c">
+        <td style="padding:8px">{{ u.id }}</td>
+        <td style="padding:8px">{{ u.email }}</td>
+        <td style="padding:8px"><span style="color:#ff3b3b">{{ u.plan }}</span></td>
+        <td style="padding:8px">{{ '✓' if u.is_admin else '—' }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <h2 style="font-size:22px;margin-bottom:16px">📊 Ultimi Lookup</h2>
+  <div style="background:#0a0b0e;border:1px solid #14161c;border-radius:12px;padding:20px;max-height:400px;overflow:auto">
+    <table style="width:100%;color:#ccc;font-size:12px">
+      {% for l in logs %}
+      <tr style="border-top:1px solid #14161c">
+        <td style="padding:6px;color:#666">{{ l.created_at.strftime('%d/%m %H:%M') }}</td>
+        <td style="padding:6px;color:#ff3b3b">{{ l.type }}</td>
+        <td style="padding:6px">{{ l.query }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</section>
+</body>
+</html>
