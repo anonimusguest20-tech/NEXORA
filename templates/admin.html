@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="it"><head><meta charset="UTF-8"><title>Admin</title><link rel="stylesheet" href="/static/style.css"></head>
+<body><nav class="topnav"><div class="brand"><div class="brand-icon">N</div><div class="brand-name">NEXORA</div></div>
+<div class="nav-actions"><a href="/dashboard" class="btn-ghost">Dashboard</a></div></nav>
+<section style="padding:60px 40px;max-width:1000px;margin:0 auto">
+  <h1>Admin</h1>
+  <h3 style="margin:20px 0 10px;color:#aaa">Utenti ({{ users|length }})</h3>
+  <pre style="background:#0a0b0e;padding:20px;border-radius:12px;color:#8ae68a">{% for u in users %}{{ u.id }} | {{ u.email }} | {{ u.plan }} | admin={{ u.is_admin }}
+{% endfor %}</pre>
+  <h3 style="margin:20px 0 10px;color:#aaa">Ultimi Lookup</h3>
+  <pre style="background:#0a0b0e;padding:20px;border-radius:12px;color:#8ae68a">{% for l in logs %}{{ l.created_at }} | {{ l.type }} | {{ l.query }}
+{% endfor %}</pre>
+</section></body></html>

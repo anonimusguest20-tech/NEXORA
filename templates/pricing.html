@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="it"><head><meta charset="UTF-8"><title>Pricing</title><link rel="stylesheet" href="/static/style.css"></head>
+<body>
+<nav class="topnav"><div class="brand"><div class="brand-icon">N</div><div class="brand-name">NEXORA</div></div>
+<div class="nav-actions"><a href="/dashboard" class="btn-ghost">Dashboard</a><a href="/logout" class="btn-ghost">Logout</a></div></nav>
+<section class="pricing-hero">
+  <h1>Choose your plan</h1>
+  <div class="plans-grid">
+    {% for key, p in plans.items() %}
+    <div class="plan-card {% if key=='elite' %}featured{% endif %}">
+      {% if key=='elite' %}<div class="ribbon">POPULAR</div>{% endif %}
+      <h3>{{ p.name }}</h3>
+      <div><span class="amount">{{ p.price }}€</span><span class="per">/mese</span></div>
+      <ul class="plan-features">
+        <li>{{ p.daily_limit if p.daily_limit < 999999 else 'Illimitati' }} lookup/giorno</li>
+        {% for m in p.modules %}<li>{{ m }}</li>{% endfor %}
+      </ul>
+      {% if key=='free' %}<button disabled class="plan-btn">Free</button>
+      {% else %}<button class="plan-btn primary">Scegli {{ p.name }}</button>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+</body></html>

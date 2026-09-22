@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"><title>NEXORA</title>
+<link rel="stylesheet" href="/static/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body data-section="home">
+<div class="app-layout">
+  <aside class="side">
+    <div class="side-brand"><div class="brand-top">NEXORA</div><div class="brand-tag">SEARCH BEYOND SURFACE</div></div>
+    <nav class="side-nav">
+      <a class="s-item active" data-section="home">🏠 Home</a>
+      <a class="s-item" data-section="search">🔍 Search</a>
+      <p class="s-title">DATA</p>
+      <a class="s-item" data-section="people">👤 People</a>
+      <a class="s-item" data-section="users">👥 Users</a>
+      <a class="s-item" data-section="email">✉ Email</a>
+      <a class="s-item" data-section="phone">📞 Phone</a>
+      <a class="s-item" data-section="domains">🌐 Domains</a>
+      <a class="s-item" data-section="social">🔗 Social</a>
+      <a class="s-item" data-section="images">🖼 Images</a>
+      <a class="s-item" data-section="ip">📍 Locations</a>
+      <a class="s-item" data-section="breaches">💾 Data Breach</a>
+      <p class="s-title">TOOLS</p>
+      <a class="s-item" data-section="tools">🛠 Tools</a>
+      <a class="s-item" data-section="reports">📊 Reports</a>
+    </nav>
+    <div class="side-foot"><div class="sf-icon">🌐</div><div class="sf-text"><p class="sf-title">Open source</p><p class="sf-sub">Better internet. Safer people.</p></div></div>
+  </aside>
+
+  <main class="app-main">
+    <section class="hero" id="heroSection">
+      <div class="globe-wrap">
+        <div class="globe-canvas" id="globeCanvas"></div>
+        <div class="hero-center">
+          <h1 class="hero-title" id="heroTitle">NEXORA</h1>
+          <p class="hero-tag" id="heroTag">INTELLIGENCE FOR A MORE TRANSPARENT WEB</p>
+          <p class="hero-desc" id="heroDesc">Open source intelligence tools to search, analyze and connect information from across the web.</p>
+        </div>
+      </div>
+      <div class="quote-right">"Information<br>reveals patterns."</div>
+      <div class="search-main fade-elem">
+        <span class="search-ico">🔍</span>
+        <input id="query" placeholder="Search for a name, email, username, phone, domain, IP...">
+        <button onclick="doLookup()">→</button>
+      </div>
+      <div class="chips-hero fade-elem" id="chipsRow"></div>
+    </section>
+
+    <section class="modules-grid fade-elem" id="modulesGrid"></section>
+
+    <section class="stats-bar fade-elem">
+      <div class="stat"><div class="stat-icon">📚</div><div><div class="stat-num">300+</div><div class="stat-label">Data Sources</div></div></div>
+      <div class="stat"><div class="stat-icon">🌐</div><div><div class="stat-num">50+</div><div class="stat-label">OSINT Tools</div></div></div>
+      <div class="stat"><div class="stat-icon">⚡</div><div><div class="stat-num">Global</div><div class="stat-label">Faster Research</div></div></div>
+      <div class="stat stat-quote">Same information.<br>A more transparent world.<div class="line"></div></div>
+    </section>
+
+    <section class="result-area fade-elem">
+      <p class="current-type">Modulo attivo: <b id="typeLabel">users</b></p>
+      <div id="result" class="result-panel"><p class="empty">In attesa di una ricerca...</p></div>
+    </section>
+  </main>
+</div>
+
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script>
+(function initGlobe(){
+  const container = document.getElementById('globeCanvas');
+  if (!container || typeof THREE === 'undefined') return;
+  const width = 900, height = 560;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, width/height, 0.1, 1000);
+  camera.position.set(0, 0, 3.6);
+  const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(width, height);
+  renderer.setClearColor(0x000000, 0);
+  container.appendChild(renderer.domElement);
+  const globeGroup = new THREE.Group();
+  scene.add(globeGroup);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+  const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+  dir.position.set(5, 3, 5);
+  scene.add(dir);
+  const loader = new THREE.TextureLoader();
+  const earthTex = loader.load('https://unpkg.com/three-globe/example/img/earth-dark.jpg');
+  globeGroup.add(new THREE.Mesh(new THREE.SphereGeometry(1, 64, 64), new THREE.MeshPhongMaterial({
+    map: earthTex, color: 0x8aa4c8, emissive: 0x0a1828, emissiveIntensity: 0.4,
+    shininess: 5, transparent: true, opacity: 0.15
+  })));
+  globeGroup.add(new THREE.Mesh(new THREE.SphereGeometry(1.06, 48, 48),
+    new THREE.MeshBasicMaterial({color:0x2a6da8, transparent:true, opacity:0.08, side:THREE.BackSide})));
+  const cities = [
+    [40.71,-74.00],[51.50,-0.12],[35.68,139.69],[48.85,2.35],[-33.86,151.20],
+    [37.77,-122.41],[55.75,37.61],[-23.55,-46.63],[1.35,103.81],[25.20,55.27],
+    [19.07,72.87],[-6.20,106.84],[52.52,13.40],[-34.60,-58.38],[30.04,31.23],
+    [13.75,100.50],[-1.29,36.82],[19.43,-99.13],[28.61,77.21],[39.90,116.40]
+  ];
+  function latLonToVec3(lat, lon, r){
+    const phi=(90-lat)*Math.PI/180, theta=(lon+180)*Math.PI/180;
+    return new THREE.Vector3(-r*Math.sin(phi)*Math.cos(theta), r*Math.cos(phi), r*Math.sin(phi)*Math.sin(theta));
+  }
+  function makeArc(a,b){
+    const s=latLonToVec3(a[0],a[1],1.005), e=latLonToVec3(b[0],b[1],1.005);
+    const m=s.clone().add(e).multiplyScalar(0.5);
+    const d=s.distanceTo(e);
+    m.normalize().multiplyScalar(1+d*0.35);
+    return new THREE.QuadraticBezierCurve3(s,m,e);
+  }
+  const arcList = [];
+  for (let i=0;i<20;i++){
+    const a=cities[Math.floor(Math.random()*cities.length)];
+    const b=cities[Math.floor(Math.random()*cities.length)];
+    if(a===b){i--;continue;}
+    const curve=makeArc(a,b);
+    const pts=curve.getPoints(80);
+    const geo=new THREE.BufferGeometry().setFromPoints(pts);
+    const line=new THREE.Line(geo, new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0.15}));
+    globeGroup.add(line);
+    const dot=new THREE.Mesh(new THREE.SphereGeometry(0.012,8,8), new THREE.MeshBasicMaterial({color:0xffffff, transparent:true}));
+    globeGroup.add(dot);
+    arcList.push({curve,dot,line,t:Math.random(),speed:0.0015+Math.random()*0.003});
+  }
+  let isDragging=false, prevX=0, prevY=0, targetRotX=0.15, targetRotY=0;
+  globeGroup.rotation.x=0.15;
+  function onDown(e){isDragging=true;const p=e.touches?e.touches[0]:e;prevX=p.clientX;prevY=p.clientY;renderer.domElement.style.cursor='grabbing';}
+  function onMove(e){
+    if(!isDragging)return;
+    const p=e.touches?e.touches[0]:e;
+    targetRotY+=(p.clientX-prevX)*0.005;
+    targetRotX+=(p.clientY-prevY)*0.005;
+    targetRotX=Math.max(-0.9,Math.min(0.9,targetRotX));
+    prevX=p.clientX;prevY=p.clientY;
+    if(e.cancelable)e.preventDefault();
+  }
+  function onUp(){isDragging=false;renderer.domElement.style.cursor='grab';}
+  renderer.domElement.style.cursor='grab';
+  renderer.domElement.addEventListener('mousedown',onDown);
+  window.addEventListener('mousemove',onMove);
+  window.addEventListener('mouseup',onUp);
+  renderer.domElement.addEventListener('touchstart',onDown,{passive:false});
+  window.addEventListener('touchmove',onMove,{passive:false});
+  window.addEventListener('touchend',onUp);
+  let t=0;
+  function animate(){
+    requestAnimationFrame(animate);
+    t+=0.016;
+    if(!isDragging) targetRotY += 0.0025;
+    globeGroup.rotation.y += (targetRotY-globeGroup.rotation.y)*0.08;
+    globeGroup.rotation.x += (targetRotX-globeGroup.rotation.x)*0.08;
+    arcList.forEach(a=>{
+      a.t+=a.speed; if(a.t>1)a.t=0;
+      const p=a.curve.getPoint(a.t);
+      a.dot.position.copy(p);
+      const fade=Math.sin(a.t*Math.PI);
+      a.dot.material.opacity=0.15+0.85*fade;
+      a.line.material.opacity=0.05+0.25*fade;
+    });
+    renderer.render(scene,camera);
+  }
+  animate();
+})();
+
+const SECTIONS={
+  home:{title:'NEXORA',tag:'INTELLIGENCE FOR A MORE TRANSPARENT WEB',desc:'Open source intelligence tools to search, analyze and connect information from across the web.',placeholder:'Search for a name, email, username, phone, domain, IP...',lookup:'users',chips:['All','People','Usernames','Email','Phone','Domains','Images'],cards:[
+    {i:'👤',t:'People Search',d:'Find and link public information about individuals.',m:'users'},
+    {i:'✉',t:'Email Lookup',d:'Discover accounts, leaks and related data.',m:'email'},
+    {i:'📞',t:'Phone Lookup',d:'Track phone numbers and related profiles.',m:'phone'},
+    {i:'@',t:'Username Search',d:'Find profiles across social networks and platforms.',m:'users'},
+    {i:'🌐',t:'Domain & IP',d:'Analyze domains, IPs and infrastructure.',m:'domains'},
+    {i:'🖼',t:'Image Search',d:'Find similar images and online matches.',m:'images'},
+    {i:'💾',t:'Data Breaches',d:'Search exposed data from public sources.',m:'breaches'},
+    {i:'🔗',t:'Social Intelligence',d:'Map connections and online activity.',m:'social'}]},
+  email:{title:'EMAIL',tag:'EMAIL INTELLIGENCE',desc:'Discover linked accounts, data breaches and reputation of an email address.',placeholder:'Enter an email (e.g. user@example.com)...',lookup:'email',chips:['All','Accounts','Breaches','Reputation'],cards:[
+    {i:'🔗',t:'Linked Accounts',d:'Find services registered with this email.',m:'email'},
+    {i:'💾',t:'Breaches',d:'Check if the email appeared in data leaks.',m:'breaches'},
+    {i:'⭐',t:'Reputation',d:'Assess trust and suspicious indicators.',m:'email'},
+    {i:'🌐',t:'Domain Info',d:'Analyze the email domain MX records.',m:'domains'}]},
+  phone:{title:'PHONE',tag:'PHONE NUMBER INTELLIGENCE',desc:'Track phone numbers, carrier details, region and related accounts.',placeholder:'Enter a phone number (e.g. +393501234567)...',lookup:'phone',chips:['All','Carrier','Region','Accounts'],cards:[
+    {i:'📡',t:'Carrier',d:'Identify the mobile operator.',m:'phone'},
+    {i:'📍',t:'Region',d:'Geographic location of the number.',m:'phone'},
+    {i:'🔗',t:'Linked Accounts',d:'Find services using this number.',m:'phone'},
+    {i:'💬',t:'Messaging Apps',d:'WhatsApp, Telegram, Signal presence.',m:'phone'}]},
+  users:{title:'USERS',tag:'USERNAME INTELLIGENCE',desc:'Search a username across dozens of social networks and platforms.',placeholder:'Enter a username (e.g. johndoe)...',lookup:'users',chips:['All','Social','Gaming','Dev','Media'],cards:[
+    {i:'💬',t:'Social Networks',d:'Twitter, Instagram, Facebook, TikTok.',m:'users'},
+    {i:'🎮',t:'Gaming',d:'Steam, Twitch, Discord, Roblox.',m:'users'},
+    {i:'💻',t:'Developer',d:'GitHub, GitLab, Stack Overflow.',m:'users'},
+    {i:'🎬',t:'Media',d:'YouTube, Vimeo, Pinterest.',m:'users'}]},
+  people:{title:'PEOPLE',tag:'SEARCH FOR INDIVIDUALS',desc:'Find and link public information about individuals across the web.',placeholder:'Enter full name, username or email...',lookup:'users',chips:['All','Names','Usernames','Emails','Phones'],cards:[
+    {i:'👤',t:'Full Name',d:'Search across public records.',m:'users'},
+    {i:'🔑',t:'Username',d:'Find profiles across social networks.',m:'users'},
+    {i:'✉',t:'Email',d:'Discover linked accounts.',m:'email'},
+    {i:'📞',t:'Phone',d:'Track related profiles.',m:'phone'}]},
+  domains:{title:'DOMAINS',tag:'DOMAIN & DNS INTELLIGENCE',desc:'Analyze domains, subdomains, DNS records and infrastructure.',placeholder:'Enter a domain (e.g. example.com)...',lookup:'domains',chips:['All','DNS','WHOIS','Subdomains'],cards:[
+    {i:'📋',t:'DNS Records',d:'A, AAAA, MX, TXT, CNAME lookup.',m:'domains'},
+    {i:'📝',t:'WHOIS',d:'Registration and ownership data.',m:'domains'},
+    {i:'🌳',t:'Subdomains',d:'Enumerate subdomains of the target.',m:'domains'},
+    {i:'🛡',t:'Security',d:'SSL, headers and vulnerabilities.',m:'domains'}]},
+  social:{title:'SOCIAL',tag:'SOCIAL INTELLIGENCE',desc:'Map social connections, followers and online activity.',placeholder:'Enter a username or profile URL...',lookup:'social',chips:['All','Twitter','Instagram','TikTok','LinkedIn'],cards:[
+    {i:'🐦',t:'Twitter/X',d:'Analyze tweets, followers and mentions.',m:'social'},
+    {i:'📸',t:'Instagram',d:'Public posts and mutual connections.',m:'social'},
+    {i:'🎵',t:'TikTok',d:'Videos and engagement analysis.',m:'social'},
+    {i:'💼',t:'LinkedIn',d:'Professional network mapping.',m:'social'}]},
+  images:{title:'IMAGES',tag:'REVERSE IMAGE SEARCH',desc:'Find similar images and matches across the web.',placeholder:'Enter an image URL...',lookup:'images',chips:['All','Reverse','Faces','EXIF'],cards:[
+    {i:'🔍',t:'Reverse Search',d:'Find where an image appears online.',m:'images'},
+    {i:'👤',t:'Face Match',d:'Search faces across databases.',m:'images'},
+    {i:'📷',t:'EXIF Data',d:'Extract metadata from images.',m:'images'},
+    {i:'🌍',t:'Geolocation',d:'Estimate location from photo.',m:'images'}]},
+  ip:{title:'LOCATIONS',tag:'IP GEOLOCATION',desc:'Locate IP addresses, servers and network infrastructure.',placeholder:'Enter an IP address (e.g. 8.8.8.8)...',lookup:'ip',chips:['All','IPv4','IPv6','ASN'],cards:[
+    {i:'🗺',t:'GeoIP',d:'Country, city, coordinates.',m:'ip'},
+    {i:'🏢',t:'ASN',d:'Autonomous System and ISP.',m:'ip'},
+    {i:'🔌',t:'Port Scan',d:'Open ports and services.',m:'ip'},
+    {i:'🚨',t:'Threat Intel',d:'Malicious activity reports.',m:'ip'}]},
+  breaches:{title:'DATA BREACH',tag:'BREACH INTELLIGENCE',desc:'Search exposed data from public breaches and leaks.',placeholder:'Enter an email or phone...',lookup:'breaches',chips:['All','Emails','Phones','Passwords'],cards:[
+    {i:'📧',t:'Email Breaches',d:'Check exposed accounts.',m:'breaches'},
+    {i:'🔐',t:'Passwords',d:'Search leaked credentials.',m:'breaches'},
+    {i:'📞',t:'Phone Leaks',d:'Numbers in public dumps.',m:'breaches'},
+    {i:'🆔',t:'Identity Leaks',d:'Names, addresses, IDs.',m:'breaches'}]},
+  tools:{title:'TOOLS',tag:'UTILITIES & HELPERS',desc:'Extra utilities to enhance your OSINT workflow.',placeholder:'Search a tool...',lookup:'users',chips:['All','Encoding','Hashing','Network'],cards:[
+    {i:'🔢',t:'Hash Generator',d:'MD5, SHA1, SHA256.',m:'tools'},
+    {i:'📡',t:'Ping / Traceroute',d:'Network diagnostics.',m:'tools'},
+    {i:'🔐',t:'Base64',d:'Encode and decode strings.',m:'tools'},
+    {i:'🌐',t:'URL Expander',d:'Expand shortened URLs.',m:'tools'}]},
+  reports:{title:'REPORTS',tag:'INVESTIGATION REPORTS',desc:'Generate and export detailed OSINT reports.',placeholder:'Search a report...',lookup:'users',chips:['All','Recent','Exported','Shared'],cards:[
+    {i:'📄',t:'New Report',d:'Start a new investigation.',m:'reports'},
+    {i:'📂',t:'My Reports',d:'Access your saved reports.',m:'reports'},
+    {i:'📤',t:'Exports',d:'PDF, JSON, CSV exports.',m:'reports'},
+    {i:'🤝',t:'Shared',d:'Reports shared with your team.',m:'reports'}]},
+  search:{title:'SEARCH',tag:'UNIVERSAL SEARCH',desc:'Search across every module with one query.',placeholder:'Enter anything...',lookup:'users',chips:['All','Auto-detect'],cards:[
+    {i:'✨',t:'Auto Detect',d:'Automatically pick best module.',m:'users'},
+    {i:'🔎',t:'Deep Search',d:'Multiple modules at once.',m:'users'},
+    {i:'⚡',t:'Fast Query',d:'Single module, instant result.',m:'users'},
+    {i:'📊',t:'Compare',d:'Cross-reference sources.',m:'users'}]}
+};
+let currentLookup='users';
+function renderChips(s){document.getElementById('chipsRow').innerHTML=SECTIONS[s].chips.map((c,i)=>`<button class="chip ${i===0?'active':''}">${c}</button>`).join('');}
+function renderCards(s){document.getElementById('modulesGrid').innerHTML=SECTIONS[s].cards.map(c=>`<div class="module-card" onclick="setLookup('${c.m}')"><div class="mc-icon">${c.i}</div><div class="mc-text"><h3>${c.t}</h3><p>${c.d}</p></div><div class="mc-arrow">›</div></div>`).join('');}
+function changeSection(s){
+  if(!SECTIONS[s])return;
+  const cfg=SECTIONS[s];
+  document.body.setAttribute('data-section',s);
+  const hero=document.getElementById('heroSection');
+  hero.classList.add('fade-out');
+  setTimeout(()=>{
+    document.getElementById('heroTitle').textContent=cfg.title;
+    document.getElementById('heroTag').textContent=cfg.tag;
+    document.getElementById('heroDesc').textContent=cfg.desc;
+    document.getElementById('query').placeholder=cfg.placeholder;
+    currentLookup=cfg.lookup;
+    document.getElementById('typeLabel').textContent=cfg.lookup;
+    renderChips(s); renderCards(s);
+    hero.classList.remove('fade-out'); hero.classList.add('fade-in');
+    setTimeout(()=>hero.classList.remove('fade-in'),450);
+  },250);
+}
+function setLookup(t){currentLookup=t;document.getElementById('typeLabel').textContent=t;document.getElementById('result').innerHTML='<p class="empty">In attesa di una ricerca...</p>';}
+document.querySelectorAll('.s-item').forEach(el=>{el.addEventListener('click',()=>{document.querySelectorAll('.s-item').forEach(x=>x.classList.remove('active'));el.classList.add('active');changeSection(el.dataset.section);});});
+document.getElementById('chipsRow').addEventListener('click',e=>{if(!e.target.classList.contains('chip'))return;document.querySelectorAll('#chipsRow .chip').forEach(x=>x.classList.remove('active'));e.target.classList.add('active');});
+
+async function doLookup(){
+  const q=document.getElementById('query').value.trim();
+  if(!q)return;
+  const el=document.getElementById('result');
+  el.innerHTML='<p class="loading">🔎 Ricerca in corso...</p>';
+  const r=await fetch('/api/lookup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:currentLookup,query:q})});
+  const d=await r.json();
+  if(d.upgrade){
+    el.innerHTML='<div class="upgrade-msg">'+d.error+'<br><br><a href="/pricing">Vai ai piani →</a></div>';
+    return;
+  }
+  renderResult(d);
+}
+
+function renderResult(data){
+  const el=document.getElementById('result');
+  if(data.error){el.innerHTML='<div class="panel-error">⚠ '+data.error+'</div>';return;}
+  let html='<div class="results-header">Risultati per <b>'+(data.number||data.email||data.username||'query')+'</b></div>';
+  const info=[];
+  if(data.number)info.push(['Numero',data.number]);
+  if(data.operator)info.push(['Operatore',data.operator]);
+  if(data.region)info.push(['Regione',data.region]);
+  if(data.country)info.push(['Paese',data.country]);
+  if(data.type)info.push(['Tipo',data.type]);
+  if(data.timezone)info.push(['Timezone',data.timezone.join(', ')]);
+  if(data.international)info.push(['Intl',data.international]);
+  if(data.e164)info.push(['E.164',data.e164]);
+  if(data.email)info.push(['Email',data.email]);
+  if(data.reputation)info.push(['Reputazione',data.reputation]);
+  if(data.suspicious!==undefined)info.push(['Sospetto',data.suspicious?'Sì':'No']);
+  if(data.domain)info.push(['Dominio',data.domain]);
+  if(data.mx_records)info.push(['MX records',data.mx_records]);
+  if(data.ip)info.push(['IP',data.ip]);
+  if(data.city)info.push(['Città',data.city]);
+  if(data.isp)info.push(['ISP',data.isp]);
+  if(info.length){
+    html+='<div class="info-grid">';
+    info.forEach(p=>{html+='<div class="info-cell"><span class="info-key">'+p[0]+'</span><span class="info-val">'+p[1]+'</span></div>';});
+    html+='</div>';
+  }
+  if(data.gravatar){
+    const g=data.gravatar;
+    html+='<div class="sites-title">👤 Profilo Gravatar</div><div class="sites-grid">';
+    if(g.profileUrl)html+='<a class="site-card" href="'+g.profileUrl+'" target="_blank"><div class="site-icon">🖼</div><div class="site-name">'+(g.displayName||g.username||'profilo')+'</div><div class="site-url">Apri profilo →</div></a>';
+    (g.accounts||[]).forEach(a=>{html+='<a class="site-card" href="'+a.url+'" target="_blank"><div class="site-icon">🔗</div><div class="site-name">'+a.shortname+'</div><div class="site-url">'+a.username+'</div></a>';});
+    html+='</div>';
+  }
+  if(data.github&&data.github.length){
+    html+='<div class="sites-title">🐙 GitHub</div><div class="sites-grid">';
+    data.github.forEach(u=>{html+='<a class="site-card" href="'+u.url+'" target="_blank"><div class="site-icon">🐙</div><div class="site-name">@'+u.login+'</div><div class="site-url">Apri profilo →</div></a>';});
+    html+='</div>';
+  }
+  var deepLinks={'firefox.com':'https://accounts.firefox.com/','office365.com':'https://login.microsoftonline.com/','replit.com':'https://replit.com/account','spotify.com':'https://www.spotify.com/account/overview/','github.com':'https://github.com/settings/profile','twitter.com':'https://twitter.com/account/begin_password_reset','instagram.com':'https://www.instagram.com/accounts/password/reset/','reddit.com':'https://www.reddit.com/password','tiktok.com':'https://www.tiktok.com/login/email/forget-password','twitch.tv':'https://www.twitch.tv/password_reset','pinterest.com':'https://www.pinterest.com/password/reset/','discord.com':'https://discord.com/login','adobe.com':'https://auth.services.adobe.com/en_US/forgotpassword.html','amazon.com':'https://www.amazon.com/ap/forgotpassword','amazon.it':'https://www.amazon.it/ap/forgotpassword','linkedin.com':'https://www.linkedin.com/checkpoint/rp/request-password-reset','yahoo.com':'https://login.yahoo.com/forgot','tumblr.com':'https://www.tumblr.com/forgot_password','snapchat.com':'https://accounts.snapchat.com/accounts/password_reset','facebook.com':'https://www.facebook.com/login/identify','netflix.com':'https://www.netflix.com/LoginHelp','dropbox.com':'https://www.dropbox.com/forgot_password'};
+  var icons={'firefox.com':'🦊','office365.com':'📧','replit.com':'💻','spotify.com':'🎵','github.com':'🐙','twitter.com':'🐦','instagram.com':'📸','reddit.com':'👽','tiktok.com':'🎵','twitch.tv':'🎮','pinterest.com':'📌','discord.com':'💬','adobe.com':'🎨','amazon.com':'📦','amazon.it':'📦','linkedin.com':'💼','yahoo.com':'💌','tumblr.com':'📓','snapchat.com':'👻','facebook.com':'👥','netflix.com':'🎬'};
+  if(data.sites_registered&&data.sites_registered.length){
+    html+='<div class="sites-title">Account collegati ('+data.sites_registered.length+')</div><div class="sites-grid">';
+    data.sites_registered.forEach(s=>{
+      var isPhone = s.hasOwnProperty('registered');
+      if(isPhone){
+        var icon=s.site.toLowerCase().includes('amazon')?'📦':s.site.toLowerCase().includes('instagram')?'📸':s.site.toLowerCase().includes('snapchat')?'👻':'🌐';
+        if(s.registered){html+='<div class="site-card registered"><div class="site-icon">'+icon+'</div><div class="site-name">'+s.site+'</div><div class="site-url" style="color:#4ade80">✓ Registrato</div></div>';}
+        else{html+='<div class="site-card"><div class="site-icon">'+icon+'</div><div class="site-name">'+s.site+'</div><div class="site-url" style="color:#666">✗ Non registrato</div></div>';}
+      } else {
+        var name=s.replace(/\.(com|org|tv|net|social|io|it|fr|de)$/,'');
+        var ic=icons[s]||'🌐';
+        var url=deepLinks[s]||('https://'+s+'/login');
+        html+='<a class="site-card" href="'+url+'" target="_blank"><div class="site-icon">'+ic+'</div><div class="site-name">'+name+'</div><div class="site-url">Verifica →</div></a>';
+      }
+    });
+    html+='</div>';
+  }
+  if(data.number){
+    var num=data.number.replace(/[^0-9]/g,'');
+    html+='<div class="sites-title">Verifica manuale app</div><div class="sites-grid">';
+    html+='<a class="site-card" href="https://wa.me/'+num+'" target="_blank"><div class="site-icon">💬</div><div class="site-name">WhatsApp</div><div class="site-url">Apri chat →</div></a>';
+    html+='<a class="site-card" href="https://t.me/+'+num+'" target="_blank"><div class="site-icon">✈</div><div class="site-name">Telegram</div><div class="site-url">Apri chat →</div></a>';
+    html+='<a class="site-card" href="https://signal.me/#p/+'+num+'" target="_blank"><div class="site-icon">🔒</div><div class="site-name">Signal</div><div class="site-url">Apri chat →</div></a>';
+    html+='</div>';
+  }
+  if(data.found&&data.found.length){
+    html+='<div class="sites-title">Profili trovati ('+data.found.length+')</div><div class="sites-grid">';
+    data.found.forEach(f=>{html+='<a class="site-card" href="'+f.url+'" target="_blank"><div class="site-icon">🌐</div><div class="site-name">'+f.site+'</div><div class="site-url">Apri →</div></a>';});
+    html+='</div>';
+  }
+  if(data.breaches&&data.breaches.length){
+    html+='<div class="sites-title">💾 Violazioni ('+data.breaches.length+')</div><div class="sites-grid">';
+    data.breaches.forEach(b=>{html+='<div class="site-card breach"><div class="site-icon">💾</div><div class="site-name">'+b+'</div></div>';});
+    html+='</div>';
+  } else if(data.breaches&&data.breaches.length===0){
+    html+='<div class="info-cell" style="margin-top:16px"><span class="info-key">Breach</span><span class="info-val" style="color:#4ade80">Nessuna violazione ✓</span></div>';
+  }
+  el.innerHTML=html;
+}
+
+document.getElementById('query').addEventListener('keydown',e=>{if(e.key==='Enter')doLookup();});
+renderChips('home');renderCards('home');
+</script>
+</body>
+</html>
