@@ -315,6 +315,7 @@ function renderResult(data){
   var icons={'firefox.com':'🦊','office365.com':'📧','replit.com':'💻','spotify.com':'🎵','github.com':'🐙','twitter.com':'🐦','instagram.com':'📸','reddit.com':'👽','tiktok.com':'🎵','twitch.tv':'🎮','pinterest.com':'📌','discord.com':'💬','adobe.com':'🎨','amazon.com':'📦','amazon.it':'📦','linkedin.com':'💼','yahoo.com':'💌','tumblr.com':'📓','snapchat.com':'👻','facebook.com':'👥','netflix.com':'🎬'};
   if(data.sites_registered&&data.sites_registered.length){
     html+='<div class="sites-title">Account collegati ('+data.sites_registered.length+')</div><div class="sites-grid">';
+    var email = data.email || '';
     data.sites_registered.forEach(s=>{
       var isPhone = s.hasOwnProperty('registered');
       if(isPhone){
@@ -325,7 +326,15 @@ function renderResult(data){
         var name=s.replace(/\.(com|org|tv|net|social|io|it|fr|de)$/,'');
         var ic=icons[s]||'🌐';
         var url=deepLinks[s]||('https://'+s+'/login');
-        html+='<a class="site-card" href="'+url+'" target="_blank"><div class="site-icon">'+ic+'</div><div class="site-name">'+name+'</div><div class="site-url">Verifica →</div></a>';
+        // Aggiungi il parametro email dove possibile
+        var emailParam = '';
+        if(s==='twitter.com')emailParam='?email='+encodeURIComponent(email);
+        else if(s==='instagram.com')emailParam='?email='+encodeURIComponent(email);
+        else if(s==='pinterest.com')emailParam='?email='+encodeURIComponent(email);
+        else if(s==='tumblr.com')emailParam='?email='+encodeURIComponent(email);
+        else if(s==='linkedin.com')emailParam='&email='+encodeURIComponent(email);
+        var fullUrl = url + emailParam;
+        html+='<a class="site-card" href="'+fullUrl+'" target="_blank"><div class="site-icon">'+ic+'</div><div class="site-name">'+name+'</div><div class="site-url">Verifica email →</div></a>';
       }
     });
     html+='</div>';
