@@ -39,6 +39,11 @@ class PlanConfig(db.Model):
     modules = db.Column(db.String(500), default="users,email,phone")
     popular = db.Column(db.Boolean, default=False)
 
+class SiteContent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(100), unique=True)
+    value = db.Column(db.Text, default="")
+
 class LookupLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -241,6 +246,17 @@ if __name__ == '__main__': app.run(debug=True, host='0.0.0.0', port=5000)
 
 
 os.makedirs('instance', exist_ok=True)
+DEFAULT_CONTENT = {
+    'hero_title': 'NEXORA',
+    'hero_tag': 'INTELLIGENCE FOR A MORE TRANSPARENT WEB',
+    'hero_desc': 'Open source intelligence tools to search, analyze and connect information from across the web.',
+    'home_quote': 'Information reveals patterns.',
+    'stat1_num': '300+', 'stat1_label': 'Data Sources',
+    'stat2_num': '50+', 'stat2_label': 'OSINT Tools',
+    'stat3_num': 'Global', 'stat3_label': 'Faster Research',
+    'stat4_text': 'Same information. A more transparent world.',
+}
+
 with app.app_context():
     db.create_all()
     for k, v in PLANS.items():
@@ -251,6 +267,10 @@ with app.app_context():
                 modules=",".join(v["modules"]),
                 popular=(k == "elite")
             ))
+    db.session.commit()
+    for k, v in DEFAULT_CONTENT.items():
+        if not db.session.query(SiteContent).filter_by(key=k).first():
+            db.session.add(SiteContent(key=k, value=v))
     db.session.commit()
 
 if __name__ == '__main__':
