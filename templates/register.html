@@ -1,15 +1,59 @@
 <!DOCTYPE html>
-<html lang="it"><head><meta charset="UTF-8"><title>Register — NEXORA</title>
-<link rel="stylesheet" href="/static/style.css"></head>
-<body class="auth">
-<form method="POST" class="auth-form">
-  <div class="brand-icon big">N</div>
-  <h2>Crea il tuo account</h2>
-  {% with m = get_flashed_messages() %}{% if m %}<p style="color:#ff3b3b">{{ m[0] }}</p>{% endif %}{% endwith %}
-  <input name="email" type="email" placeholder="Email" required autofocus>
-  <input name="username" type="text" placeholder="Username (3-20 caratteri)" minlength="3" maxlength="20" required>
-  <input name="password" type="password" placeholder="Password" minlength="6" required>
-  <button type="submit">Registrati</button>
-  <p>Hai già un account? <a href="/login">Accedi</a></p>
-</form>
-</body></html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"><title>Registrati — NEXORA</title>
+<link rel="stylesheet" href="/static/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+
+<div class="auth-left">
+  <div class="auth-brand">
+    <div class="auth-logo">
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="ngrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#e8eef5"/>
+            <stop offset="100%" stop-color="#7a8896"/>
+          </linearGradient>
+        </defs>
+        <circle cx="100" cy="100" r="88" fill="none" stroke="#1a1d24" stroke-width="0.5"/>
+        <circle cx="100" cy="100" r="88" fill="none" stroke="#2a2f3a" stroke-width="0.3" stroke-dasharray="2 4"/>
+        <path d="M55 140 L55 60 L145 140 L145 60" 
+              fill="none" stroke="url(#ngrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="55" cy="60" r="4" fill="#fff" opacity="0.6"/>
+        <circle cx="145" cy="140" r="4" fill="#fff" opacity="0.6"/>
+        <ellipse cx="100" cy="100" rx="100" ry="30" fill="none" stroke="#1f242c" stroke-width="0.4" transform="rotate(-20 100 100)"/>
+      </svg>
+    </div>
+    <h1 class="auth-wordmark">NEXORA</h1>
+    <p class="auth-tagline">SEARCH BEYOND SURFACE</p>
+    <p class="auth-desc">Crea il tuo account in 10 secondi.</p>
+  </div>
+  <div class="auth-foot">
+    <div class="auth-stats">
+      <div><b>300+</b><span>Data Sources</span></div>
+      <div><b>50+</b><span>OSINT Tools</span></div>
+      <div><b>24/7</b><span>Global Access</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="auth-right">
+  <form method="POST" class="auth-box">
+    <h2>Inizia ora</h2>
+    <p class="auth-sub">Crea il tuo account NEXORA</p>
+    {% with m = get_flashed_messages() %}{% if m %}<div class="auth-error">{{ m[0] }}</div>{% endif %}{% endwith %}
+    <label class="auth-label">Email</label>
+    <input name="email" type="email" placeholder="nome@esempio.com" required autofocus>
+    <label class="auth-label">Username</label>
+    <input name="username" type="text" placeholder="il_tuo_username" minlength="3" maxlength="20" required>
+    <label class="auth-label">Password</label>
+    <input name="password" type="password" placeholder="Minimo 6 caratteri" minlength="6" required>
+    <button type="submit" class="auth-btn">Crea account →</button>
+    <p class="auth-bottom">Hai già un account? <a href="/login">Accedi</a></p>
+  </form>
+</div>
+
+</body>
+</html>

@@ -287,3 +287,253 @@ body[data-section="home"] .planet-label { opacity:1; }
   color: #fff;
   text-shadow: 0 0 18px rgba(255,255,255,0.8);
 }
+
+/* Fix allineamento etichette pianeta */
+.planet-label {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.planet-label .label-line {
+  height: 1px;
+  width: 70px;
+  background: linear-gradient(90deg, rgba(200,220,255,0.6), rgba(200,220,255,0));
+  margin: 0 8px;
+}
+.planet-label .label-text {
+  white-space: nowrap;
+  color: #c8d4e0;
+}
+.planet-label .label-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 8px #fff;
+  animation: labelPulse 2s ease-in-out infinite;
+}
+
+/* Etichette SINISTRA: testo → linea → punto (verso destra, verso globo) */
+.lab-left-1, .lab-left-2, .lab-left-3, .lab-left-4 {
+  /* già corretto di default */
+}
+
+/* Etichette DESTRA: devono avere linea e punto che vanno verso il globo (a sinistra) */
+.lab-right-1, .lab-right-2, .lab-right-3, .lab-right-4 {
+  flex-direction: row-reverse;
+}
+.lab-right-1 .label-line, .lab-right-2 .label-line,
+.lab-right-3 .label-line, .lab-right-4 .label-line {
+  background: linear-gradient(270deg, rgba(200,220,255,0.6), rgba(200,220,255,0));
+  margin: 0 8px;
+}
+
+/* AUTH PAGE - Stile NEXORA */
+.auth-page {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  background: #050608;
+  font-family: 'Inter', sans-serif;
+}
+@media (max-width: 900px) {
+  .auth-page { grid-template-columns: 1fr; }
+  .auth-left { display: none !important; }
+}
+
+.auth-left {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 60px 50px;
+  background: radial-gradient(circle at 30% 40%, #0a0d14 0%, #050608 60%);
+  border-right: 1px solid #0f1115;
+  overflow: hidden;
+}
+.auth-left::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.03), transparent 40%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 30px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 30px);
+  pointer-events: none;
+}
+
+.auth-brand {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  margin: auto 0;
+}
+.auth-logo {
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 30px;
+  filter: drop-shadow(0 0 40px rgba(200,220,255,0.15));
+  animation: authLogoFloat 6s ease-in-out infinite;
+}
+.auth-logo svg { width: 100%; height: 100%; }
+@keyframes authLogoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.auth-wordmark {
+  font-size: 52px;
+  font-weight: 900;
+  letter-spacing: 14px;
+  background: linear-gradient(180deg, #fff 0%, #7a8896 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 14px;
+  text-align: center;
+}
+.auth-tagline {
+  font-size: 11px;
+  letter-spacing: 6px;
+  color: #555;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.auth-desc {
+  font-size: 14px;
+  color: #666;
+  max-width: 340px;
+  margin: 0 auto;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.auth-foot {
+  position: relative;
+  z-index: 2;
+}
+.auth-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  padding-top: 30px;
+  border-top: 1px solid #0f1115;
+}
+.auth-stats div { text-align: center; }
+.auth-stats b {
+  display: block;
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.auth-stats span {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #555;
+  text-transform: uppercase;
+}
+
+.auth-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.auth-box {
+  width: 100%;
+  max-width: 380px;
+}
+.auth-box h2 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 6px;
+  letter-spacing: -0.5px;
+}
+.auth-sub {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 34px;
+}
+.auth-label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #666;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  margin-top: 18px;
+  font-weight: 600;
+}
+.auth-box input {
+  width: 100%;
+  background: #0a0b0e;
+  border: 1px solid #14161c;
+  color: #fff;
+  padding: 14px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.auth-box input:focus {
+  border-color: #c8d4e0;
+  background: #0e0f14;
+  box-shadow: 0 0 0 3px rgba(200,212,224,0.08);
+}
+.auth-box input::placeholder { color: #444; }
+
+.auth-btn {
+  width: 100%;
+  background: linear-gradient(180deg, #fff 0%, #d8dfe8 100%);
+  color: #000;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 28px;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.auth-btn:hover {
+  background: linear-gradient(180deg, #fff 0%, #fff 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(255,255,255,0.15);
+}
+.auth-btn:active { transform: translateY(0); }
+
+.auth-error {
+  background: rgba(255, 60, 60, 0.08);
+  border: 1px solid rgba(255, 60, 60, 0.3);
+  color: #ff8080;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.auth-bottom {
+  text-align: center;
+  margin-top: 24px;
+  color: #666;
+  font-size: 13px;
+}
+.auth-bottom a {
+  color: #fff;
+  text-decoration: none;
+  border-bottom: 1px solid #333;
+  padding-bottom: 2px;
+  transition: border-color 0.2s;
+}
+.auth-bottom a:hover {
+  border-color: #fff;
+}
+
+/* Override eventuali stili .auth vecchi */
+body.auth { all: unset; }
