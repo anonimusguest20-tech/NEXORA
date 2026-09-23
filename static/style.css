@@ -319,14 +319,8 @@ body[data-section="home"] .planet-label { opacity:1; }
 }
 
 /* Etichette DESTRA: devono avere linea e punto che vanno verso il globo (a sinistra) */
-.lab-right-1, .lab-right-2, .lab-right-3, .lab-right-4 {
-  flex-direction: row-reverse;
-}
-.lab-right-1 .label-line, .lab-right-2 .label-line,
-.lab-right-3 .label-line, .lab-right-4 .label-line {
-  background: linear-gradient(270deg, rgba(200,220,255,0.6), rgba(200,220,255,0));
-  margin: 0 8px;
-}
+
+
 
 /* AUTH PAGE - Stile NEXORA */
 .auth-page {
@@ -537,3 +531,9 @@ body[data-section="home"] .planet-label { opacity:1; }
 
 /* Override eventuali stili .auth vecchi */
 body.auth { all: unset; }
+
+/* Etichette destra: punto a sinistra (verso globo), linea verso testo */
+.lab-right-1 .label-line, .lab-right-2 .label-line,
+.lab-right-3 .label-line, .lab-right-4 .label-line {
+  background: linear-gradient(90deg, rgba(200,220,255,0.7), rgba(200,220,255,0)) !important;
+}
