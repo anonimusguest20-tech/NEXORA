@@ -651,6 +651,21 @@ DEFAULT_CONTENT = {
 
 with app.app_context():
     db.create_all()
+    # AUTO MIGRATION - aggiunge colonne mancanti
+    from sqlalchemy import text, inspect
+    try:
+        insp = inspect(db.engine)
+        cols = [c['name'] for c in insp.get_columns('user')]
+        with db.engine.connect() as conn:
+            if 'username' not in cols:
+                conn.execute(text("ALTER TABLE user ADD COLUMN username VARCHAR(40)"))
+            if 'verified' not in cols:
+                conn.execute(text("ALTER TABLE user ADD COLUMN verified BOOLEAN DEFAULT 1"))
+            if 'device_id' not in cols:
+                conn.execute(text("ALTER TABLE user ADD COLUMN device_id VARCHAR(64)"))
+            conn.commit()
+    except Exception as e:
+        print("Migration:", e)
     for k, v in PLANS.items():
         if not db.session.query(PlanConfig).filter_by(key=k).first():
             db.session.add(PlanConfig(
