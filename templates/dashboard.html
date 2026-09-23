@@ -26,6 +26,7 @@
       <a class="s-item" data-section="social"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></span> Social</a>
       <a class="s-item" data-section="images"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></span> Images</a>
       <a class="s-item" data-section="ip"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-6 8-13a8 8 0 1 0-16 0c0 7 8 13 8 13z"/><circle cx="12" cy="9" r="3"/></svg></span> Locations</a>
+      <a class="s-item" data-section="discord"><span class="s-ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.4A19.8 19.8 0 0 0 15.4 3l-.3.5c1.7.4 2.5 1 3.3 1.6a13.5 13.5 0 0 0-12.8 0c.8-.6 1.7-1.2 3.3-1.6L8.6 3A19.8 19.8 0 0 0 3.7 4.4C.4 9.5-.6 14.5.1 19.4a19.9 19.9 0 0 0 6.1 3l1.3-2c-.7-.3-1.4-.6-2-1l.5-.4a14 14 0 0 0 12 0l.5.4c-.6.4-1.3.7-2 1l1.3 2a19.9 19.9 0 0 0 6.1-3c.8-5.7-.8-10.6-3.6-15zM8.5 15.5c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2zm7 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2z"/></svg></span> Discord</a>
       <a class="s-item" data-section="breaches"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v6c0 1.7 4 3 9 3s9-1.3 9-3V5M3 11v6c0 1.7 4 3 9 3s9-1.3 9-3v-6"/></svg></span> Data Breach</a>
 
       <p class="s-title">TOOLS</p>
@@ -220,6 +221,11 @@ const SECTIONS={
     {i:'🏢',t:'ASN',d:'Autonomous System and ISP.',m:'ip'},
     {i:'🔌',t:'Port Scan',d:'Open ports and services.',m:'ip'},
     {i:'🚨',t:'Threat Intel',d:'Malicious activity reports.',m:'ip'}]},
+  discord:{title:'DISCORD',tag:'DISCORD ID INTELLIGENCE',desc:'Estrai tutte le informazioni pubbliche da un ID Discord.',placeholder:'Inserisci un Discord ID (es. 123456789012345678)...',lookup:'discord',chips:['All','User','Badges','Guilds'],cards:[
+    {i:'👤',t:'User Info',d:'Username, avatar, banner, colore.',m:'discord'},
+    {i:'🎂',t:'Account Age',d:'Data di creazione account.',m:'discord'},
+    {i:'🏅',t:'Badges',d:'Emblemi e flags pubbliche.',m:'discord'},
+    {i:'🏠',t:'Mutual Guilds',d:'Server in comune col bot.',m:'discord'}]},
   breaches:{title:'DATA BREACH',tag:'BREACH INTELLIGENCE',desc:'Search exposed data from public breaches and leaks.',placeholder:'Enter an email or phone...',lookup:'breaches',chips:['All','Emails','Phones','Passwords'],cards:[
     {i:'📧',t:'Email Breaches',d:'Check exposed accounts.',m:'breaches'},
     {i:'🔐',t:'Passwords',d:'Search leaked credentials.',m:'breaches'},
@@ -296,6 +302,68 @@ async function runMultiSearch(mode){
 function renderResult(data){
   const el=document.getElementById('result');
   if(data.error){el.innerHTML='<div class="panel-error">⚠ '+data.error+'</div>';return;}
+
+    if(data.user_id){
+    let html='<div class="results-header">Discord ID: <b>'+data.user_id+'</b></div>';
+
+    // Avatar + Banner
+    html+='<div style="display:flex;gap:20px;justify-content:center;align-items:center;flex-wrap:wrap;margin:20px 0">';
+    if(data.avatar_url){
+      html+='<div style="text-align:center"><div class="sites-title" style="margin:0 0 10px">Avatar</div><img src="'+data.avatar_url+'" style="width:128px;height:128px;border-radius:50%;border:2px solid '+(data.accent_hex||'#1a1c22')+'"></div>';
+    }
+    if(data.banner_url){
+      html+='<div style="text-align:center"><div class="sites-title" style="margin:0 0 10px">Banner</div><img src="'+data.banner_url+'" style="max-width:400px;height:128px;border-radius:12px;border:1px solid '+(data.accent_hex||'#1a1c22')+';object-fit:cover"></div>';
+    }
+    html+='</div>';
+
+    // Info base
+    const info=[];
+    if(data.username)info.push(['Username',data.username]);
+    if(data.global_name)info.push(['Display Name',data.global_name]);
+    if(data.discriminator&&data.discriminator!=='0')info.push(['Tag','#'+data.discriminator]);
+    if(data.bot)info.push(['Bot','Sì']);
+    if(data.system)info.push(['System','Sì']);
+    if(data.account_created)info.push(['Creato il',data.account_created]);
+    if(data.account_age_years)info.push(['Età',data.account_age_years+' anni ('+data.account_age_days+' giorni)']);
+    if(data.unix_timestamp)info.push(['Unix',data.unix_timestamp]);
+    if(data.accent_hex)info.push(['Accent',data.accent_hex]);
+    if(info.length){html+='<div class="info-grid">';info.forEach(p=>{html+='<div class="info-cell"><span class="info-key">'+p[0]+'</span><span class="info-val">'+p[1]+'</span></div>';});html+='</div>';}
+
+    // Link profilo
+    html+='<div style="text-align:center;margin:20px 0"><a href="'+data.profile_url+'" target="_blank" style="background:#5865f2;color:#fff;padding:12px 24px;border-radius:999px;text-decoration:none;font-weight:600">Apri profilo Discord →</a></div>';
+
+    // Badges
+    if(data.badges&&data.badges.length){
+      html+='<div class="sites-title">🏅 Badges ('+data.badges.length+')</div><div class="sites-grid">';
+      data.badges.forEach(b=>{html+='<div class="site-card"><div class="site-icon">🏅</div><div class="site-name">'+b+'</div></div>';});
+      html+='</div>';
+    } else {
+      html+='<div class="sites-title">🏅 Badges</div><div class="info-cell"><span class="info-key">Badges</span><span class="info-val" style="color:#666">Nessuna badge pubblica (o bot non in server comune)</span></div>';
+    }
+
+    // Server in comune
+    if(data.mutual_guilds&&data.mutual_guilds.length){
+      html+='<div class="sites-title">🏠 Server in comune ('+data.mutual_guilds.length+')</div><div class="sites-grid">';
+      data.mutual_guilds.forEach(g=>{
+        html+='<div class="site-card" style="text-align:left;align-items:flex-start">';
+        html+='<div style="font-weight:600;color:#fff;font-size:13px;margin-bottom:6px">🏠 '+g.name+'</div>';
+        if(g.nick)html+='<div style="font-size:11px;color:#888;margin-bottom:4px">Nickname: '+g.nick+'</div>';
+        if(g.roles&&g.roles.length)html+='<div style="font-size:11px;color:#888;margin-bottom:4px">Ruoli: '+g.roles.length+'</div>';
+        if(g.joined_at)html+='<div style="font-size:11px;color:#888">Entrato: '+new Date(g.joined_at).toLocaleDateString()+'</div>';
+        if(g.premium_since)html+='<div style="font-size:11px;color:#ffd700">⭐ Booster dal '+new Date(g.premium_since).toLocaleDateString()+'</div>';
+        html+='</div>';
+      });
+      html+='</div>';
+    } else {
+      html+='<div class="sites-title">🏠 Server in comune</div><div class="info-cell"><span class="info-key">Server</span><span class="info-val" style="color:#666">Nessuno (invita il bot in un tuo server)</span></div>';
+    }
+
+    // Nota
+    html+='<div class="info-cell" style="margin-top:24px"><span class="info-key">⚠ Nota</span><span class="info-val" style="color:#888;font-size:12px">Email, telefono, IP e connessioni non sono accessibili da bot token (solo user token, contro i ToS).</span></div>';
+
+    document.getElementById('result').innerHTML = html;
+    return;
+  }
   let html='<div class="results-header">Risultati per <b>'+(data.email||data.number||data.username||data.query||'query')+'</b></div>';
   const info=[];
   if(data.email)info.push(['Email',data.email]);

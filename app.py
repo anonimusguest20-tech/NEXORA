@@ -19,9 +19,9 @@ login_manager.login_view = 'login'
 ADMIN_EMAILS = ['admin@nexora.local', 'amico@nexora.local']
 PLANS = {
     'free':     {'name':'Free',     'price':0,   'daily_limit':5,      'modules':['users','email','phone']},
-    'pro':      {'name':'Pro',      'price':20,  'daily_limit':10,     'modules':['users','email','phone','domains','social']},
-    'elite':    {'name':'Elite',    'price':50,  'daily_limit':50,     'modules':['users','email','phone','domains','social','ip','breaches','images']},
-    'ultimate': {'name':'Ultimate', 'price':100, 'daily_limit':999999, 'modules':['users','email','phone','domains','social','ip','breaches','images']},
+    'pro':      {'name':'Pro',      'price':20,  'daily_limit':10,     'modules':['users','email','phone','domains','social','discord']},
+    'elite':    {'name':'Elite',    'price':50,  'daily_limit':50,     'modules':['users','email','phone','domains','social','ip','breaches','images','discord']},
+    'ultimate': {'name':'Ultimate', 'price':100, 'daily_limit':999999, 'modules':['users','email','phone','domains','social','ip','breaches','images','discord']},
 }
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -347,9 +347,126 @@ def lookup_breaches(query):
     return result
 
 
-LOOKUP_MAP = {'phone':lookup_phone,'email':lookup_email,'ip':lookup_ip,'username':lookup_username,
-              'users':lookup_username,'domains':lookup_domain,'social':lookup_username,
-              'breaches':lookup_breaches,'images':lookup_username}
+def lookup_discord(user_id):
+    token = os.getenv("DISCORD_BOT_TOKEN", "")
+    if not token:
+        return {"error": "DISCORD_BOT_TOKEN non configurato"}
+    headers = {"Authorization": f"Bot {token}"}
+    result = {"user_id": user_id, "sources": []}
+
+    # Dati base utente
+    try:
+        r = requests.get(f"https://discord.com/api/v9/users/{user_id}", headers=headers, timeout=10)
+        if r.status_code == 404:
+            return {"error": "Utente non trovato."}
+        if r.status_code == 401:
+            return {"error": "Token Discord non valido."}
+        if r.status_code != 200:
+            return {"error": f"API Discord errore {r.status_code}"}
+        d = r.json()
+        result["username"] = d.get("username")
+        result["global_name"] = d.get("global_name")
+        result["discriminator"] = d.get("discriminator")
+        result["bot"] = d.get("bot", False)
+        result["system"] = d.get("system", False)
+        if d.get("avatar"):
+            ext = "gif" if d["avatar"].startswith("a_") else "png"
+            result["avatar_url"] = f"https://cdn.discordapp.com/avatars/{user_id}/{d['avatar']}.{ext}?size=1024"
+            result["avatar_animated"] = d["avatar"].startswith("a_")
+        result["profile_url"] = f"https://discord.com/users/{user_id}"
+        result["sources"].append("discord-api")
+    except Exception as e:
+        return {"error": f"Errore: {str(e)}"}
+
+    # Server in comune + dati completi dal member object
+    try:
+        rg = requests.get("https://discord.com/api/v9/users/@me/guilds", headers=headers, timeout=10)
+        if rg.status_code == 200:
+            mutual = []
+            full_data_taken = False
+            for g in rg.json()[:50]:
+                gm = requests.get(f"https://discord.com/api/v9/guilds/{g['id']}/members/{user_id}",
+                                  headers=headers, timeout=5)
+                if gm.status_code == 200:
+                    m = gm.json()
+                    u = m.get("user", {})
+                    entry = {
+                        "name": g["name"],
+                        "id": g["id"],
+                        "nick": m.get("nick"),
+                        "roles": m.get("roles", []),
+                        "joined_at": m.get("joined_at"),
+                        "premium_since": m.get("premium_since"),
+                        "deaf": m.get("deaf", False),
+                        "mute": m.get("mute", False),
+                        "flags": m.get("flags", 0),
+                    }
+                    # Avatar per-server
+                    if m.get("avatar"):
+                        ext = "gif" if m["avatar"].startswith("a_") else "png"
+                        entry["guild_avatar"] = f"https://cdn.discordapp.com/guilds/{g['id']}/users/{user_id}/avatars/{m['avatar']}.{ext}?size=256"
+                    mutual.append(entry)
+
+                    # Salva dati completi solo una volta (banner, accent, badges)
+                    if not full_data_taken:
+                        if u.get("banner"):
+                            ext = "gif" if u["banner"].startswith("a_") else "png"
+                            result["banner_url"] = f"https://cdn.discordapp.com/banners/{user_id}/{u['banner']}.{ext}?size=1024"
+                        if "accent_color" in u and u["accent_color"] is not None:
+                            result["accent_color"] = u["accent_color"]
+                            result["accent_hex"] = "#{:06x}".format(u["accent_color"])
+                        if "public_flags" in u:
+                            result["public_flags"] = u.get("public_flags", 0)
+                        full_data_taken = True
+            result["mutual_guilds"] = mutual
+            if full_data_taken:
+                result["sources"].append("guild-member")
+    except Exception:
+        pass
+
+    # Data creazione account
+    try:
+        ts = ((int(user_id) >> 22) + 1420070400000) / 1000
+        import datetime
+        created = datetime.datetime.utcfromtimestamp(ts)
+        result["account_created"] = created.strftime("%d/%m/%Y %H:%M:%S UTC")
+        age_days = (datetime.datetime.utcnow() - created).days
+        result["account_age_days"] = age_days
+        result["account_age_years"] = round(age_days / 365, 1)
+        result["account_age_months"] = round(age_days / 30, 1)
+        result["unix_timestamp"] = int(ts)
+    except Exception:
+        pass
+
+    # Badges
+    flag_map = {
+        1 << 0: "Discord Employee", 1 << 1: "Partnered Server Owner",
+        1 << 2: "HypeSquad Events", 1 << 3: "Bug Hunter Level 1",
+        1 << 6: "HypeSquad Bravery", 1 << 7: "HypeSquad Brilliance",
+        1 << 8: "HypeSquad Balance", 1 << 9: "Early Supporter",
+        1 << 14: "Bug Hunter Level 2", 1 << 16: "Verified Bot",
+        1 << 17: "Early Verified Bot Developer", 1 << 18: "Moderator Programs Alumni",
+        1 << 19: "Discord Certified Moderator", 1 << 22: "Active Developer",
+    }
+    badges = []
+    flags = result.get("public_flags", 0)
+    for bit, name in flag_map.items():
+        if flags & bit:
+            badges.append(name)
+    result["badges"] = badges
+    result["raw_flags"] = flags
+
+    return result
+
+
+LOOKUP_MAP = {
+    'phone': lookup_phone, 'email': lookup_email, 'ip': lookup_ip,
+    'username': lookup_username, 'users': lookup_username,
+    'domains': lookup_domain, 'social': lookup_username,
+    'breaches': lookup_breaches, 'images': lookup_username,
+    'discord': lookup_discord
+}
+
 @app.route('/')
 def index(): return render_template('index.html')
 @app.route('/register', methods=['GET','POST'])
@@ -398,7 +515,6 @@ def api_lookup():
     if not query: return jsonify({"error":"Query vuota"}), 400
     ok, msg = check_lookup(current_user, ltype)
     if not ok: return jsonify({"error":msg,"upgrade":True}), 403
-    fn = LOOKUP_MAP.get(ltype)
     if not fn: return jsonify({"error":"Tipo non valido"}), 400
     result = fn(query); log_lookup(current_user, ltype, query)
     return jsonify(result)
@@ -442,7 +558,6 @@ def api_search_multi():
         if not ok:
             results[m] = {"error": msg, "skipped": True}
             continue
-        fn = LOOKUP_MAP.get(m)
         if not fn:
             continue
         try:
