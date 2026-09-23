@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"><title>Piani — NEXORA</title>
+<link rel="stylesheet" href="/static/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="topnav">
+  <div class="brand">
+    <div class="brand-icon">N</div>
+    <div><div class="brand-name">NEXORA</div><div class="brand-sub">SEARCH BEYOND SURFACE</div></div>
+  </div>
+  <div class="nav-actions">
+    <a href="/dashboard" class="btn-ghost">Dashboard</a>
+    <a href="/logout" class="btn-ghost">Logout</a>
+  </div>
+</nav>
+
+<section class="pricing-page">
+  <div class="pricing-head">
+    <h1>Scegli il tuo piano</h1>
+    <p>Sblocca il potere completo di NEXORA</p>
+  </div>
+
+  <div class="pricing-cards">
+    <div class="p-card">
+      <div class="p-name">STARTER</div>
+      <div class="p-price"><span class="p-euro">€</span>10<span class="p-per">/mese</span></div>
+      <ul class="p-list">
+        <li>10 lookup al giorno</li>
+        <li>Email + Phone + Users</li>
+        <li>Esportazione JSON</li>
+      </ul>
+      <button class="p-btn" onclick="buy('starter')">Scegli Starter</button>
+    </div>
+
+    <div class="p-card">
+      <div class="p-name">BASIC</div>
+      <div class="p-price"><span class="p-euro">€</span>25<span class="p-per">/mese</span></div>
+      <ul class="p-list">
+        <li>25 lookup al giorno</li>
+        <li>Tutti i moduli base</li>
+        <li>Esportazione CSV + JSON</li>
+      </ul>
+      <button class="p-btn" onclick="buy('basic')">Scegli Basic</button>
+    </div>
+
+    <div class="p-card featured">
+      <div class="p-badge">POPOLARE</div>
+      <div class="p-name">PRO</div>
+      <div class="p-price"><span class="p-euro">€</span>50<span class="p-per">/mese</span></div>
+      <ul class="p-list">
+        <li>50 lookup al giorno</li>
+        <li>Domains + Social + IP</li>
+        <li>Data Breach access</li>
+        <li>Supporto email</li>
+      </ul>
+      <button class="p-btn primary" onclick="buy('pro')">Scegli Pro</button>
+    </div>
+
+    <div class="p-card">
+      <div class="p-name">ELITE</div>
+      <div class="p-price"><span class="p-euro">€</span>100<span class="p-per">/mese</span></div>
+      <ul class="p-list">
+        <li>100 lookup al giorno</li>
+        <li>Tutti i moduli</li>
+        <li>Image Search + Breach esteso</li>
+        <li>Supporto prioritario</li>
+      </ul>
+      <button class="p-btn" onclick="buy('elite')">Scegli Elite</button>
+    </div>
+
+    <div class="p-card ultimate">
+      <div class="p-badge gold">∞</div>
+      <div class="p-name">ULTIMATE</div>
+      <div class="p-price"><span class="p-euro">€</span>200<span class="p-per">/mese</span></div>
+      <ul class="p-list">
+        <li>Lookup illimitati</li>
+        <li>Tutto di Elite</li>
+        <li>API illimitata</li>
+        <li>Server Discord privato</li>
+        <li>Supporto 24/7</li>
+      </ul>
+      <button class="p-btn gold" onclick="buy('ultimate')">Scegli Ultimate</button>
+    </div>
+  </div>
+</section>
+
+<script>
+function buy(plan){
+  fetch('/api/checkout/'+plan,{method:'POST'}).then(r=>r.json()).then(d=>{
+    if(d.url)window.location.href=d.url;
+    else alert('Stripe non configurato. Contatta admin.');
+  });
+}
+</script>
+</body>
+</html>

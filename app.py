@@ -460,6 +460,11 @@ def api_search_multi():
         "results": results
     })
 
+@app.route('/piani')
+@login_required
+def piani():
+    return render_template('piani.html')
+
 @app.route('/pricing')
 def pricing():
     plans_db = db.session.query(PlanConfig).all()
@@ -480,7 +485,7 @@ def admin():
     return render_template('admin.html', users=users, logs=logs)
 os.makedirs('instance', exist_ok=True)
 with app.app_context(): db.create_all()
-if __name__ == '__main__': app.run(debug=True, host='0.0.0.0', port=5000)
+if __name__ == '__main__': app.run(debug=False, host='0.0.0.0', port=5000, threaded=False, use_reloader=False)
 
 
 os.makedirs('instance', exist_ok=True)
@@ -513,4 +518,4 @@ with app.app_context():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(debug=False, host='0.0.0.0', port=port)
+    app.run(debug=False, host='0.0.0.0', port=port, threaded=False, use_reloader=False)
