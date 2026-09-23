@@ -289,13 +289,62 @@ def lookup_username(username):
 def lookup_domain(d):
     try: return requests.get(f"https://dns.google/resolve?name={d}&type=A", timeout=10).json()
     except Exception as e: return {"error":str(e)}
-def lookup_breaches(email):
-    return {
-        "email": email,
-        "breaches": [],
-        "note": "Servizio breach disabilitato. HIBP, LeakCheck e Firefox Monitor ora richiedono API key a pagamento. Visita https://haveibeenpwned.com manualmente.",
-        "manual_link": f"https://haveibeenpwned.com/account/{email}"
-    }
+def lookup_breaches(query):
+    result = {"query": query, "breaches": [], "breach_details": [], "sources": []}
+
+    # XposedOrNot (email + password)
+    try:
+        r = requests.get(f"https://api.xposedornot.com/v1/check-email/{query}", timeout=15)
+        if r.status_code == 200:
+            d = r.json()
+            if d.get("status") == "success":
+                raw = d.get("breaches", [])
+                flat = []
+                for item in raw:
+                    if isinstance(item, list):
+                        flat.extend(item)
+                    else:
+                        flat.append(item)
+                result["breaches"] = flat
+                result["sources"].append("xposedornot")
+        elif r.status_code == 404:
+            pass
+        elif r.status_code == 429:
+            result["note"] = "Rate limit, riprova tra poco"
+    except Exception as e:
+        result["xon_error"] = str(e)
+
+    # Dettagli extra da XposedOrNot
+    if result["breaches"]:
+        try:
+            r2 = requests.get("https://api.xposedornot.com/v1/breach-analytics",
+                              params={"email": query}, timeout=15)
+            if r2.status_code == 200:
+                d2 = r2.json()
+                result["breach_details"] = d2.get("Breaches_Details", [])
+        except Exception:
+            pass
+
+    # Hudson Rock (infostealer, funziona anche con telefoni)
+    try:
+        r3 = requests.get(f"https://cavalier.hudsonrock.com/api/json/v2/osint-tools/search-by-username",
+                          params={"username": query}, timeout=15)
+        if r3.status_code == 200:
+            d3 = r3.json()
+            if d3.get("data"):
+                result["hudsonrock"] = []
+                for item in d3["data"][:10]:
+                    result["hudsonrock"].append({
+                        "stealer": item.get("stealer_family"),
+                        "computer": item.get("computer_name"),
+                        "ip": item.get("ip"),
+                        "date": item.get("date_compromised")
+                    })
+                result["sources"].append("hudsonrock")
+    except Exception:
+        pass
+
+    return result
 
 
 LOOKUP_MAP = {'phone':lookup_phone,'email':lookup_email,'ip':lookup_ip,'username':lookup_username,

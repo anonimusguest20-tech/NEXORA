@@ -163,7 +163,24 @@
   animate();
 })();
 
-const SECTIONS={
+const ICONS = {
+  'users':      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>',
+  'email':      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
+  'phone':      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 17v3a2 2 0 0 1-2.2 2 19 19 0 0 1-8.6-3.1 19 19 0 0 1-5.8-5.8A19 19 0 0 1 2.3 4.4 2 2 0 0 1 4.3 2h3a2 2 0 0 1 2 1.7 12 12 0 0 0 .7 2.6 2 2 0 0 1-.5 2.1L8.4 9.5a16 16 0 0 0 6 6l1.1-1.1a2 2 0 0 1 2.1-.5 12 12 0 0 0 2.6.7A2 2 0 0 1 22 17z"/></svg>',
+  'domains':    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>',
+  'social':     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>',
+  'images':     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>',
+  'breaches':   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v6c0 1.7 4 3 9 3s9-1.3 9-3V5M3 11v6c0 1.7 4 3 9 3s9-1.3 9-3v-6"/></svg>',
+  'ip':         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-6 8-13a8 8 0 1 0-16 0c0 7 8 13 8 13z"/><circle cx="12" cy="9" r="3"/></svg>',
+  'tools':      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 6.3a4 4 0 0 1-5.6 5.6l-6 6a2 2 0 0 0 2.8 2.8l6-6a4 4 0 0 1 5.6-5.6l-3 3"/></svg>',
+  'reports':    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>',
+  'auto':       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8z"/></svg>',
+  'deep':       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>',
+  'fast':       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h8l-1 8 10-12h-8z"/></svg>',
+  'compare':    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 20V10M10 20V4M16 20v-8M22 20V8"/></svg>'
+};
+
+const SECTIONS = {
   home:{title:'NEXORA',tag:'INTELLIGENCE FOR A MORE TRANSPARENT WEB',desc:'Open source intelligence tools to search, analyze and connect information from across the web.',placeholder:'Search for a name, email, username, phone, domain, IP...',lookup:'users',chips:['All','People','Usernames','Email','Phone','Domains','Images'],cards:[
     {i:'👤',t:'People Search',d:'Find and link public information about individuals.',m:'users'},
     {i:'✉',t:'Email Lookup',d:'Discover accounts, leaks and related data.',m:'email'},
@@ -236,24 +253,15 @@ const SECTIONS={
 };
 let currentLookup='users';
 function renderChips(s){document.getElementById('chipsRow').innerHTML=SECTIONS[s].chips.map((c,i)=>`<button class="chip ${i===0?'active':''}">${c}</button>`).join('');}
-function renderCards(s){document.getElementById('modulesGrid').innerHTML=SECTIONS[s].cards.map(c=>`<div class="module-card" onclick="handleCard('${c.m}','${c.t}')"><div class="mc-icon">${c.i}</div><div class="mc-text"><h3>${c.t}</h3><p>${c.d}</p></div><div class="mc-arrow">›</div></div>`).join('');}
-function changeSection(s){
-  if(!SECTIONS[s])return;
-  const cfg=SECTIONS[s];
-  document.body.setAttribute('data-section',s);
-  const hero=document.getElementById('heroSection');
-  hero.classList.add('fade-out');
-  setTimeout(()=>{
-    document.getElementById('heroTitle').textContent=cfg.title;
-    document.getElementById('heroTag').textContent=cfg.tag;
-    document.getElementById('heroDesc').textContent=cfg.desc;
-    document.getElementById('query').placeholder=cfg.placeholder;
-    currentLookup=cfg.lookup;
-    document.getElementById('typeLabel').textContent=cfg.lookup;
-    renderChips(s); renderCards(s);
-    hero.classList.remove('fade-out'); hero.classList.add('fade-in');
-    setTimeout(()=>hero.classList.remove('fade-in'),450);
-  },250);
+function renderCards(s){
+  document.getElementById('modulesGrid').innerHTML = SECTIONS[s].cards.map(c => {
+    const icon = ICONS[c.m] || ICONS['users'];
+    return `<div class="module-card" onclick="handleCard('${c.m}')">
+      <div class="mc-icon">${icon}</div>
+      <div class="mc-text"><h3>${c.t}</h3><p>${c.d}</p></div>
+      <div class="mc-arrow">›</div>
+    </div>`;
+  }).join('');
 }
 function handleCard(mode, title){
   if(mode==='auto'||mode==='deep'||mode==='fast'||mode==='compare'){
@@ -343,6 +351,7 @@ function renderResult(data){
   if(data.error){el.innerHTML='<div class="panel-error">⚠ '+data.error+'</div>';return;}
   let html='<div class="results-header">Risultati per <b>'+(data.number||data.email||data.username||'query')+'</b></div>';
   const info=[];
+  if(data.risk_score)info.push(['Rischio',data.risk_score]);
   if(data.number)info.push(['Numero',data.number]);
   if(data.operator)info.push(['Operatore',data.operator]);
   if(data.region)info.push(['Regione',data.region]);
@@ -446,11 +455,26 @@ function renderResult(data){
     data.found.forEach(f=>{html+='<a class="site-card" href="'+f.url+'" target="_blank"><div class="site-icon">🌐</div><div class="site-name">'+f.site+'</div><div class="site-url">Apri →</div></a>';});
     html+='</div>';
   }
-  if(data.breaches&&data.breaches.length){
-    html+='<div class="sites-title">💾 Violazioni ('+data.breaches.length+')</div><div class="sites-grid">';
-    data.breaches.forEach(b=>{html+='<div class="site-card breach"><div class="site-icon">💾</div><div class="site-name">'+b+'</div></div>';});
+  if(data.breach_details && data.breach_details.length){
+    html+='<div class="sites-title">💾 Violazioni trovate ('+data.breach_details.length+')</div><div class="sites-grid">';
+    data.breach_details.forEach(function(b){
+      var name = b.breach || b.name || 'Unknown';
+      var date = b.breach_date || b.date || '';
+      var pwned = b.xposed_records || b.pwned_count || 0;
+      var classes = (b.xposed_data || b.data_classes || '').split(';').slice(0,3).join(', ');
+      html+='<div class="site-card breach" style="text-align:left;align-items:flex-start">';
+      html+='<div style="display:flex;gap:10px;align-items:center;margin-bottom:8px"><div class="site-icon" style="margin:0">💾</div><div class="site-name" style="text-align:left">'+name+'</div></div>';
+      if(date)html+='<div style="font-size:11px;color:#888;margin-bottom:4px">📅 '+date+'</div>';
+      if(pwned)html+='<div style="font-size:11px;color:#ff8080;margin-bottom:4px">👥 '+Number(pwned).toLocaleString()+' account</div>';
+      if(classes)html+='<div style="font-size:10px;color:#666">🔓 '+classes+'</div>';
+      html+='</div>';
+    });
     html+='</div>';
-  } else if(data.breaches&&data.breaches.length===0){
+  } else if(data.breaches && data.breaches.length){
+    html+='<div class="sites-title">💾 Violazioni ('+data.breaches.length+')</div><div class="sites-grid">';
+    data.breaches.forEach(function(b){html+='<div class="site-card breach"><div class="site-icon">💾</div><div class="site-name">'+b+'</div></div>';});
+    html+='</div>';
+  } else if(data.breaches && data.breaches.length===0){
     html+='<div class="info-cell" style="margin-top:16px"><span class="info-key">Breach</span><span class="info-val" style="color:#4ade80">Nessuna violazione ✓</span></div>';
   }
   el.innerHTML=html;
