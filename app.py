@@ -2,10 +2,11 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, f
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from datetime import datetime, timedelta
-import os, requests, phonenumbers, hashlib, subprocess
+import os, requests, phonenumbers, hashlib, subprocess, random, string
 from phonenumbers import carrier, geocoder, timezone as pn_timezone
 from dotenv import load_dotenv
 
+import random, string
 load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'nexora-secret')
@@ -504,6 +505,7 @@ def register():
             flash('Email già registrata. Prova ad accedere.')
             return redirect(url_for('login'))
         code6 = ''.join(random.choices(string.digits, k=6))
+        print('PRINT DEBUG: codice', code6, 'per', email, flush=True)
         # Rimuovi codici vecchi per questa email
         db.session.query(VerifyCode).filter_by(email=email).delete()
         db.session.add(VerifyCode(email=email, code=code6))
