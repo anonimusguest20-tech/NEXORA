@@ -17,7 +17,15 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 ADMIN_EMAILS = ['admin@nexora.local', 'amico@nexora.local']
+
+PLAN_EMAILS = {
+    'plaiko@nexora.local': 'starter',
+    'gwt@nexora.local': 'elite',
+    'chicoria@nexora.local': 'ultimate',
+}
 PLANS = {
+    'starter':  {'name':'Starter',  'price':10,  'daily_limit':10,     'modules':['users','email','phone']},
+    'basic':    {'name':'Basic',    'price':25,  'daily_limit':25,     'modules':['users','email','phone','domains','social']},
     'free':     {'name':'Free',     'price':0,   'daily_limit':5,      'modules':['users','email','phone']},
     'pro':      {'name':'Pro',      'price':20,  'daily_limit':10,     'modules':['users','email','phone','domains','social','discord']},
     'elite':    {'name':'Elite',    'price':50,  'daily_limit':50,     'modules':['users','email','phone','domains','social','ip','breaches','images','discord']},
@@ -477,7 +485,8 @@ def register():
         if db.session.query(User).filter_by(email=email).first():
             flash('Email già registrata.'); return redirect(url_for('register'))
         is_admin = email in ADMIN_EMAILS
-        u = User(email=email, password=pwd, is_admin=is_admin, plan='ultimate' if is_admin else 'free')
+        assigned_plan = 'ultimate' if is_admin else PLAN_EMAILS.get(email, 'free')
+        u = User(email=email, password=pwd, is_admin=is_admin, plan=assigned_plan)
         db.session.add(u); db.session.commit(); login_user(u)
         return redirect(url_for('dashboard'))
     return render_template('register.html')
@@ -629,6 +638,13 @@ with app.app_context():
     for k, v in DEFAULT_CONTENT.items():
         if not db.session.query(SiteContent).filter_by(key=k).first():
             db.session.add(SiteContent(key=k, value=v))
+    db.session.commit()
+
+    # Aggiorna piani utenti esistenti da PLAN_EMAILS
+    for em, plan in PLAN_EMAILS.items():
+        u = db.session.query(User).filter_by(email=em).first()
+        if u and u.plan != plan:
+            u.plan = plan
     db.session.commit()
 
 if __name__ == '__main__':
