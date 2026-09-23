@@ -290,48 +290,12 @@ def lookup_domain(d):
     try: return requests.get(f"https://dns.google/resolve?name={d}&type=A", timeout=10).json()
     except Exception as e: return {"error":str(e)}
 def lookup_breaches(email):
-    result = {"email": email, "breaches": [], "sources": []}
-
-    # Firefox Monitor (API gratuita Mozilla)
-    try:
-        r = requests.get(f"https://monitor.firefox.com/api/v1/breaches", timeout=10)
-        # Firefox monitor non espone endpoint per email singola senza key
-    except: pass
-
-    # LeakCheck (free tier)
-    try:
-        r = requests.get(f"https://leakcheck.io/api/public?check={email}",
-                         headers={"User-Agent":"Mozilla/5.0"}, timeout=10)
-        if r.status_code == 200:
-            d = r.json()
-            if d.get("success") and d.get("found"):
-                sources = d.get("sources", [])
-                result["breaches"] = [s.get("name", "Unknown") for s in sources]
-                result["sources"].append("leakcheck")
-            else:
-                result["sources"].append("leakcheck")
-    except Exception as e:
-        result["leakcheck_error"] = str(e)
-
-    # Fallback: check email su siti pubblici noti
-    try:
-        # HaveIBeenPwned senza API key (endpoint pubblico limitato)
-        r = requests.get(f"https://haveibeenpwned.com/unifiedsearch/{email}",
-                         headers={"User-Agent":"Mozilla/5.0","Accept":"application/json"}, timeout=10)
-        if r.status_code == 200:
-            d = r.json()
-            breaches = d.get("Breaches", [])
-            if breaches:
-                result["breaches"] = [b.get("Name") for b in breaches]
-                result["sources"].append("hibp-public")
-    except: pass
-
-    # Se ancora vuoto, mostra la lista di breach noti (informativa)
-    if not result["breaches"]:
-        result["breaches"] = []
-        result["note"] = "Nessuna violazione trovata o API non accessibile"
-
-    return result
+    return {
+        "email": email,
+        "breaches": [],
+        "note": "Servizio breach disabilitato. HIBP, LeakCheck e Firefox Monitor ora richiedono API key a pagamento. Visita https://haveibeenpwned.com manualmente.",
+        "manual_link": f"https://haveibeenpwned.com/account/{email}"
+    }
 
 
 LOOKUP_MAP = {'phone':lookup_phone,'email':lookup_email,'ip':lookup_ip,'username':lookup_username,
