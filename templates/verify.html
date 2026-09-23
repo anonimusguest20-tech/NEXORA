@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="it"><head><meta charset="UTF-8"><title>Verifica — NEXORA</title>
+<link rel="stylesheet" href="/static/style.css"></head>
+<body class="auth">
+<form method="POST" class="auth-form">
+  <div class="brand-icon big">N</div>
+  <h2>Inserisci il codice</h2>
+  <p style="color:#888;font-size:13px;margin-bottom:16px">Codice inviato a <b style="color:#fff">{{ email }}</b></p>
+  {% with m = get_flashed_messages() %}{% if m %}<p style="color:#ff3b3b">{{ m[0] }}</p>{% endif %}{% endwith %}
+  <input name="code" type="text" placeholder="000000" maxlength="6" pattern="[0-9]{6}" required autofocus style="text-align:center;font-size:28px;letter-spacing:10px">
+  <button type="submit">Verifica</button>
+  <p style="color:#666;font-size:12px">Non lo hai ricevuto? <a href="/register">Riprova</a></p>
+</form>
+</body></html>

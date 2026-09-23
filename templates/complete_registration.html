@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="it"><head><meta charset="UTF-8"><title>Completa — NEXORA</title>
+<link rel="stylesheet" href="/static/style.css"></head>
+<body class="auth">
+<form method="POST" class="auth-form">
+  <div class="brand-icon big">N</div>
+  <h2>Crea il tuo profilo</h2>
+  <p style="color:#888;font-size:13px;margin-bottom:16px">Email verificata: <b style="color:#fff">{{ email }}</b></p>
+  {% with m = get_flashed_messages() %}{% if m %}<p style="color:#ff3b3b">{{ m[0] }}</p>{% endif %}{% endwith %}
+  <input name="username" type="text" placeholder="Scegli un username" minlength="3" maxlength="20" required autofocus>
+  <input name="password" type="password" placeholder="Scegli una password" minlength="6" required>
+  <button type="submit">Crea account</button>
+</form>
+</body></html>
