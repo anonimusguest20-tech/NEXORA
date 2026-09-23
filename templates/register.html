@@ -5,10 +5,11 @@
 <form method="POST" class="auth-form">
   <div class="brand-icon big">N</div>
   <h2>Crea il tuo account</h2>
-  <p style="color:#888;font-size:13px;margin-bottom:16px">Inserisci la tua email. Ti invieremo un codice di verifica.</p>
   {% with m = get_flashed_messages() %}{% if m %}<p style="color:#ff3b3b">{{ m[0] }}</p>{% endif %}{% endwith %}
-  <input name="email" type="email" placeholder="La tua email" required autofocus>
-  <button type="submit">Invia codice</button>
+  <input name="email" type="email" placeholder="Email" required autofocus>
+  <input name="username" type="text" placeholder="Username (3-20 caratteri)" minlength="3" maxlength="20" required>
+  <input name="password" type="password" placeholder="Password" minlength="6" required>
+  <button type="submit">Registrati</button>
   <p>Hai già un account? <a href="/login">Accedi</a></p>
 </form>
 </body></html>

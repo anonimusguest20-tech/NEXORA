@@ -36,6 +36,8 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
+    username = db.Column(db.String(40), unique=True)
+    verified = db.Column(db.Boolean, default=True)
     plan = db.Column(db.String(20), default='free')
     is_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -501,83 +503,29 @@ def logout(): logout_user(); return redirect(url_for('index'))
 def register():
     if request.method == 'POST':
         email = request.form['email'].strip().lower()
-        if db.session.query(User).filter_by(email=email).first():
-            flash('Email già registrata. Prova ad accedere.')
-            return redirect(url_for('login'))
-        code6 = ''.join(random.choices(string.digits, k=6))
-        print('PRINT DEBUG: codice', code6, 'per', email, flush=True)
-        # Rimuovi codici vecchi per questa email
-        db.session.query(VerifyCode).filter_by(email=email).delete()
-        db.session.add(VerifyCode(email=email, code=code6))
-        db.session.commit()
-        try:
-            send_verify_email(email, code6)
-        except Exception as e:
-            print("Errore invio email:", e)
-            flash(f'Errore invio email: {e}')
-            return redirect(url_for('register'))
-        session['pending_email'] = email
-        return redirect(url_for('verify'))
-    return render_template('register.html')
-
-@app.route('/verify', methods=['GET','POST'])
-def verify():
-    email = session.get('pending_email')
-    if not email:
-        return redirect(url_for('register'))
-    if request.method == 'POST':
-        code_in = request.form['code'].strip()
-        vc = db.session.query(VerifyCode).filter_by(email=email).order_by(VerifyCode.id.desc()).first()
-        if vc and vc.code == code_in:
-            session['verified_email'] = email
-            db.session.delete(vc)
-            db.session.commit()
-            return redirect(url_for('complete_registration'))
-        flash('Codice errato.')
-    return render_template('verify.html', email=email)
-
-@app.route('/complete', methods=['GET','POST'])
-def complete_registration():
-    email = session.get('verified_email')
-    if not email:
-        return redirect(url_for('register'))
-    if request.method == 'POST':
+        pwd = request.form['password']
         username = request.form['username'].strip()
-        password = request.form['password']
-        if len(username) < 3 or len(username) > 20:
-            flash('Username: 3-20 caratteri.')
-        elif not username.replace('_','').isalnum():
-            flash('Solo lettere, numeri e _')
-        elif db.session.query(User).filter_by(username=username).first():
+        if db.session.query(User).filter_by(email=email).first():
+            flash('Email già registrata.')
+            return redirect(url_for('register'))
+        if db.session.query(User).filter_by(username=username).first():
             flash('Username già preso.')
-        elif len(password) < 6:
-            flash('Password minimo 6 caratteri.')
-        else:
-            is_admin = email in ADMIN_EMAILS
-            assigned_plan = 'ultimate' if is_admin else PLAN_EMAILS.get(email, 'free')
-            u = User(email=email, password=password, username=username,
-                     verified=True, is_admin=is_admin, plan=assigned_plan)
-            db.session.add(u)
-            db.session.commit()
-            session.pop('pending_email', None)
-            session.pop('verified_email', None)
-            login_user(u, remember=True)
-            return redirect(url_for('dashboard'))
-    return render_template('complete_registration.html', email=email)
-
-def send_verify_email(to_email, code):
-    smtp_user = os.getenv('SMTP_EMAIL','')
-    smtp_pass = os.getenv('SMTP_PASSWORD','')
-    if not smtp_user or not smtp_pass:
-        print("SMTP non configurato. Codice:", code)
-        return
-    msg = MIMEText(f"Il tuo codice di verifica NEXORA è: {code}")
-    msg['Subject'] = 'NEXORA — Codice di verifica'
-    msg['From'] = smtp_user
-    msg['To'] = to_email
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as s:
-        s.login(smtp_user, smtp_pass)
-        s.send_message(msg)
+            return redirect(url_for('register'))
+        if len(username) < 3 or len(username) > 20:
+            flash('Username 3-20 caratteri.')
+            return redirect(url_for('register'))
+        if not username.replace('_','').isalnum():
+            flash('Solo lettere, numeri e _')
+            return redirect(url_for('register'))
+        is_admin = email in ADMIN_EMAILS
+        assigned_plan = 'ultimate' if is_admin else PLAN_EMAILS.get(email, 'free')
+        u = User(email=email, password=pwd, username=username,
+                 verified=True, is_admin=is_admin, plan=assigned_plan)
+        db.session.add(u)
+        db.session.commit()
+        login_user(u, remember=True)
+        return redirect(url_for('dashboard'))
+    return render_template('register.html')
 
 @app.route('/dashboard')
 @login_required
@@ -600,6 +548,7 @@ def api_lookup():
     if not query: return jsonify({"error":"Query vuota"}), 400
     ok, msg = check_lookup(current_user, ltype)
     if not ok: return jsonify({"error":msg,"upgrade":True}), 403
+    fn = LOOKUP_MAP.get(ltype)
     if not fn: return jsonify({"error":"Tipo non valido"}), 400
     result = fn(query); log_lookup(current_user, ltype, query)
     return jsonify(result)
