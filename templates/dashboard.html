@@ -37,7 +37,7 @@
 
   <main class="main">
     <div class="topbar">
-      <a class="discord-btn" href="https://discord.gg/8tj7Y6aQU9" target="_blank">💬 Discord Server</a>
+      <a class="discord-btn" href="https://discord.gg/8tj7Y6aQU9" target="_blank">Discord</a>
       <div class="topbar-right">
         <span class="credits">⚡ {{ remaining }} credits</span>
         <a href="/piani" class="tb-link">Piani</a>
@@ -79,6 +79,8 @@
       <div class="chips" id="chipsRow"></div>
     </section>
 
+    <section class="mods" id="modsGrid"></section>
+
     <section class="result-sec" id="resultPanel" style="display:none">
       <p class="result-active">Modulo attivo: <b id="typeLabel">users</b></p>
       <div id="result" class="result-body"></div>
@@ -98,7 +100,7 @@
       <div class="osint-tip" id="osintTip"><div class="tip-w" id="tipW"></div><div class="tip-d" id="tipD"></div></div>
     </section>
 
-    <section class="mods" id="modsGrid"></section>
+    
 
     <section class="stats">
       <div class="stat"><b>300+</b><span>Data Sources</span></div>
@@ -124,7 +126,7 @@ const ICONS = {
 };
 
 const SECTIONS = {
-  home:{title:'NEXORA',tag:'INTELLIGENCE FOR A MORE TRANSPARENT WEB',desc:'Open source intelligence tools to search, analyze and connect information from across the web.',ph:'Search for a name, email, username, phone, domain, IP...',lookup:'users',chips:['All','People','Usernames','Email','Phone','Domains','Images'],cards:[
+  home:{title:'NEXORA',tag:'INTELLIGENCE FOR A MORE TRANSPARENT WEB',desc:'Open source intelligence tools to search, analyze and connect information from across the web.',ph:'Search for a name, email, username, phone, domain, IP...',lookup:'users',chips:['All','People','Usernames','Email','Phone','Domains'],cards:[
     {t:'People Search',d:'Find public information about individuals.',i:'users',m:'users'},
     {t:'Email Lookup',d:'Discover accounts and data.',i:'email',m:'email'},
     {t:'Phone Lookup',d:'Track phone numbers and profiles.',i:'phone',m:'phone'},
@@ -133,36 +135,36 @@ const SECTIONS = {
     {t:'Image Search',d:'Find similar images online.',i:'images',m:'images'},
     {t:'Data Breaches',d:'Search exposed data sources.',i:'breaches',m:'breaches'},
     {t:'Social Intelligence',d:'Map connections and online activity.',i:'social',m:'social'}]},
-  email:{title:'EMAIL',tag:'EMAIL INTELLIGENCE',desc:'Discover linked accounts, data breaches and reputation of an email address.',ph:'Enter an email (e.g. user@example.com)...',lookup:'email',chips:['All','Accounts','Breaches','Reputation'],cards:[
+  email:{title:'EMAIL',tag:'EMAIL INTELLIGENCE',desc:'Discover linked accounts, data breaches and reputation of an email address.',ph:'Enter an email...',lookup:'email',chips:['All','Accounts','Breaches','Reputation'],cards:[
     {t:'Linked Accounts',d:'Find services registered with this email.',i:'email',m:'email'},
     {t:'Breaches',d:'Check if the email appeared in data leaks.',i:'breaches',m:'breaches'},
     {t:'Reputation',d:'Assess trust and suspicious indicators.',i:'email',m:'email'},
     {t:'Domain Info',d:'Analyze the email domain MX records.',i:'domains',m:'domains'}]},
-  phone:{title:'PHONE',tag:'PHONE NUMBER INTELLIGENCE',desc:'Track phone numbers, carrier details, region and related accounts.',ph:'Enter a phone number (e.g. +393501234567)...',lookup:'phone',chips:['All','Carrier','Region','Accounts'],cards:[
-    {t:'Carrier',d:'Identify the mobile operator.',i:'phone',m:'phone'},
-    {t:'Region',d:'Geographic location of the number.',i:'phone',m:'phone'},
+  phone:{title:'PHONE',tag:'PHONE NUMBER INTELLIGENCE',desc:'Track phone numbers, carrier details, region and related accounts.',ph:'Enter a phone number...',lookup:'phone',chips:['All','Carrier','Region','Accounts'],cards:[
+    {t:'Carrier Lookup',d:'Identify the mobile operator.',i:'phone',m:'phone'},
+    {t:'Region Lookup',d:'Geographic location of the number.',i:'phone',m:'phone'},
     {t:'Linked Accounts',d:'Find services using this number.',i:'phone',m:'phone'},
-    {t:'Messaging Apps',d:'WhatsApp, Telegram, Signal.',i:'phone',m:'phone'}]},
-  users:{title:'USERS',tag:'USERNAME INTELLIGENCE',desc:'Search a username across dozens of social networks and platforms.',ph:'Enter a username (e.g. johndoe)...',lookup:'users',chips:['All','Social','Gaming','Dev','Media'],cards:[
+    {t:'Messaging Apps',d:'WhatsApp, Telegram, Signal presence.',i:'phone',m:'phone'}]},
+  users:{title:'USERS',tag:'USERNAME INTELLIGENCE',desc:'Search a username across 25+ social networks.',ph:'Enter a username...',lookup:'users',chips:['All','Social','Gaming','Dev','Media'],cards:[
     {t:'Social Networks',d:'Twitter, Instagram, Facebook, TikTok.',i:'users',m:'users'},
-    {t:'Gaming',d:'Steam, Twitch, Discord, Roblox.',i:'users',m:'users'},
-    {t:'Developer',d:'GitHub, GitLab, Stack Overflow.',i:'users',m:'users'},
-    {t:'Media',d:'YouTube, Vimeo, Pinterest.',i:'users',m:'users'}]},
-  people:{title:'PEOPLE',tag:'SEARCH FOR INDIVIDUALS',desc:'Find and link public information about individuals across the web.',ph:'Enter full name, username or email...',lookup:'users',chips:['All','Names','Usernames','Emails','Phones'],cards:[
+    {t:'Gaming',d:'Steam, Twitch, Roblox.',i:'users',m:'users'},
+    {t:'Developer',d:'GitHub, GitLab, BitBucket.',i:'users',m:'users'},
+    {t:'Media',d:'YouTube, Vimeo, SoundCloud.',i:'users',m:'users'}]},
+  people:{title:'PEOPLE',tag:'SEARCH FOR INDIVIDUALS',desc:'Find and link public information about individuals.',ph:'Enter full name, username or email...',lookup:'users',chips:['All','Names','Usernames','Emails'],cards:[
     {t:'Full Name',d:'Search across public records.',i:'users',m:'users'},
     {t:'Username',d:'Find profiles across social networks.',i:'users',m:'users'},
     {t:'Email',d:'Discover linked accounts.',i:'email',m:'email'},
     {t:'Phone',d:'Track related profiles.',i:'phone',m:'phone'}]},
-  domains:{title:'DOMAINS',tag:'DOMAIN & DNS INTELLIGENCE',desc:'Analyze domains, subdomains, DNS records and infrastructure.',ph:'Enter a domain (e.g. example.com)...',lookup:'domains',chips:['All','DNS','WHOIS','Subdomains'],cards:[
-    {t:'DNS Records',d:'A, AAAA, MX, TXT, CNAME lookup.',i:'domains',m:'domains'},
-    {t:'WHOIS',d:'Registration and ownership data.',i:'domains',m:'domains'},
-    {t:'Subdomains',d:'Enumerate subdomains.',i:'domains',m:'domains'},
-    {t:'Security',d:'SSL, headers and vulnerabilities.',i:'domains',m:'domains'}]},
-  social:{title:'SOCIAL',tag:'SOCIAL INTELLIGENCE',desc:'Map social connections, followers and online activity.',ph:'Enter a username...',lookup:'social',chips:['All','Twitter','Instagram','TikTok','LinkedIn'],cards:[
-    {t:'Twitter/X',d:'Analyze tweets and followers.',i:'social',m:'social'},
-    {t:'Instagram',d:'Public posts and connections.',i:'social',m:'social'},
-    {t:'TikTok',d:'Videos and engagement analysis.',i:'social',m:'social'},
-    {t:'LinkedIn',d:'Professional network mapping.',i:'social',m:'social'}]},
+  domains:{title:'DOMAINS',tag:'DOMAIN & DNS INTELLIGENCE',desc:'Analyze domains, subdomains, DNS records and infrastructure.',ph:'Enter a domain (e.g. example.com)...',lookup:'domains',chips:['All','DNS','MX','Subdomains'],cards:[
+    {t:'DNS Records',d:'A, AAAA, MX, TXT, NS lookup.',i:'domains',m:'domains'},
+    {t:'Subdomains',d:'Enumerate via crt.sh.',i:'domains',m:'domains'},
+    {t:'MX Records',d:'Mail servers of the domain.',i:'domains',m:'domains'},
+    {t:'TXT Records',d:'SPF, DKIM, verification.',i:'domains',m:'domains'}]},
+  social:{title:'SOCIAL',tag:'SOCIAL INTELLIGENCE',desc:'Map social connections, followers and online activity.',ph:'Enter a username...',lookup:'users',chips:['All','Twitter','Instagram','TikTok','LinkedIn'],cards:[
+    {t:'Twitter/X',d:'Analyze tweets and followers.',i:'social',m:'users'},
+    {t:'Instagram',d:'Public posts and connections.',i:'social',m:'users'},
+    {t:'TikTok',d:'Videos and engagement analysis.',i:'social',m:'users'},
+    {t:'LinkedIn',d:'Professional network mapping.',i:'social',m:'users'}]},
   images:{title:'IMAGES',tag:'REVERSE IMAGE SEARCH',desc:'Find similar images and matches across the web.',ph:'Enter an image URL...',lookup:'images',chips:['All','Reverse','Faces','EXIF'],cards:[
     {t:'Reverse Search',d:'Find where an image appears online.',i:'images',m:'images'},
     {t:'Face Match',d:'Search faces across databases.',i:'images',m:'images'},
@@ -171,23 +173,18 @@ const SECTIONS = {
   ip:{title:'IP',tag:'IP GEOLOCATION',desc:'Locate IP addresses, servers and network infrastructure.',ph:'Enter an IP address (e.g. 8.8.8.8)...',lookup:'ip',chips:['All','IPv4','IPv6','ASN'],cards:[
     {t:'GeoIP',d:'Country, city, coordinates.',i:'ip',m:'ip'},
     {t:'ASN',d:'Autonomous System and ISP.',i:'ip',m:'ip'},
-    {t:'Port Scan',d:'Open ports and services.',i:'ip',m:'ip'},
-    {t:'Threat Intel',d:'Malicious activity reports.',i:'ip',m:'ip'}]},
+    {t:'Timezone',d:'Time zone of the IP.',i:'ip',m:'ip'},
+    {t:'Reverse DNS',d:'Hostname lookup.',i:'ip',m:'ip'}]},
   discord:{title:'DISCORD',tag:'DISCORD ID INTELLIGENCE',desc:'Extract all public data from a Discord ID.',ph:'Enter a Discord ID...',lookup:'discord',chips:['All','User','Badges','Guilds'],cards:[
     {t:'User Info',d:'Username, avatar, banner.',i:'discord',m:'discord'},
     {t:'Account Age',d:'Account creation date.',i:'discord',m:'discord'},
     {t:'Badges',d:'Public badges and flags.',i:'discord',m:'discord'},
     {t:'Mutual Guilds',d:'Servers shared with the bot.',i:'discord',m:'discord'}]},
-  breaches:{title:'BREACH',tag:'BREACH INTELLIGENCE',desc:'Search exposed data from public breaches and leaks.',ph:'Enter an email or phone...',lookup:'breaches',chips:['All','Emails','Phones','Passwords'],cards:[
+  breaches:{title:'BREACH',tag:'BREACH INTELLIGENCE',desc:'Search exposed data from public breaches and leaks.',ph:'Enter an email or phone...',lookup:'breaches',chips:['All','Emails','Phones'],cards:[
     {t:'Email Breaches',d:'Check exposed accounts.',i:'breaches',m:'breaches'},
-    {t:'Passwords',d:'Search leaked credentials.',i:'breaches',m:'breaches'},
     {t:'Phone Leaks',d:'Numbers in public dumps.',i:'breaches',m:'breaches'},
-    {t:'Identity Leaks',d:'Names, addresses, IDs.',i:'breaches',m:'breaches'}]},
-  search:{title:'SEARCH',tag:'UNIVERSAL SEARCH',desc:'Search across every module with one query.',ph:'Enter anything...',lookup:'users',chips:['All','Auto-detect'],cards:[
-    {t:'Auto Detect',d:'Automatically pick best module.',i:'users',m:'users'},
-    {t:'Deep Search',d:'Multiple modules at once.',i:'users',m:'users'},
-    {t:'Fast Query',d:'Single module, instant result.',i:'users',m:'users'},
-    {t:'Compare',d:'Cross-reference sources.',i:'users',m:'users'}]}
+    {t:'Identity Leaks',d:'Names, addresses, IDs.',i:'breaches',m:'breaches'},
+    {t:'Password Leaks',d:'Search leaked credentials.',i:'breaches',m:'breaches'}]}
 };
 
 let currentSec = 'home';
@@ -197,7 +194,7 @@ function renderChips(s){
   const row = document.getElementById('chipsRow');
   if (!row || !SECTIONS[s].chips) return;
   row.innerHTML = SECTIONS[s].chips.map(function(c, i){
-    return '<button class="chip ' + (i===0?'active':'') + '">' + c + '</button>';
+    return '<button class="chip ' + (i===0?'active':'') + '" data-chip="' + c.toLowerCase() + '">' + c + '</button>';
   }).join('');
 }
 
@@ -206,14 +203,17 @@ function renderCards(s){
   if (!grid) return;
   grid.innerHTML = SECTIONS[s].cards.map(function(c){
     var icon = ICONS[c.i] || ICONS.users;
-    return '<div class="mod" onclick="setLookup(\'' + c.m + '\')"><div class="mod-ic">' + icon + '</div><div class="mod-tx"><h3>' + c.t + '</h3><p>' + c.d + '</p></div><div class="mod-ar">›</div></div>';
+    return '<div class="mod" onclick="setLookup(\'' + c.m + '\', \'' + c.t.replace(/'/g,"") + '\')"><div class="mod-ic">' + icon + '</div><div class="mod-tx"><h3>' + c.t + '</h3><p>' + c.d + '</p></div><div class="mod-ar">›</div></div>';
   }).join('');
 }
 
-function setLookup(m){
+function setLookup(m, label){
   currentLookup = m;
   var tl = document.getElementById('typeLabel');
   if (tl) tl.textContent = m;
+  // Focus sull'input
+  var i = document.getElementById('searchInput');
+  if (i) i.focus();
 }
 
 function changeSection(s){
@@ -229,20 +229,19 @@ function changeSection(s){
   var si = document.getElementById('searchInput');
   var g = document.getElementById('globe');
   var hc = document.querySelector('.hero-center');
+  var labels = document.querySelectorAll('.lbl');
   if (hc) { hc.style.transition = 'opacity 0.4s ease'; hc.style.opacity = '0'; }
   if (g) { g.style.transition = 'opacity 0.4s ease, transform 0.4s ease'; g.style.opacity = '0'; g.style.transform = 'translate(-50%,-50%) translateY(20px)'; }
-  var labels = document.querySelectorAll('.lbl');
   labels.forEach(function(l){
     l.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
     l.style.opacity = '0';
     l.style.transform = 'translateY(calc(-50% + 20px))';
   });
-
   setTimeout(function(){
     if (ht) ht.textContent = cfg.title;
     if (hg) hg.textContent = cfg.tag;
     if (hd) hd.textContent = cfg.desc;
-    if (si) si.placeholder = cfg.ph;
+    if (si) { si.placeholder = cfg.ph; si.value = ''; }
     currentLookup = cfg.lookup;
     var tl = document.getElementById('typeLabel');
     if (tl) tl.textContent = cfg.lookup;
@@ -279,6 +278,7 @@ async function doLookup(){
   var r = document.getElementById('result');
   if (rp) rp.style.display = 'block';
   if (r) r.innerHTML = '<p class="loading">🔎 Ricerca in corso...</p>';
+  rp.scrollIntoView({behavior:'smooth', block:'nearest'});
   try {
     var resp = await fetch('/api/lookup', {
       method:'POST',
@@ -300,39 +300,202 @@ function renderResult(data){
   var r = document.getElementById('result');
   if (!r) return;
   if (data.error) { r.innerHTML = '<div class="panel-error">⚠ ' + data.error + '</div>'; return; }
-  var h = '<div class="results-head">Risultati per <b>' + (data.email || data.number || data.username || data.query || 'query') + '</b></div>';
-  var info = [];
-  if (data.email) info.push(['Email', data.email]);
-  if (data.reputation) info.push(['Reputazione', data.reputation]);
-  if (data.number) info.push(['Numero', data.number]);
-  if (data.operator) info.push(['Operatore', data.operator]);
-  if (data.region) info.push(['Regione', data.region]);
-  if (data.country) info.push(['Paese', data.country]);
-  if (data.type) info.push(['Tipo', data.type]);
-  if (data.ip) info.push(['IP', data.ip]);
-  if (data.city) info.push(['Città', data.city]);
-  if (data.isp) info.push(['ISP', data.isp]);
-  if (data.username) info.push(['Username', data.username]);
-  if (info.length) {
-    h += '<div class="info-grid">';
-    info.forEach(function(p){ h += '<div class="info-cell"><span class="info-k">' + p[0] + '</span><span class="info-v">' + p[1] + '</span></div>'; });
-    h += '</div>';
+
+  var h = '';
+
+  // ─── PHONE ───
+  if (data.number && data.operator !== undefined) {
+    h += '<div class="results-head">Risultati per <b>' + data.number + '</b></div>';
+    var info = [];
+    if (data.operator) info.push(['Operatore', data.operator]);
+    if (data.country_name) info.push(['Paese', data.country_name]);
+    if (data.region) info.push(['Regione', data.region]);
+    if (data.location) info.push(['Località', data.location]);
+    if (data.type) info.push(['Tipo', data.type]);
+    if (data.line_type) info.push(['Linea', data.line_type]);
+    if (data.international) info.push(['Intl', data.international]);
+    if (data.e164) info.push(['E.164', data.e164]);
+    if (data.timezone) info.push(['Timezone', data.timezone.join(', ')]);
+    if (info.length) {
+      h += '<div class="info-grid">';
+      info.forEach(function(p){ h += '<div class="info-cell"><span class="info-k">' + p[0] + '</span><span class="info-v">' + p[1] + '</span></div>'; });
+      h += '</div>';
+    }
+    if (data.links && data.links.length) {
+      h += '<div class="sites-title">Verifica manuale</div><div class="sites-grid">';
+      data.links.forEach(function(l){
+        h += '<a class="site-card" href="' + l.url + '" target="_blank"><div class="site-name">' + l.name + '</div><div class="site-url">Apri →</div></a>';
+      });
+      h += '</div>';
+    }
   }
-  if (data.breaches && data.breaches.length) {
-    h += '<div class="sites-title">💾 Violazioni (' + data.breaches.length + ')</div><div class="sites-grid">';
-    data.breaches.forEach(function(b){ h += '<div class="site-card breach"><div class="site-name">' + b + '</div></div>'; });
-    h += '</div>';
+  // ─── USERNAME ───
+  else if (data.username && data.found !== undefined) {
+    h += '<div class="results-head">Profili trovati per <b>' + data.username + '</b> (' + data.found.length + '/' + data.total_checked + ')</div>';
+    if (data.found.length) {
+      h += '<div class="sites-grid">';
+      data.found.forEach(function(f){
+        h += '<a class="site-card" href="' + f.url + '" target="_blank"><div class="site-name">' + f.site + '</div><div class="site-url">Apri →</div></a>';
+      });
+      h += '</div>';
+    } else {
+      h += '<div class="info-cell"><span class="info-k">Profili</span><span class="info-v" style="color:#888">Nessun profilo pubblico trovato</span></div>';
+    }
   }
-  if (data.found && data.found.length) {
-    h += '<div class="sites-title">Profili trovati (' + data.found.length + ')</div><div class="sites-grid">';
-    data.found.forEach(function(f){ h += '<a class="site-card" href="' + f.url + '" target="_blank"><div class="site-name">' + f.site + '</div><div class="site-url">Apri →</div></a>'; });
-    h += '</div>';
+  // ─── DOMAIN ───
+  else if (data.domain) {
+    h += '<div class="results-head">Risultati per <b>' + data.domain + '</b></div>';
+    var dinfo = [];
+    if (data.a_records && data.a_records.length) dinfo.push(['A Records', data.a_records.join(', ')]);
+    if (data.mx_records && data.mx_records.length) dinfo.push(['MX', data.mx_records.length + ' record']);
+    if (data.ns_records && data.ns_records.length) dinfo.push(['NS', data.ns_records.join(', ')]);
+    if (dinfo.length) {
+      h += '<div class="info-grid">';
+      dinfo.forEach(function(p){ h += '<div class="info-cell"><span class="info-k">' + p[0] + '</span><span class="info-v">' + p[1] + '</span></div>'; });
+      h += '</div>';
+    }
+    if (data.subdomains && data.subdomains.length) {
+      h += '<div class="sites-title">Subdomains (' + data.subdomains.length + ')</div><div class="sites-grid">';
+      data.subdomains.forEach(function(s){ h += '<div class="site-card"><div class="site-name">' + s + '</div></div>'; });
+      h += '</div>';
+    }
   }
+  // ─── DISCORD ───
+  else if (data.user_id) {
+    h += '<div class="results-head">Discord ID: <b>' + data.user_id + '</b></div>';
+    var iinfo = [];
+    if (data.username) iinfo.push(['Username', data.username]);
+    if (data.global_name) iinfo.push(['Display', data.global_name]);
+    if (data.account_created) iinfo.push(['Creato', data.account_created]);
+    if (data.account_age_years) iinfo.push(['Età', data.account_age_years + ' anni']);
+    if (iinfo.length) {
+      h += '<div class="info-grid">';
+      iinfo.forEach(function(p){ h += '<div class="info-cell"><span class="info-k">' + p[0] + '</span><span class="info-v">' + p[1] + '</span></div>'; });
+      h += '</div>';
+    }
+    if (data.avatar_url) h += '<div style="text-align:center;margin:20px 0"><img src="' + data.avatar_url + '" style="width:128px;height:128px;border-radius:50%;border:2px solid #1a1c22"></div>';
+    if (data.badges && data.badges.length) {
+      h += '<div class="sites-title">Badges</div><div class="sites-grid">';
+      data.badges.forEach(function(b){ h += '<div class="site-card"><div class="site-name">' + b + '</div></div>'; });
+      h += '</div>';
+    }
+  }
+  // ─── IP ───
+  else if (data.ip || data.query) {
+    h += '<div class="results-head">Risultati per <b>' + (data.query || data.ip) + '</b></div>';
+    var pinfo = [];
+    if (data.country) pinfo.push(['Paese', data.country]);
+    if (data.region) pinfo.push(['Regione', data.region]);
+    if (data.city) pinfo.push(['Città', data.city]);
+    if (data.zip) pinfo.push(['CAP', data.zip]);
+    if (data.isp) pinfo.push(['ISP', data.isp]);
+    if (data.org) pinfo.push(['Org', data.org]);
+    if (data.as) pinfo.push(['AS', data.as]);
+    if (data.timezone) pinfo.push(['Timezone', data.timezone]);
+    if (data.latitude) pinfo.push(['Lat/Lon', data.latitude + ', ' + data.longitude]);
+    if (pinfo.length) {
+      h += '<div class="info-grid">';
+      pinfo.forEach(function(p){ h += '<div class="info-cell"><span class="info-k">' + p[0] + '</span><span class="info-v">' + p[1] + '</span></div>'; });
+      h += '</div>';
+    }
+  }
+  // ─── EMAIL / BREACH ───
+  else {
+    var email = data.email || data.query || '';
+    h += '<div class="results-head">Risultati per <b>' + email + '</b></div>';
+
+    // Info generali
+    var einfo = [];
+    if (data.email) einfo.push(['Email', data.email]);
+    if (data.domain) einfo.push(['Dominio', data.domain]);
+    if (data.mx_records) einfo.push(['MX Records', data.mx_records + ' trovati']);
+    if (data.reputation) einfo.push(['Reputazione', data.reputation]);
+    if (einfo.length) {
+      h += '<div class="info-grid">';
+      einfo.forEach(function(p){ h += '<div class="info-cell"><span class="info-k">' + p[0] + '</span><span class="info-v">' + p[1] + '</span></div>'; });
+      h += '</div>';
+    }
+
+    // Violazioni
+    if (data.breaches && data.breaches.length) {
+      h += '<div class="sites-title">⚠ Violazioni trovate (' + data.breaches.length + ')</div><div class="sites-grid">';
+      data.breaches.forEach(function(b){
+        h += '<div class="site-card breach"><div class="site-icon-badge">💾</div><div class="site-name">' + b + '</div><div class="site-url" style="color:#ff8080">Violazione</div></div>';
+      });
+      h += '</div>';
+    } else if (data.breaches && data.breaches.length === 0) {
+      h += '<div class="success-banner"><span>✓</span> Nessuna violazione trovata per questa email</div>';
+    }
+
+    // Siti collegati con icone
+    if (data.sites_registered && data.sites_registered.length) {
+      var icons = {
+        'firefox.com':'🦊','office365.com':'📧','replit.com':'💻','spotify.com':'🎵',
+        'github.com':'🐙','twitter.com':'🐦','instagram.com':'📸','reddit.com':'👽',
+        'tiktok.com':'🎵','twitch.tv':'🎮','pinterest.com':'📌','discord.com':'💬',
+        'adobe.com':'🎨','amazon.com':'📦','amazon.it':'📦','linkedin.com':'💼',
+        'yahoo.com':'💌','tumblr.com':'📓','snapchat.com':'👻','facebook.com':'👥',
+        'netflix.com':'🎬','dropbox.com':'📁','telegram.com':'✈'
+      };
+      var links = {
+        'firefox.com':'https://accounts.firefox.com/','office365.com':'https://login.microsoftonline.com/',
+        'replit.com':'https://replit.com/account','spotify.com':'https://www.spotify.com/account/overview/',
+        'github.com':'https://github.com/settings/profile','twitter.com':'https://twitter.com/account/begin_password_reset',
+        'instagram.com':'https://www.instagram.com/accounts/password/reset/','reddit.com':'https://www.reddit.com/password',
+        'tiktok.com':'https://www.tiktok.com/login/email/forget-password','twitch.tv':'https://www.twitch.tv/password_reset',
+        'pinterest.com':'https://www.pinterest.com/password/reset/','discord.com':'https://discord.com/login',
+        'adobe.com':'https://auth.services.adobe.com/en_US/forgotpassword.html','amazon.com':'https://www.amazon.com/ap/forgotpassword',
+        'amazon.it':'https://www.amazon.it/ap/forgotpassword','linkedin.com':'https://www.linkedin.com/checkpoint/rp/request-password-reset',
+        'yahoo.com':'https://login.yahoo.com/forgot','tumblr.com':'https://www.tumblr.com/forgot_password',
+        'snapchat.com':'https://accounts.snapchat.com/accounts/password_reset','facebook.com':'https://www.facebook.com/login/identify',
+        'netflix.com':'https://www.netflix.com/LoginHelp','dropbox.com':'https://www.dropbox.com/forgot_password'
+      };
+      h += '<div class="sites-title">🔗 Siti collegati (' + data.sites_registered.length + ')</div><div class="sites-grid">';
+      data.sites_registered.forEach(function(s){
+        var site = (typeof s === 'object') ? (s.site || 'unknown') : s;
+        if (site.length > 25) return;
+        var icon = icons[site] || '🌐';
+        var url = links[site] || ('https://' + site);
+        h += '<a class="site-card" href="' + url + '" target="_blank">';
+        h += '<div class="site-icon-badge">' + icon + '</div>';
+        h += '<div class="site-name">' + site.replace(/\.(com|org|net|it|tv)$/,'') + '</div>';
+        h += '<div class="site-url">Verifica account →</div>';
+        h += '</a>';
+      });
+      h += '</div>';
+    }
+  }
+
   r.innerHTML = h;
 }
 
-var si2 = document.getElementById('searchInput');
-if (si2) si2.addEventListener('keydown', function(e){ if (e.key === 'Enter') doLookup(); });
+// Chips click
+var chipsRow = document.getElementById('chipsRow');
+if (chipsRow) {
+  chipsRow.addEventListener('click', function(e){
+    if (!e.target.classList.contains('chip')) return;
+    chipsRow.querySelectorAll('.chip').forEach(function(x){ x.classList.remove('active'); });
+    e.target.classList.add('active');
+    var chip = e.target.getAttribute('data-chip');
+    var map = {
+      'all': SECTIONS[currentSec].lookup,
+      'carrier': 'phone', 'region': 'phone', 'accounts': 'phone',
+      'people': 'users', 'names': 'users', 'usernames': 'users',
+      'email': 'email', 'emails': 'email', 'reputation': 'email',
+      'phone': 'phone', 'phones': 'phone',
+      'domains': 'domains', 'dns': 'domains', 'mx': 'domains', 'subdomains': 'domains',
+      'images': 'images', 'breaches': 'breaches', 'passwords': 'breaches'
+    };
+    if (map[chip]) {
+      currentLookup = map[chip];
+      var tl = document.getElementById('typeLabel');
+      if (tl) tl.textContent = currentLookup;
+    }
+  });
+}
+
+var si = document.getElementById('searchInput');
+if (si) si.addEventListener('keydown', function(e){ if (e.key === 'Enter') doLookup(); });
 
 renderChips('home');
 renderCards('home');

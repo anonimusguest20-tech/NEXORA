@@ -1,14 +1,163 @@
 <!DOCTYPE html>
-<html lang="it"><head><meta charset="UTF-8"><title>NEXORA</title><link rel="stylesheet" href="/static/style.css"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"></head>
+<html lang="it">
+<head>
+<meta charset="UTF-8"><title>NEXORA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#050608;
+  color:#fff;
+  font-family:'Inter',sans-serif;
+  min-height:100vh;
+  background-image:
+    radial-gradient(circle at 50% 40%, rgba(200,220,255,0.04), transparent 50%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 40px);
+}
+.topnav {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 40px;
+  border-bottom:1px solid #121418;
+}
+.brand { display:flex; gap:12px; align-items:center; }
+.brand-icon {
+  width:38px; height:38px;
+  border-radius:10px;
+  background:linear-gradient(135deg,#fff,#999);
+  color:#000;
+  font-weight:900;
+  font-size:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.brand-name { font-size:22px; font-weight:800; letter-spacing:2px; }
+.brand-sub { font-size:9px; letter-spacing:3px; color:#666; margin-top:-2px; }
+.nav-actions { display:flex; gap:12px; align-items:center; }
+.btn-ghost {
+  color:#fff;
+  padding:8px 18px;
+  border-radius:999px;
+  border:1px solid #222;
+  font-size:13px;
+  text-decoration:none;
+}
+.btn-ghost:hover { border-color:#fff; }
+.btn-white {
+  background:#fff;
+  color:#000;
+  padding:10px 22px;
+  border-radius:999px;
+  font-weight:600;
+  font-size:13px;
+  text-decoration:none;
+}
+.btn-white:hover { background:#ff3b3b; color:#fff; }
+
+.hero {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:calc(100vh - 80px);
+  text-align:center;
+  padding:60px 20px;
+}
+.logo-big {
+  width:120px;
+  height:120px;
+  margin-bottom:30px;
+  filter:drop-shadow(0 0 40px rgba(200,220,255,0.2));
+}
+.logo-big svg { width:100%; height:100%; display:block; }
+h1 {
+  font-size:72px;
+  font-weight:900;
+  letter-spacing:14px;
+  background:linear-gradient(180deg,#fff,#7a8896);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  margin-bottom:18px;
+}
+.tagline {
+  font-size:11px;
+  letter-spacing:6px;
+  color:#888;
+  margin-bottom:24px;
+}
+.desc {
+  color:#888;
+  font-size:16px;
+  max-width:560px;
+  line-height:1.6;
+  margin-bottom:40px;
+}
+.btn-hero {
+  background:#fff;
+  color:#000;
+  padding:16px 40px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:15px;
+  text-decoration:none;
+  transition:all 0.2s;
+  letter-spacing:0.5px;
+}
+.btn-hero:hover {
+  background:#ff3b3b;
+  color:#fff;
+  transform:translateY(-2px);
+  box-shadow:0 12px 40px rgba(255,60,60,0.3);
+}
+.footer-note {
+  margin-top:50px;
+  color:#555;
+  font-size:12px;
+  letter-spacing:1px;
+}
+</style>
+</head>
 <body>
+
 <nav class="topnav">
-  <div class="brand"><div class="brand-icon">N</div><div><div class="brand-name">NEXORA</div><div class="brand-sub">SEARCH BEYOND SURFACE</div></div></div>
-  <div class="nav-actions"><a href="/login" class="btn-ghost">Login</a><a href="/register" class="btn-white">Get Started</a></div>
+  <div class="brand">
+    <div class="brand-icon">N</div>
+    <div>
+      <div class="brand-name">NEXORA</div>
+      <div class="brand-sub">SEARCH BEYOND SURFACE</div>
+    </div>
+  </div>
+  <div class="nav-actions">
+    <a href="/login" class="btn-ghost">Login</a>
+    <a href="/register" class="btn-white">Get Started</a>
+  </div>
 </nav>
-<section class="pricing-hero">
+
+<section class="hero">
+  <div class="logo-big">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="ngrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#e8eef5"/>
+          <stop offset="100%" stop-color="#7a8896"/>
+        </linearGradient>
+      </defs>
+      <circle cx="100" cy="100" r="88" fill="none" stroke="#1a1d24" stroke-width="0.5"/>
+      <circle cx="100" cy="100" r="88" fill="none" stroke="#2a2f3a" stroke-width="0.3" stroke-dasharray="2 4"/>
+      <path d="M55 140 L55 60 L145 140 L145 60" fill="none" stroke="url(#ngrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="55" cy="60" r="4" fill="#fff" opacity="0.8"/>
+      <circle cx="145" cy="140" r="4" fill="#fff" opacity="0.8"/>
+    </svg>
+  </div>
   <h1>NEXORA</h1>
-  <p style="color:#888;margin:20px 0">Open source intelligence tools for a more transparent web.</p>
-  <a href="/register" class="btn-white" style="display:inline-block;margin-top:20px">Get Started</a>
+  <p class="tagline">INTELLIGENCE FOR A MORE TRANSPARENT WEB</p>
+  <p class="desc">Open source intelligence tools to search, analyze and connect information from across the web.</p>
+  <a href="/register" class="btn-hero">Inizia ora →</a>
+  <p class="footer-note">Hai già un account? <a href="/login" style="color:#ff3b3b;text-decoration:none">Accedi</a></p>
 </section>
-<script src="/static/music.js"></script>
-</body></html>
+
+</body>
+</html>

@@ -85,43 +85,37 @@ def lookup_phone(number):
         p = phonenumbers.parse(number, None)
         if not phonenumbers.is_valid_number(p):
             return {"error": "Numero non valido"}
-
         result = {
             "number": number,
-            "operator": carrier.name_for_number(p, "it") or "Sconosciuto",
-            "region": geocoder.description_for_number(p, "it") or "Sconosciuta",
+            "operator": carrier.name_for_number(p, "it") or None,
+            "region": geocoder.description_for_number(p, "it") or None,
             "country": phonenumbers.region_code_for_number(p),
             "type": "Mobile" if phonenumbers.number_type(p) == phonenumbers.PhoneNumberType.MOBILE else "Fisso",
-            "timezone": pn_timezone.time_zones_for_number(p),
+            "timezone": list(pn_timezone.time_zones_for_number(p)),
             "international": phonenumbers.format_number(p, phonenumbers.PhoneNumberFormat.INTERNATIONAL),
             "national": phonenumbers.format_number(p, phonenumbers.PhoneNumberFormat.NATIONAL),
             "e164": phonenumbers.format_number(p, phonenumbers.PhoneNumberFormat.E164),
-            "carrier": carrier.name_for_number(p, "en") or "Unknown",
+            "country_name": None,
+            "location": None,
+            "line_type": None,
             "sources": []
         }
-
         # Veriphone
         vk = os.getenv("VERIPHONE_KEY", "")
         if vk:
             try:
-                r = requests.get(f"https://api.veriphone.io/v2/verify",
+                r = requests.get("https://api.veriphone.io/v2/verify",
                                  params={"phone": number, "key": vk}, timeout=10)
                 if r.status_code == 200:
                     d = r.json()
                     if d.get("status") == "success":
-                        result["carrier"] = d.get("carrier") or result.get("carrier")
-                        result["type"] = d.get("phone_type") or result.get("type")
-                        result["region"] = d.get("phone_region") or result.get("region")
+                        result["operator"] = d.get("carrier") or result["operator"]
                         result["country_name"] = d.get("country")
-                        result["country_code"] = d.get("country_code")
-                        result["international"] = d.get("international_number") or result.get("international")
-                        result["local"] = d.get("local_number")
-                        result["e164"] = d.get("e164") or result.get("e164")
+                        result["region"] = d.get("phone_region") or result["region"]
+                        result["line_type"] = d.get("phone_type")
                         result["sources"].append("veriphone")
-            except Exception as e:
-                result["veriphone_error"] = str(e)
-
-        # Abstract API
+            except: pass
+        # Abstract
         ak = os.getenv("ABSTRACT_KEY", "")
         if ak:
             try:
@@ -130,20 +124,12 @@ def lookup_phone(number):
                 if r.status_code == 200:
                     d = r.json()
                     if not d.get("error"):
-                        result["abstract_valid"] = d.get("valid")
-                        result["abstract_format_int"] = d.get("format", {}).get("international")
-                        result["abstract_format_local"] = d.get("format", {}).get("local")
-                        result["abstract_country"] = d.get("country", {}).get("name")
-                        result["abstract_country_code"] = d.get("country", {}).get("code")
-                        result["abstract_location"] = d.get("location")
-                        result["abstract_type"] = d.get("type")
-                        result["abstract_carrier"] = d.get("carrier")
-                        if d.get("location"): result["region"] = d.get("location")
-                        if d.get("carrier"): result["operator"] = d.get("carrier")
+                        result["location"] = d.get("location")
+                        result["country_name"] = d.get("country", {}).get("name") or result["country_name"]
+                        if d.get("carrier"): result["operator"] = d["carrier"]
+                        if d.get("type"): result["line_type"] = d["type"]
                         result["sources"].append("abstract")
-            except Exception as e:
-                result["abstract_error"] = str(e)
-
+            except: pass
         # Numverify
         nk = os.getenv("NUMVERIFY_KEY", "")
         if nk:
@@ -153,160 +139,197 @@ def lookup_phone(number):
                 if r.status_code == 200:
                     d = r.json()
                     if d.get("valid"):
-                        result["numverify_valid"] = d.get("valid")
-                        result["numverify_number"] = d.get("number")
-                        result["numverify_local"] = d.get("local_format")
-                        result["numverify_international"] = d.get("international_format")
-                        result["numverify_country_prefix"] = d.get("country_prefix")
-                        result["numverify_country_code"] = d.get("country_code")
-                        result["numverify_country_name"] = d.get("country_name")
-                        result["numverify_location"] = d.get("location")
-                        result["numverify_carrier"] = d.get("carrier")
-                        result["numverify_line_type"] = d.get("line_type")
-                        if d.get("carrier") and result.get("operator") == "Sconosciuto":
-                            result["operator"] = d.get("carrier")
-                        if d.get("location") and result.get("region") == "Sconosciuta":
-                            result["region"] = d.get("location")
-                        if d.get("line_type"): result["type"] = d.get("line_type").capitalize()
+                        result["country_name"] = d.get("country_name") or result["country_name"]
+                        if d.get("carrier") and not result["operator"]:
+                            result["operator"] = d["carrier"]
+                        if d.get("location") and not result["location"]:
+                            result["location"] = d["location"]
+                        if d.get("line_type"): result["line_type"] = d["line_type"]
                         result["sources"].append("numverify")
-            except Exception as e:
-                result["numverify_error"] = str(e)
-
-        result["sites_registered"] = []
-
-        # Ignorant (funziona in locale, non su Railway Python 3.13)
-        try:
-            import trio, httpx
-            from ignorant.modules.shopping.amazon import amazon
-            from ignorant.modules.social.instagram import instagram
-            from ignorant.modules.social.snapchat import snapchat
-
-            cc = str(p.country_code)
-            nn = str(p.national_number)
-
-            async def check():
-                client = httpx.AsyncClient(timeout=10)
-                out = []
-                await amazon(nn, cc, client, out)
-                await instagram(nn, cc, client, out)
-                await snapchat(nn, cc, client, out)
-                await client.aclose()
-                return out
-
-            results = trio.run(check)
-            for r in results:
-                result["sites_registered"].append({
-                    "site": r.get("name", "Unknown"),
-                    "registered": bool(r.get("exists")),
-                    "domain": r.get("domain", "")
-                })
-        except ImportError:
-            result["ignorant_note"] = "ignorant non installato"
-        except Exception as e:
-            result["ignorant_error"] = str(e)
-
+            except: pass
+        # Link diretti
+        digits = number.replace("+", "").replace(" ", "").replace("-", "")
+        result["links"] = [
+            {"name": "WhatsApp", "url": f"https://wa.me/{digits}"},
+            {"name": "Telegram", "url": f"https://t.me/+{digits}"},
+            {"name": "Truecaller", "url": f"https://www.truecaller.com/search/it/{digits}"},
+            {"name": "Sync.me", "url": f"https://sync.me/search/?number={digits}"},
+            {"name": "Facebook", "url": "https://www.facebook.com/login/identify"},
+            {"name": "Google", "url": "https://accounts.google.com/signin/recovery"}
+        ]
         return result
     except Exception as e:
         return {"error": str(e)}
 
+
 def lookup_email(email):
-    result = {"email": email, "sources": [], "sites_registered": []}
+    result = {"email": email, "breaches": [], "sites_registered": [], "sources": []}
     domain = email.split("@")[-1]
 
-    # MX records
+    # MX
     try:
-        dns = requests.get(f"https://dns.google/resolve?name={domain}&type=MX", timeout=10).json()
+        dns = requests.get("https://dns.google/resolve?name=" + domain + "&type=MX", timeout=10).json()
         result["mx_records"] = len(dns.get("Answer", []))
     except: pass
 
     # EmailRep
     try:
-        r = requests.get(f"https://emailrep.io/{email}",
-                         headers={"User-Agent":"NEXORA"}, timeout=10)
+        r = requests.get("https://emailrep.io/" + email, headers={"User-Agent":"NEXORA"}, timeout=10)
         if r.status_code == 200:
             d = r.json()
             result["reputation"] = d.get("reputation")
             result["suspicious"] = d.get("suspicious")
-            result["domain"] = d.get("domain")
             result["profiles"] = d.get("profiles", [])
             result["sources"].append("emailrep")
-        elif r.status_code == 429:
-            result["emailrep_note"] = "rate limit"
     except: pass
+
+    # Holehe - cerca su 120+ siti
+    try:
+        import subprocess
+        res = subprocess.run(["holehe", email, "--only-used", "--no-color"],
+                             capture_output=True, text=True, timeout=180)
+        for line in res.stdout.splitlines():
+            if "[+]" in line:
+                s = line.split("[+]")[1].strip()
+                if s and len(s) < 40:
+                    result["sites_registered"].append(s)
+        result["sources"].append("holehe")
+    except Exception as e:
+        result["holehe_error"] = str(e)
 
     # Gravatar
     try:
+        import hashlib
         h = hashlib.md5(email.lower().encode()).hexdigest()
-        gr = requests.get(f"https://gravatar.com/{h}.json", timeout=10)
+        gr = requests.get("https://gravatar.com/" + h + ".json", timeout=10)
         if gr.status_code == 200:
-            entry = gr.json().get("entry",[{}])[0]
+            entry = gr.json().get("entry", [{}])[0]
             result["gravatar"] = {
                 "username": entry.get("preferredUsername"),
                 "displayName": entry.get("displayName"),
                 "profileUrl": entry.get("profileUrl"),
-                "accounts": entry.get("accounts",[])
+                "accounts": entry.get("accounts", [])
             }
             result["sources"].append("gravatar")
     except: pass
 
     # GitHub
     try:
-        gh = requests.get(f"https://api.github.com/search/users?q={email}+in:email",
+        gh = requests.get("https://api.github.com/search/users?q=" + email + "+in:email",
                           headers={"Accept":"application/vnd.github+json"}, timeout=10)
         if gh.status_code == 200:
-            d = gh.json()
-            if d.get("total_count",0) > 0:
-                result["github"] = [{"login":u["login"],"url":u["html_url"]} for u in d.get("items",[])[:5]]
+            data = gh.json()
+            if data.get("total_count", 0) > 0:
+                result["github"] = [{"login":u["login"],"url":u["html_url"]} for u in data.get("items",[])[:10]]
                 result["sources"].append("github")
     except: pass
 
-    # Firefox Monitor (breach check gratuito)
+    # XposedOrNot per breach
     try:
-        fm = requests.get(f"https://monitor.firefox.com/api/v1/breaches", timeout=10).json()
-        # Firefox non ha API pubblica per email specifica, skip
+        xon = requests.get("https://api.xposedornot.com/v1/check-email/" + email, timeout=15)
+        if xon.status_code == 200:
+            xd = xon.json()
+            if xd.get("status") == "success":
+                bl = xd.get("breaches", [])
+                if bl and len(bl) > 0:
+                    result["breaches"] = bl[0] if isinstance(bl[0], list) else bl
+                    result["sources"].append("xposedornot")
     except: pass
 
-    # holehe (funziona solo in locale, su Railway è disabilitato)
+    # Hudson Rock (infostealer)
     try:
-        res = subprocess.run(["holehe", email, "--only-used", "--no-color"],
-                             capture_output=True, text=True, timeout=60)
-        for line in res.stdout.splitlines():
-            if "[+]" in line:
-                s = line.split("[+]")[1].strip()
-                if s: result["sites_registered"].append(s)
-        result["sources"].append("holehe")
-    except FileNotFoundError:
-        pass
-    except Exception as e:
-        result["holehe_error"] = str(e)
+        hr = requests.get("https://cavalier.hudsonrock.com/api/json/v2/osint-tools/search-by-email",
+                          params={"email": email}, timeout=15)
+        if hr.status_code == 200:
+            hd = hr.json()
+            if hd.get("data") and hd["data"].get("employees"):
+                result["hudsonrock"] = hd["data"]
+                result["sources"].append("hudsonrock")
+    except: pass
 
-    # Fallback: se holehe non c'è, verifica manuale su piattaforme comuni
-    if not result["sites_registered"]:
-        common_sites = ["firefox.com","office365.com","spotify.com","adobe.com","amazon.com","pinterest.com","twitter.com","instagram.com","reddit.com","discord.com","github.com","tumblr.com","snapchat.com","linkedin.com","yahoo.com","dropbox.com"]
-        result["sites_registered"] = common_sites
-        result["sites_note"] = "Verifica manuale — clicca per controllare"
+    # IBM X-Force
+    try:
+        xf = requests.get("https://exchange.xforce.ibmcloud.com/api/breaches",
+                         params={"email": email}, timeout=10)
+        if xf.status_code == 200:
+            result["xforce"] = xf.json().get("breaches", [])
+    except: pass
 
     return result
+
 
 def lookup_ip(ip):
     try: return requests.get(f"http://ip-api.com/json/{ip}", timeout=10).json()
     except Exception as e: return {"error":str(e)}
 def lookup_username(username):
-    sites = {"GitHub":f"https://github.com/{username}","Twitter":f"https://twitter.com/{username}",
-             "Instagram":f"https://instagram.com/{username}","Reddit":f"https://reddit.com/user/{username}",
-             "TikTok":f"https://tiktok.com/@{username}","YouTube":f"https://youtube.com/@{username}",
-             "Twitch":f"https://twitch.tv/{username}","Steam":f"https://steamcommunity.com/id/{username}",
-             "Pinterest":f"https://pinterest.com/{username}","Telegram":f"https://t.me/{username}"}
+    sites = {
+        "GitHub": f"https://github.com/{username}",
+        "Twitter": f"https://twitter.com/{username}",
+        "Instagram": f"https://instagram.com/{username}",
+        "Reddit": f"https://reddit.com/user/{username}",
+        "TikTok": f"https://tiktok.com/@{username}",
+        "YouTube": f"https://youtube.com/@{username}",
+        "Twitch": f"https://twitch.tv/{username}",
+        "Steam": f"https://steamcommunity.com/id/{username}",
+        "Pinterest": f"https://pinterest.com/{username}",
+        "Telegram": f"https://t.me/{username}",
+        "SoundCloud": f"https://soundcloud.com/{username}",
+        "Spotify": f"https://open.spotify.com/user/{username}",
+        "Medium": f"https://medium.com/@{username}",
+        "Dev.to": f"https://dev.to/{username}",
+        "Behance": f"https://behance.net/{username}",
+        "Dribbble": f"https://dribbble.com/{username}",
+        "Flickr": f"https://flickr.com/people/{username}",
+        "Vimeo": f"https://vimeo.com/{username}",
+        "GitLab": f"https://gitlab.com/{username}",
+        "BitBucket": f"https://bitbucket.org/{username}",
+        "Mastodon": f"https://mastodon.social/@{username}",
+        "Bluesky": f"https://bsky.app/profile/{username}.bsky.social",
+        "Facebook": f"https://facebook.com/{username}",
+        "LinkedIn": f"https://linkedin.com/in/{username}",
+        "Keybase": f"https://keybase.io/{username}"
+    }
     found = []
     for site, url in sites.items():
         try:
-            r = requests.get(url, timeout=5, headers={"User-Agent":"Mozilla/5.0"})
-            if r.status_code == 200: found.append({"site":site,"url":url})
+            r = requests.get(url, timeout=4, headers={"User-Agent": "Mozilla/5.0"})
+            if r.status_code == 200:
+                found.append({"site": site, "url": url})
         except: pass
-    return {"username":username,"found":found}
+    return {"username": username, "found": found, "total_checked": len(sites)}
+
+
 def lookup_domain(d):
-    try: return requests.get(f"https://dns.google/resolve?name={d}&type=A", timeout=10).json()
-    except Exception as e: return {"error":str(e)}
+    d = d.replace("https://", "").replace("http://", "").split("/")[0]
+    result = {"domain": d, "sources": []}
+    try:
+        a = requests.get("https://dns.google/resolve?name=" + d + "&type=A", timeout=10).json()
+        result["a_records"] = [x.get("data") for x in a.get("Answer", [])]
+        mx = requests.get("https://dns.google/resolve?name=" + d + "&type=MX", timeout=10).json()
+        result["mx_records"] = [x.get("data") for x in mx.get("Answer", [])]
+        txt = requests.get("https://dns.google/resolve?name=" + d + "&type=TXT", timeout=10).json()
+        result["txt_records"] = [x.get("data") for x in txt.get("Answer", [])][:5]
+        ns = requests.get("https://dns.google/resolve?name=" + d + "&type=NS", timeout=10).json()
+        result["ns_records"] = [x.get("data") for x in ns.get("Answer", [])]
+        result["sources"].append("dns.google")
+    except Exception:
+        pass
+    try:
+        r = requests.get("https://crt.sh/?q=%25." + d + "&output=json", timeout=15)
+        if r.status_code == 200:
+            subs = set()
+            for entry in r.json()[:50]:
+                nv = entry.get("name_value", "")
+                for name in nv.split(chr(10)):
+                    if name.endswith(d) and name != d:
+                        subs.add(name)
+            result["subdomains"] = list(subs)[:30]
+            result["sources"].append("crt.sh")
+    except Exception:
+        pass
+    return result
+
+
 def lookup_breaches(query):
     result = {"query": query, "breaches": [], "breach_details": [], "sources": []}
 
@@ -639,7 +662,24 @@ def api_search_multi():
 @app.route('/piani')
 @login_required
 def piani():
-    return render_template('piani.html')
+    plans_db = db.session.query(PlanConfig).all()
+    if plans_db:
+        plans = {}
+        for p in plans_db:
+            limit = p.daily_limit
+            limit_display = '∞' if limit >= 999999 else limit
+            plans[p.key] = {"name": p.name, "price": p.price,
+                            "daily_limit": limit, "daily_display": limit_display,
+                            "modules": p.modules.split(","), "popular": p.popular}
+    else:
+        plans = {}
+        for k, v in PLANS.items():
+            limit = v['daily_limit']
+            limit_display = '∞' if limit >= 999999 else limit
+            plans[k] = {"name": v['name'], "price": v['price'],
+                        "daily_limit": limit, "daily_display": limit_display,
+                        "modules": v['modules'], "popular": (k == 'elite')}
+    return render_template('piani.html', plans=plans)
 
 @app.route('/player_bg')
 def player_bg():

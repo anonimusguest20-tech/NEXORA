@@ -2,10 +2,51 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8"><title>Piani — NEXORA</title>
-<link rel="stylesheet" href="/static/style.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#050608; color:#fff; font-family:'Inter',sans-serif; min-height:100vh; }
+.topnav { display:flex; justify-content:space-between; align-items:center; padding:18px 40px; border-bottom:1px solid #121418; }
+.brand { display:flex; gap:12px; align-items:center; }
+.brand-icon { width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg,#fff,#999); color:#000; font-weight:900; font-size:20px; display:flex; align-items:center; justify-content:center; }
+.brand-name { font-size:22px; font-weight:800; letter-spacing:2px; }
+.brand-sub { font-size:9px; letter-spacing:3px; color:#666; }
+.nav-actions { display:flex; gap:12px; align-items:center; }
+.btn-ghost { color:#fff; padding:8px 18px; border-radius:999px; border:1px solid #222; font-size:13px; text-decoration:none; }
+.btn-ghost:hover { border-color:#fff; }
+.pricing-wrap { max-width:1400px; margin:0 auto; padding:70px 40px 120px; }
+.pricing-head { text-align:center; margin-bottom:60px; }
+.pricing-head h1 { font-size:52px; font-weight:900; letter-spacing:-2px; background:linear-gradient(180deg,#fff,#888); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:12px; }
+.pricing-head p { color:#888; font-size:15px; }
+.pricing-cards { display:grid; grid-template-columns:repeat(5,1fr); gap:18px; max-width:1300px; margin:0 auto; }
+@media (max-width:1200px) { .pricing-cards { grid-template-columns:repeat(2,1fr); } }
+@media (max-width:700px) { .pricing-cards { grid-template-columns:1fr; } }
+.p-card { background:#0a0b0e; border:1px solid #14161c; border-radius:18px; padding:32px 24px; position:relative; display:flex; flex-direction:column; transition:all 0.2s; }
+.p-card:hover { border-color:#2a2d38; transform:translateY(-4px); }
+.p-card.featured { border-color:#ff3b3b; box-shadow:0 0 40px rgba(255,60,60,0.15); }
+.p-card.ultimate { border-color:#ffd700; box-shadow:0 0 40px rgba(255,215,0,0.1); }
+.p-badge { position:absolute; top:-12px; right:20px; background:#ff3b3b; color:#fff; padding:4px 14px; border-radius:999px; font-size:10px; font-weight:700; letter-spacing:1px; }
+.p-badge.gold { background:#ffd700; color:#000; font-size:14px; padding:2px 12px; }
+.p-name { font-size:13px; letter-spacing:3px; color:#888; font-weight:700; margin-bottom:20px; }
+.p-price { font-size:48px; font-weight:900; color:#fff; line-height:1; margin-bottom:28px; display:flex; align-items:flex-start; }
+.p-euro { font-size:24px; margin-top:6px; margin-right:2px; }
+.p-per { font-size:13px; color:#666; font-weight:500; align-self:flex-end; margin-left:6px; margin-bottom:8px; }
+.p-list { list-style:none; margin-bottom:28px; flex:1; }
+.p-list li { padding:9px 0; font-size:13px; color:#bbb; border-bottom:1px solid #0f1115; }
+.p-list li:before { content:"✓ "; color:#ff3b3b; font-weight:700; margin-right:4px; }
+.p-card.ultimate .p-list li:before { color:#ffd700; }
+.p-btn { width:100%; padding:13px; background:#14161c; color:#fff; border:none; border-radius:999px; font-weight:600; cursor:pointer; font-size:13.5px; font-family:inherit; margin-top:auto; transition:all 0.2s; }
+.p-btn:hover { background:#1f2229; }
+.p-btn.primary { background:#ff3b3b; }
+.p-btn.primary:hover { background:#e02a2a; }
+.p-btn.gold { background:#ffd700; color:#000; }
+.p-btn.gold:hover { background:#e6c200; }
+.note { text-align:center; color:#666; margin-top:50px; font-size:13px; }
+.note a { color:#ff3b3b; text-decoration:none; }
+</style>
 </head>
 <body>
+
 <nav class="topnav">
   <div class="brand">
     <div class="brand-icon">N</div>
@@ -17,7 +58,7 @@
   </div>
 </nav>
 
-<section class="pricing-page">
+<section class="pricing-wrap">
   <div class="pricing-head">
     <h1>Scegli il tuo piano</h1>
     <p>Sblocca il potere completo di NEXORA</p>
@@ -76,7 +117,7 @@
       <div class="p-name">ULTIMATE</div>
       <div class="p-price"><span class="p-euro">€</span>200<span class="p-per">/mese</span></div>
       <ul class="p-list">
-        <li>Lookup illimitati</li>
+        <li>Lookup <b style="color:#ffd700;font-size:16px">∞</b> illimitati</li>
         <li>Tutto di Elite</li>
         <li>API illimitata</li>
         <li>Server Discord privato</li>
@@ -86,19 +127,14 @@
     </div>
   </div>
 
-  <p class="buy-note">
-    Open the Ticket in the <a href="https://discord.gg/IL_TUO_INVITO" target="_blank">Discord Server</a> to buy a Plan
-  </p>
+  <p class="note">Apri un Ticket nel <a href="https://discord.gg/8tj7Y6aQU9" target="_blank">Server Discord</a> per acquistare un Piano</p>
 </section>
 
 <script>
 function buy(plan){
-  fetch('/api/checkout/'+plan,{method:'POST'}).then(r=>r.json()).then(d=>{
-    if(d.url)window.location.href=d.url;
-    else alert('Stripe non configurato. Contatta admin.');
-  });
+  window.open('https://discord.gg/8tj7Y6aQU9', '_blank');
 }
 </script>
-<script src="/static/music.js"></script>
+
 </body>
 </html>

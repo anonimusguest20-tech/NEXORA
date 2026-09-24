@@ -2,51 +2,140 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8"><title>Il tuo NEXORA ID</title>
-<link rel="stylesheet" href="/static/style.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  min-height:100vh;
+  background:#050608;
+  background-image:
+    radial-gradient(circle at 50% 40%, rgba(200,220,255,0.04), transparent 50%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 40px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Inter',sans-serif;
+  color:#fff;
+  padding:40px 20px;
+}
+.card {
+  background:rgba(10,11,14,0.9);
+  border:1px solid #14161c;
+  border-radius:24px;
+  padding:50px 44px;
+  max-width:460px;
+  width:100%;
+  text-align:center;
+  box-shadow:0 0 60px rgba(200,220,255,0.06), 0 20px 60px rgba(0,0,0,0.6);
+}
+.logo {
+  width:110px; height:110px;
+  margin:0 auto 26px;
+  filter:drop-shadow(0 0 24px rgba(200,220,255,0.25));
+}
+.logo svg { width:100%; height:100%; display:block; }
+h1 {
+  font-size:26px;
+  font-weight:800;
+  margin-bottom:10px;
+  letter-spacing:-0.3px;
+}
+.sub {
+  color:#888;
+  font-size:13.5px;
+  line-height:1.6;
+  margin-bottom:32px;
+  max-width:340px;
+  margin-left:auto;
+  margin-right:auto;
+}
+.idbox {
+  background:#050608;
+  border:1px solid #1a1d24;
+  border-radius:14px;
+  padding:24px 20px;
+  margin-bottom:16px;
+}
+.idval {
+  font-family:'JetBrains Mono',monospace;
+  font-size:26px;
+  font-weight:700;
+  color:#fff;
+  letter-spacing:4px;
+  text-shadow:0 0 20px rgba(200,220,255,0.4);
+  word-break:break-all;
+}
+.btn {
+  display:block;
+  width:100%;
+  background:#14161c;
+  color:#fff;
+  border:1px solid #1f242c;
+  padding:14px;
+  border-radius:12px;
+  font-weight:600;
+  font-size:14px;
+  cursor:pointer;
+  font-family:inherit;
+  text-decoration:none;
+  text-align:center;
+  transition:all 0.2s;
+  margin-bottom:12px;
+}
+.btn:hover { background:#1a1d24; border-color:#2a2f3a; }
+.btn-primary {
+  background:linear-gradient(180deg,#fff 0%,#d8dfe8 100%);
+  color:#000;
+  border:none;
+  font-weight:700;
+}
+.btn-primary:hover {
+  background:#fff;
+  box-shadow:0 8px 24px rgba(255,255,255,0.15);
+}
+.welcome {
+  color:#666;
+  font-size:13px;
+  margin:24px 0 20px;
+}
+.welcome b { color:#fff; font-weight:700; }
+</style>
 </head>
-<body class="showid-body">
-
-<div class="showid-wrap">
-  <div class="showid-card">
-    <div class="showid-logo">
-      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="ngrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#ffffff"/>
-            <stop offset="100%" stop-color="#8892a0"/>
-          </linearGradient>
-        </defs>
-        <circle cx="100" cy="100" r="88" fill="none" stroke="#1a1d24" stroke-width="0.5"/>
-        <circle cx="100" cy="100" r="88" fill="none" stroke="#2a2f3a" stroke-width="0.3" stroke-dasharray="2 4"/>
-        <path d="M55 140 L55 60 L145 140 L145 60" fill="none" stroke="url(#ngrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="55" cy="60" r="4" fill="#fff" opacity="0.8"/>
-        <circle cx="145" cy="140" r="4" fill="#fff" opacity="0.8"/>
-      </svg>
-    </div>
-
-    <h1 class="showid-title">Ecco il tuo NEXORA ID</h1>
-    <p class="showid-sub">Conservalo! Ti servirà ad ogni login insieme a email e password.</p>
-
-    <div class="showid-idbox">
-      <div class="showid-id" id="nidBox">{{ nexora_id }}</div>
-    </div>
-
-    <button type="button" onclick="copyID()" id="copyBtn" class="showid-btn">📋 Copia ID</button>
-
-    <p class="showid-welcome">Benvenuto, <b>{{ username }}</b></p>
-
-    <a href="/dashboard" class="showid-btn showid-primary">Entra nella Dashboard →</a>
+<body>
+<div class="card">
+  <div class="logo">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="ngrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#e8eef5"/>
+          <stop offset="100%" stop-color="#7a8896"/>
+        </linearGradient>
+      </defs>
+      <circle cx="100" cy="100" r="88" fill="none" stroke="#1a1d24" stroke-width="0.5"/>
+      <circle cx="100" cy="100" r="88" fill="none" stroke="#2a2f3a" stroke-width="0.3" stroke-dasharray="2 4"/>
+      <path d="M55 140 L55 60 L145 140 L145 60" fill="none" stroke="url(#ngrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="55" cy="60" r="4" fill="#fff" opacity="0.8"/>
+      <circle cx="145" cy="140" r="4" fill="#fff" opacity="0.8"/>
+    </svg>
   </div>
+  <h1>Ecco il tuo NEXORA ID</h1>
+  <p class="sub">Conservalo! Ti servirà ad ogni login insieme a email e password.</p>
+  <div class="idbox">
+    <div class="idval" id="nidBox">{{ nexora_id }}</div>
+  </div>
+  <button type="button" onclick="copyID()" id="copyBtn" class="btn">📋 Copia ID</button>
+  <p class="welcome">Benvenuto, <b>{{ username }}</b></p>
+  <a href="/dashboard" class="btn btn-primary">Entra nella Dashboard →</a>
 </div>
 
 <script>
 function copyID(){
   const id = document.getElementById('nidBox').innerText.trim();
-  navigator.clipboard.writeText(id).then(()=>{
+  navigator.clipboard.writeText(id).then(() => {
     const btn = document.getElementById('copyBtn');
     btn.innerText = '✓ Copiato!';
-    setTimeout(()=>{ btn.innerText = '📋 Copia ID'; }, 2000);
+    setTimeout(() => { btn.innerText = '📋 Copia ID'; }, 2000);
   });
 }
 </script>
