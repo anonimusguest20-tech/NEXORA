@@ -1024,3 +1024,30 @@ body.auth { all: unset; }
 .playlist::-webkit-scrollbar { width: 4px; }
 .playlist::-webkit-scrollbar-track { background: transparent; }
 .playlist::-webkit-scrollbar-thumb { background: #1a1d24; border-radius: 4px; }
+
+/* Toggle musica */
+.music-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(10, 11, 14, 0.9);
+  border: 1px solid #1a1d24;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+.music-toggle:hover {
+  background: #14161c;
+  border-color: #2a2f3a;
+  transform: scale(1.1);
+}

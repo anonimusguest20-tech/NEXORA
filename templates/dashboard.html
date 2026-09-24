@@ -404,5 +404,77 @@ function buyPlan(p){
 document.getElementById('query').addEventListener('keydown',e=>{if(e.key==='Enter')doLookup();});
 renderChips('home');renderCards('home');
 </script>
+
+<!-- AUTO MUSIC PLAYER (nascosto) -->
+<div id="nexoraAutoPlayer" style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none"></div>
+<button id="nexoraMusicToggle" class="music-toggle" title="Play / Pausa musica">🎵</button>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+(function(){
+  const PLAYLIST_ID = "PLcL3BVYhxFZA";
+  let bgPlayer = null;
+  let started = false;
+
+  window.onYouTubeIframeAPIReady = function(){
+    bgPlayer = new YT.Player('nexoraAutoPlayer', {
+      height: '1', width: '1',
+      playerVars: {
+        listType: 'playlist',
+        list: PLAYLIST_ID,
+        autoplay: 1,
+        controls: 0,
+        disablekb: 1,
+        modestbranding: 1,
+        rel: 0,
+        iv_load_policy: 3,
+        playsinline: 1
+      },
+      events: {
+        'onReady': function(e){
+          // Prova autoplay (funziona perché l'utente ha appena cliccato login)
+          e.target.setVolume(40);
+          e.target.playVideo();
+          started = true;
+        },
+        'onStateChange': function(e){
+          if (e.data === YT.PlayerState.ENDED){
+            e.target.playVideoAt(0);
+          }
+        },
+        'onError': function(){
+          try {
+            const next = (bgPlayer.getPlaylistIndex() + 1) % bgPlayer.getPlaylist().length;
+            bgPlayer.playVideoAt(next);
+          } catch(err){}
+        }
+      }
+    });
+  };
+
+  // Toggle play/pausa col bottone
+  document.addEventListener('click', function(ev){
+    if (ev.target.closest('#nexoraMusicToggle')){
+      if (!bgPlayer) return;
+      const state = bgPlayer.getPlayerState();
+      if (state === 1) {
+        bgPlayer.pauseVideo();
+        document.getElementById('nexoraMusicToggle').innerText = '🔇';
+      } else {
+        bgPlayer.playVideo();
+        document.getElementById('nexoraMusicToggle').innerText = '🎵';
+      }
+    }
+  });
+
+  // Se dopo 2 secondi non è partito, mostra hint
+  setTimeout(() => {
+    if (bgPlayer && bgPlayer.getPlayerState && bgPlayer.getPlayerState() !== 1) {
+      document.getElementById('nexoraMusicToggle').innerText = '▶️';
+    }
+  }, 2000);
+})();
+</script>
+
 </body>
 </html>
