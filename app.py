@@ -669,7 +669,53 @@ def admin():
     logs = db.session.query(LookupLog).order_by(LookupLog.created_at.desc()).limit(100).all()
     return render_template('admin.html', users=users, logs=logs)
 os.makedirs('instance', exist_ok=True)
-with app.app_context(): db.create_all()
+
+with app.app_context():
+    db.create_all()
+    # ─── MIGRATION PRIMA DI QUALSIASI QUERY ───
+    from sqlalchemy import text
+    try:
+        with db.engine.connect() as conn:
+            cols = [row[1] for row in conn.execute(text("PRAGMA table_info(user)"))]
+            migrations = [
+                ('username', "ALTER TABLE user ADD COLUMN username VARCHAR(40)"),
+                ('verified', "ALTER TABLE user ADD COLUMN verified BOOLEAN DEFAULT 1"),
+                ('device_id', "ALTER TABLE user ADD COLUMN device_id VARCHAR(64)"),
+                ('nexora_id', "ALTER TABLE user ADD COLUMN nexora_id VARCHAR(20)"),
+            ]
+            for col_name, sql in migrations:
+                if col_name not in cols:
+                    conn.execute(text(sql))
+                    print(f"MIGRATION: aggiunta colonna {col_name}", flush=True)
+            conn.commit()
+    except Exception as e:
+        print(f"MIGRATION ERROR: {e}", flush=True)
+
+    # ─── PIANI DEFAULT ───
+    try:
+        for k, v in PLANS.items():
+            if not db.session.query(PlanConfig).filter_by(key=k).first():
+                db.session.add(PlanConfig(
+                    key=k, name=v["name"], price=v["price"],
+                    daily_limit=v["daily_limit"],
+                    modules=",".join(v["modules"]),
+                    popular=(k == "elite")
+                ))
+        db.session.commit()
+    except Exception as e:
+        print(f"PLANS INIT ERROR: {e}", flush=True)
+
+    # ─── ADMIN FORZATI ───
+    try:
+        for em in ADMIN_EMAILS:
+            u = db.session.query(User).filter_by(email=em).first()
+            if u and not u.is_admin:
+                u.is_admin = True
+                u.plan = 'ultimate'
+        db.session.commit()
+    except Exception as e:
+        print(f"ADMIN INIT ERROR: {e}", flush=True)
+
 if __name__ == '__main__': app.run(debug=False, host='0.0.0.0', port=5000, threaded=False, use_reloader=False)
 
 
@@ -685,51 +731,6 @@ DEFAULT_CONTENT = {
     'stat4_text': 'Same information. A more transparent world.',
 }
 
-with app.app_context():
-    db.create_all()
-    # AUTO MIGRATION - aggiunge colonne mancanti
-    from sqlalchemy import text, inspect
-    try:
-        insp = inspect(db.engine)
-        cols = [c['name'] for c in insp.get_columns('user')]
-        with db.engine.connect() as conn:
-            if 'username' not in cols:
-                conn.execute(text("ALTER TABLE user ADD COLUMN username VARCHAR(40)"))
-            if 'verified' not in cols:
-                conn.execute(text("ALTER TABLE user ADD COLUMN verified BOOLEAN DEFAULT 1"))
-            if 'device_id' not in cols:
-                conn.execute(text("ALTER TABLE user ADD COLUMN device_id VARCHAR(64)"))
-            conn.commit()
-    except Exception as e:
-        print("Migration:", e)
-    for k, v in PLANS.items():
-        if not db.session.query(PlanConfig).filter_by(key=k).first():
-            db.session.add(PlanConfig(
-                key=k, name=v["name"], price=v["price"],
-                daily_limit=v["daily_limit"],
-                modules=",".join(v["modules"]),
-                popular=(k == "elite")
-            ))
-    db.session.commit()
-    for k, v in DEFAULT_CONTENT.items():
-        if not db.session.query(SiteContent).filter_by(key=k).first():
-            db.session.add(SiteContent(key=k, value=v))
-    db.session.commit()
-
-    # Aggiorna piani utenti esistenti da PLAN_EMAILS
-    for em, plan in PLAN_EMAILS.items():
-        u = db.session.query(User).filter_by(email=em).first()
-        if u and u.plan != plan:
-            u.plan = plan
-    db.session.commit()
-
-    # Forza admin per ADMIN_EMAILS
-    for em in ADMIN_EMAILS:
-        u = db.session.query(User).filter_by(email=em).first()
-        if u and not u.is_admin:
-            u.is_admin = True
-            u.plan = 'ultimate'
-    db.session.commit()
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
