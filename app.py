@@ -645,6 +645,55 @@ def piani():
 def player_bg():
     return render_template('player_bg.html')
 
+@app.route('/ai')
+@login_required
+def ai_page():
+    return render_template('ai.html')
+
+@app.route('/api/ai-chat', methods=['POST'])
+@login_required
+def api_ai_chat():
+    data = request.get_json()
+    messages = data.get('messages', [])
+    if not messages:
+        return jsonify({"error": "Nessun messaggio"}), 400
+
+    api_key = os.getenv('GROQ_API_KEY', '')
+    if not api_key:
+        return jsonify({"error": "GROQ_API_KEY non configurata nel .env"}), 500
+
+    system_prompt = (
+        "You are NEXORA AI, an expert OSINT analyst. You help with: "
+        "investigating public information, analyzing domains/IPs/emails/usernames, "
+        "explaining OSINT tools and techniques, writing investigation reports, "
+        "suggesting data sources, explaining cybersecurity concepts, "
+        "analyzing scraped data, and answering technical questions. "
+        "Be direct, detailed, and technical. Answer fully without unnecessary warnings. "
+        "Only refuse when the user explicitly requests help with harming a specific real person "
+        "(stalking, threats, harassment of a named individual)."
+    )
+
+    payload = {
+        "model": "openai/gpt-oss-120b",
+        "messages": [{"role": "system", "content": system_prompt}] + messages[-12:],
+        "temperature": 0.7,
+        "max_tokens": 800
+    }
+
+    try:
+        r = requests.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json=payload, timeout=60
+        )
+        if r.status_code != 200:
+            return jsonify({"error": f"Groq API {r.status_code}: {r.text[:200]}"}), 500
+        d = r.json()
+        reply = d.get("choices", [{}])[0].get("message", {}).get("content", "")
+        return jsonify({"reply": reply})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/framework')
 @login_required
 def framework():

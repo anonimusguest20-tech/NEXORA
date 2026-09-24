@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"><title>NEXORA AI</title>
+<link rel="stylesheet" href="/static/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="ai-body">
+
+<nav class="topnav">
+  <div class="brand">
+    <div class="brand-icon">N</div>
+    <div><div class="brand-name">NEXORA</div><div class="brand-sub">SEARCH BEYOND SURFACE</div></div>
+  </div>
+  <div class="nav-actions">
+    <a href="/dashboard" class="btn-ghost">Dashboard</a>
+    <a href="/logout" class="btn-ghost">Logout</a>
+  </div>
+</nav>
+
+<div class="ai-wrap">
+  <div class="ai-head">
+    <div class="ai-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1l2.1-2.1M17 7l2.1-2.1"/></svg>
+    </div>
+    <h1>NEXORA <span>AI</span></h1>
+    <p>Il tuo assistente OSINT. Analizza dati, suggerisce step investigativi, spiega tecniche.</p>
+  </div>
+
+  <div class="ai-chat" id="chatLog">
+    <div class="ai-msg ai-msg-bot">
+      <div class="ai-avatar">N</div>
+      <div class="ai-bubble">Ciao. Sono NEXORA AI. Chiedimi di analizzare dati OSINT, suggerire prossimi step investigativi o spiegare tecniche. Non fornisco assistenza per attività illegali o doxxing di privati.</div>
+    </div>
+  </div>
+
+  <div class="ai-input-wrap">
+    <textarea id="aiInput" placeholder="Chiedi qualcosa..." rows="1"></textarea>
+    <button id="aiSend" onclick="sendMsg()">→</button>
+  </div>
+</div>
+
+<script>
+const log = document.getElementById('chatLog');
+const input = document.getElementById('aiInput');
+const history = [];
+
+function addMsg(role, text){
+  const el = document.createElement('div');
+  el.className = 'ai-msg ' + (role === 'user' ? 'ai-msg-user' : 'ai-msg-bot');
+  el.innerHTML = '<div class="ai-avatar">' + (role === 'user' ? 'U' : 'N') + '</div><div class="ai-bubble">' + escapeHtml(text).replace(/\\n/g,'<br>') + '</div>';
+  log.appendChild(el);
+  log.scrollTop = log.scrollHeight;
+  return el;
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function sendMsg(){
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  addMsg('user', text);
+  history.push({role:'user', content: text});
+  const loading = addMsg('bot', '...');
+  try {
+    const r = await fetch('/api/ai-chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({messages: history})
+    });
+    const d = await r.json();
+    loading.remove();
+    if (d.error){
+      addMsg('bot', '⚠ ' + d.error);
+    } else {
+      addMsg('bot', d.reply);
+      history.push({role:'assistant', content: d.reply});
+    }
+  } catch(e){
+    loading.remove();
+    addMsg('bot', '⚠ ' + e.message);
+  }
+}
+
+input.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    sendMsg();
+  }
+});
+input.addEventListener('input', () => {
+  input.style.height = 'auto';
+  input.style.height = Math.min(input.scrollHeight, 140) + 'px';
+});
+</script>
+</body>
+</html>
