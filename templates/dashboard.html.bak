@@ -34,7 +34,6 @@
       <a class="s-item" data-section="reports"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg></span> Reports</a>
 
       <p class="s-title">ACCOUNT</p>
-      <a class="s-item" href="/song"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span> Song</a>
       <a class="s-item" href="/piani"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg></span> Piani</a>
     </nav>
     <div class="side-foot">
@@ -59,22 +58,7 @@
       <div class="globe-wrap">
         <div class="globe-canvas" id="globeCanvas"></div>
 
-        <div class="planet-label lab-left-1"><span class="label-text">PEOPLE</span><div class="label-line"></div><span class="label-dot"></span></div>
-        <div class="planet-label lab-left-2"><span class="label-text">DOMAINS</span><div class="label-line"></div><span class="label-dot"></span></div>
-        <div class="planet-label lab-left-3"><span class="label-text">SOCIAL</span><div class="label-line"></div><span class="label-dot"></span></div>
-        <div class="planet-label lab-left-4"><span class="label-text">LEAKS</span><div class="label-line"></div><span class="label-dot"></span></div>
-
-        <div class="planet-label lab-right-1"><span class="label-dot"></span><div class="label-line"></div><span class="label-text">DATA</span></div>
-        <div class="planet-label lab-right-2"><span class="label-dot"></span><div class="label-line"></div><span class="label-text">CONNECTIONS</span></div>
-        <div class="planet-label lab-right-3"><span class="label-dot"></span><div class="label-line"></div><span class="label-text">INTELLIGENCE</span></div>
-        <div class="planet-label lab-right-4"><span class="label-dot"></span><div class="label-line"></div><span class="label-text">A SAFER WEB</span></div>
-
-        <div class="hero-center">
-          <h1 class="hero-title" id="heroTitle">NEXORA</h1>
-          <p class="hero-tag" id="heroTag">INTELLIGENCE FOR A MORE TRANSPARENT WEB</p>
-          <p class="hero-desc" id="heroDesc">Open source intelligence tools to search, analyze and connect information from across the web.</p>
-        </div>
-      </div>
+        
 
       <div class="quote-right">"Information<br>reveals patterns."</div>
 

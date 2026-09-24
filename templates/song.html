@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"><title>Song — NEXORA</title>
+<link rel="stylesheet" href="/static/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="song-body">
+
+<nav class="topnav">
+  <div class="brand">
+    <div class="brand-icon">N</div>
+    <div><div class="brand-name">NEXORA</div><div class="brand-sub">SEARCH BEYOND SURFACE</div></div>
+  </div>
+  <div class="nav-actions">
+    <a href="/dashboard" class="btn-ghost">Dashboard</a>
+    <a href="/logout" class="btn-ghost">Logout</a>
+  </div>
+</nav>
+
+<div class="song-layout">
+
+  <div class="disc-zone">
+    <div class="disc" id="disc">
+      <div class="disc-ring"></div>
+      <div class="disc-ring"></div>
+      <div class="disc-ring"></div>
+      <div class="disc-center">
+        <div class="disc-label">
+          <div class="disc-n">N</div>
+          <div class="disc-wordmark">NEXORA</div>
+        </div>
+        <div class="disc-hole"></div>
+      </div>
+      <div class="disc-shine"></div>
+    </div>
+
+    <div class="disc-info">
+      <div class="disc-now">NOW PLAYING</div>
+      <div class="disc-song" id="songTitle">In attesa di riproduzione...</div>
+      <div style="text-align:center;margin-bottom:20px">
+        <button onclick="openBgPlayer()" class="disc-btn" style="width:auto;padding:10px 24px;border-radius:999px;font-size:13px;height:auto;background:linear-gradient(180deg,#fff,#d8dfe8);color:#000;font-weight:700">
+          🎵 Apri in background
+        </button>
+      </div>
+      <div class="disc-controls">
+        <button onclick="prevSong()" class="disc-btn">⏮</button>
+        <button onclick="togglePlay()" class="disc-btn disc-btn-main" id="playBtn">▶</button>
+        <button onclick="nextSong()" class="disc-btn">⏭</button>
+      </div>
+      <div class="disc-progress">
+        <span id="curTime">0:00</span>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <span id="totTime">0:00</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="playlist-zone">
+    <div class="playlist-head">
+      <h3>PLAYLIST</h3>
+      <span id="plCount">0 brani</span>
+    </div>
+    <div class="playlist" id="playlist"></div>
+  </div>
+
+</div>
+
+<div id="ytPlayer" style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px"></div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+// ═══════════════════════════════════════════════════════
+// PERSISTENZA: salva timestamp e brano ogni secondo
+// ═══════════════════════════════════════════════════════
+function saveState(){
+  if (!player || !player.getCurrentTime) return;
+  try {
+    const state = {
+      index: player.getPlaylistIndex(),
+      time: player.getCurrentTime(),
+      playing: isPlaying,
+      ts: Date.now()
+    };
+    localStorage.setItem('nexora_song_state', JSON.stringify(state));
+  } catch(e){}
+}
+
+function loadState(){
+  try {
+    const raw = localStorage.getItem('nexora_song_state');
+    if (!raw) return null;
+    const state = JSON.parse(raw);
+    // Se sono passate più di 6 ore, ignora
+    if (Date.now() - state.ts > 6 * 3600 * 1000) {
+      localStorage.removeItem('nexora_song_state');
+      return null;
+    }
+    return state;
+  } catch(e){ return null; }
+}
+</script>
+<script>
+// ═══════════════════════════════════════════════════════
+// CONFIGURA QUI LA TUA PLAYLIST
+// Sostituisci PLAYLIST_ID con l'ID della tua playlist YouTube.
+// Esempio URL: https://www.youtube.com/playlist?list=PLxxxxxx
+// → PLAYLIST_ID = "PLxxxxxx"
+// ═══════════════════════════════════════════════════════
+const PLAYLIST_ID = "PLcL3BVYhxFZA";
+
+let player;
+let playlistData = [];
+let currentIndex = 0;
+let isPlaying = false;
+
+function onYouTubeIframeAPIReady(){
+  player = new YT.Player('ytPlayer', {
+    height: '1',
+    width: '1',
+    playerVars: {
+      listType: 'playlist',
+      list: PLAYLIST_ID,
+      autoplay: 0,
+      controls: 0,
+      disablekb: 1,
+      modestbranding: 1,
+      rel: 0,
+      iv_load_policy: 3,
+      playsinline: 1
+    },
+    events: {
+      'onReady': onPlayerReady,
+      'onStateChange': onPlayerStateChange,
+      'onError': onPlayerError
+    }
+  });
+}
+
+function onPlayerReady(){
+  // Riprendi lo stato salvato
+  const saved = loadState();
+  // Carica la lista della playlist
+  const ids = player.getPlaylist();
+  if (ids && ids.length > 0) {
+    // Recupera i titoli
+    ids.forEach((vid, i) => {
+      fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${vid}`)
+        .then(r => r.json())
+        .then(data => {
+          playlistData[i] = {
+            id: vid,
+            title: data.title || `Brano ${i+1}`,
+            author: data.author_name || ''
+          };
+          renderPlaylist();
+        })
+        .catch(() => {
+          playlistData[i] = { id: vid, title: `Brano ${i+1}`, author: '' };
+          renderPlaylist();
+        });
+    });
+  }
+  // Se c'era uno stato salvato, riprendi
+  if (saved && saved.index >= 0 && saved.playing) {
+    setTimeout(() => {
+      player.playVideoAt(saved.index);
+      setTimeout(() => {
+        if (saved.time > 2) player.seekTo(saved.time, true);
+      }, 1200);
+    }, 800);
+  }
+}
+
+function onPlayerStateChange(event){
+  if (event.data === YT.PlayerState.PLAYING){
+    isPlaying = true;
+    document.getElementById('playBtn').innerText = '❚❚';
+    document.getElementById('disc').classList.add('spinning');
+    const idx = player.getPlaylistIndex();
+    currentIndex = idx;
+    updateNowPlaying();
+    renderPlaylist();
+  } else if (event.data === YT.PlayerState.PAUSED){
+    isPlaying = false;
+    document.getElementById('playBtn').innerText = '▶';
+    document.getElementById('disc').classList.remove('spinning');
+  } else if (event.data === YT.PlayerState.ENDED){
+    // Loop: torna all'inizio della playlist
+    player.playVideoAt(0);
+  }
+}
+
+function onPlayerError(){
+  // Salta al prossimo in caso di errore
+  const next = (player.getPlaylistIndex() + 1) % player.getPlaylist().length;
+  player.playVideoAt(next);
+}
+
+function updateNowPlaying(){
+  const item = playlistData[currentIndex];
+  if (item){
+    document.getElementById('songTitle').innerText = item.title + (item.author ? ' — ' + item.author : '');
+  }
+}
+
+function renderPlaylist(){
+  const cont = document.getElementById('playlist');
+  document.getElementById('plCount').innerText = playlistData.length + ' brani';
+  cont.innerHTML = playlistData.map((item, i) => `
+    <div class="pl-item ${i === currentIndex ? 'active' : ''}" onclick="playSong(${i})">
+      <div class="pl-num">${i + 1}</div>
+      <div class="pl-info">
+        <div class="pl-title">${item ? item.title : '...'}</div>
+        <div class="pl-author">${item ? item.author : ''}</div>
+      </div>
+      <div class="pl-icon">${i === currentIndex && isPlaying ? '❚❚' : '▶'}</div>
+    </div>
+  `).join('');
+}
+
+function playSong(i){
+  currentIndex = i;
+  player.playVideoAt(i);
+}
+
+function togglePlay(){
+  if (!player) return;
+  if (isPlaying) player.pauseVideo();
+  else player.playVideo();
+}
+
+function nextSong(){
+  if (!player) return;
+  const next = (player.getPlaylistIndex() + 1) % player.getPlaylist().length;
+  player.playVideoAt(next);
+}
+
+function prevSong(){
+  if (!player) return;
+  const list = player.getPlaylist();
+  const prev = (player.getPlaylistIndex() - 1 + list.length) % list.length;
+  player.playVideoAt(prev);
+}
+
+// Aggiorna progress
+setInterval(() => {
+  if (player && player.getCurrentTime){
+    const cur = player.getCurrentTime() || 0;
+    const tot = player.getDuration() || 0;
+    document.getElementById('curTime').innerText = fmt(cur);
+    document.getElementById('totTime').innerText = fmt(tot);
+    if (tot > 0) document.getElementById('progressFill').style.width = (cur / tot * 100) + '%';
+    saveState();
+  }
+}, 1000);
+
+// Salva anche quando si chiude la pagina
+window.addEventListener('beforeunload', saveState);
+
+function openBgPlayer(){
+  const w = 420, h = 380;
+  const left = window.screen.width - w - 40;
+  const top = window.screen.height - h - 80;
+  window.open('/player_bg', 'NexoraPlayer', 'width=' + w + ',height=' + h + ',left=' + left + ',top=' + top + ',resizable=yes,scrollbars=no');
+}
+
+function fmt(s){
+  s = Math.floor(s);
+  return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+}
+</script>
+</body>
+</html>

@@ -17,7 +17,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-ADMIN_EMAILS = ['admin@nexora.local', 'amico@nexora.local']
+ADMIN_EMAILS = ['admin@nexora.local', 'anonimus.guest20@gmail.com', 'amico@nexora.local']
 
 PLAN_EMAILS = {
     'plaiko@nexora.local': 'starter',
@@ -38,6 +38,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(200), nullable=False)
     username = db.Column(db.String(40), unique=True)
     verified = db.Column(db.Boolean, default=True)
+    nexora_id = db.Column(db.String(20), unique=True)
     plan = db.Column(db.String(20), default='free')
     is_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -486,19 +487,18 @@ LOOKUP_MAP = {
 
 @app.route('/')
 def index(): return render_template('index.html')
-@app.route('/login', methods=['GET','POST'])
-def login():
-    if request.method == 'POST':
-        email = request.form['email'].strip().lower()
-        pwd = request.form['password']
-        u = db.session.query(User).filter_by(email=email, password=pwd).first()
-        if u:
-            login_user(u); return redirect(url_for('dashboard'))
-        flash('Credenziali errate.')
-    return render_template('login.html')
 @app.route('/logout')
 @login_required
 def logout(): logout_user(); return redirect(url_for('index'))
+def generate_nexora_id():
+    import random, string
+    while True:
+        part1 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        part2 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        nid = f"NEX-{part1}-{part2}"
+        if not db.session.query(User).filter_by(nexora_id=nid).first():
+            return nid
+
 @app.route('/register', methods=['GET','POST'])
 def register():
     if request.method == 'POST':
@@ -519,13 +519,40 @@ def register():
             return redirect(url_for('register'))
         is_admin = email in ADMIN_EMAILS
         assigned_plan = 'ultimate' if is_admin else PLAN_EMAILS.get(email, 'free')
+        nid = generate_nexora_id()
         u = User(email=email, password=pwd, username=username,
-                 verified=True, is_admin=is_admin, plan=assigned_plan)
+                 verified=True, is_admin=is_admin, plan=assigned_plan,
+                 nexora_id=nid)
         db.session.add(u)
         db.session.commit()
         login_user(u, remember=True)
-        return redirect(url_for('dashboard'))
+        # Reindirizza alla pagina che mostra l'ID
+        return redirect(url_for('show_nexora_id'))
     return render_template('register.html')
+
+@app.route('/welcome')
+@login_required
+def show_nexora_id():
+    return render_template('show_id.html', nexora_id=current_user.nexora_id, username=current_user.username)
+
+@app.route('/login', methods=['GET','POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email'].strip().lower()
+        pwd = request.form['password']
+        nid = request.form.get('nexora_id', '').strip()
+        u = db.session.query(User).filter_by(email=email, password=pwd).first()
+        if not u:
+            flash('Credenziali errate.')
+            return render_template('login.html')
+        # Se non è admin, serve anche l'ID
+        if not u.is_admin:
+            if not nid or nid != u.nexora_id:
+                flash('NEXORA ID errato o mancante.')
+                return render_template('login.html')
+        login_user(u, remember=True)
+        return redirect(url_for('dashboard'))
+    return render_template('login.html')
 
 @app.route('/dashboard')
 @login_required
@@ -614,6 +641,15 @@ def api_search_multi():
 def piani():
     return render_template('piani.html')
 
+@app.route('/player_bg')
+def player_bg():
+    return render_template('player_bg.html')
+
+@app.route('/song')
+@login_required
+def song():
+    return render_template('song.html')
+
 @app.route('/pricing')
 def pricing():
     plans_db = db.session.query(PlanConfig).all()
@@ -685,6 +721,14 @@ with app.app_context():
         u = db.session.query(User).filter_by(email=em).first()
         if u and u.plan != plan:
             u.plan = plan
+    db.session.commit()
+
+    # Forza admin per ADMIN_EMAILS
+    for em in ADMIN_EMAILS:
+        u = db.session.query(User).filter_by(email=em).first()
+        if u and not u.is_admin:
+            u.is_admin = True
+            u.plan = 'ultimate'
     db.session.commit()
 
 if __name__ == '__main__':

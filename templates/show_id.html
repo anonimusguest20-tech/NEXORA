@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"><title>Il tuo NEXORA ID</title>
+<link rel="stylesheet" href="/static/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+</head>
+<body class="showid-body">
+
+<div class="showid-wrap">
+  <div class="showid-card">
+    <div class="showid-logo">
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="ngrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#8892a0"/>
+          </linearGradient>
+        </defs>
+        <circle cx="100" cy="100" r="88" fill="none" stroke="#1a1d24" stroke-width="0.5"/>
+        <circle cx="100" cy="100" r="88" fill="none" stroke="#2a2f3a" stroke-width="0.3" stroke-dasharray="2 4"/>
+        <path d="M55 140 L55 60 L145 140 L145 60" fill="none" stroke="url(#ngrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="55" cy="60" r="4" fill="#fff" opacity="0.8"/>
+        <circle cx="145" cy="140" r="4" fill="#fff" opacity="0.8"/>
+      </svg>
+    </div>
+
+    <h1 class="showid-title">Ecco il tuo NEXORA ID</h1>
+    <p class="showid-sub">Conservalo! Ti servirà ad ogni login insieme a email e password.</p>
+
+    <div class="showid-idbox">
+      <div class="showid-id" id="nidBox">{{ nexora_id }}</div>
+    </div>
+
+    <button type="button" onclick="copyID()" id="copyBtn" class="showid-btn">📋 Copia ID</button>
+
+    <p class="showid-welcome">Benvenuto, <b>{{ username }}</b></p>
+
+    <a href="/dashboard" class="showid-btn showid-primary">Entra nella Dashboard →</a>
+  </div>
+</div>
+
+<script>
+function copyID(){
+  const id = document.getElementById('nidBox').innerText.trim();
+  navigator.clipboard.writeText(id).then(()=>{
+    const btn = document.getElementById('copyBtn');
+    btn.innerText = '✓ Copiato!';
+    setTimeout(()=>{ btn.innerText = '📋 Copia ID'; }, 2000);
+  });
+}
+</script>
+</body>
+</html>
