@@ -645,6 +645,11 @@ def piani():
 def player_bg():
     return render_template('player_bg.html')
 
+@app.route('/framework')
+@login_required
+def framework():
+    return render_template('framework.html')
+
 @app.route('/song')
 @login_required
 def song():

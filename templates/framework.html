@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"><title>NEXORA Framework (Easy)</title>
+<link rel="stylesheet" href="/static/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="fw-body">
+
+<nav class="topnav">
+  <div class="brand">
+    <div class="brand-icon">N</div>
+    <div><div class="brand-name">NEXORA</div><div class="brand-sub">SEARCH BEYOND SURFACE</div></div>
+  </div>
+  <div class="nav-actions">
+    <a href="/dashboard" class="btn-ghost">Dashboard</a>
+    <a href="/logout" class="btn-ghost">Logout</a>
+  </div>
+</nav>
+
+<div class="fw-header">
+  <h1>NEXORA Framework <span>(Easy)</span></h1>
+  <input class="fw-search" id="fwSearch" placeholder="Search tools..." oninput="filterTree()">
+</div>
+
+<div class="fw-tree-wrap">
+  <svg id="fwSvg"></svg>
+</div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+const TREE_DATA = {
+  name: "NEXORA OSINT TOOL (Easy)",
+  children: [
+    { name: "Username", children: [
+      { name: "Namechk", url: "https://namechk.com/" },
+      { name: "KnowEm", url: "https://knowem.com/" },
+      { name: "Instant Username", url: "https://instantusername.com/" },
+      { name: "UserSearch", url: "https://usersearch.org/" },
+      { name: "CheckUsernames", url: "https://checkusernames.com/" }
+    ]},
+    { name: "Email Address", children: [
+      { name: "Hunter.io", url: "https://hunter.io/" },
+      { name: "Phonebook.cz", url: "https://phonebook.cz/" },
+      { name: "Skymem", url: "https://www.skymem.info/" },
+      { name: "Toofr", url: "https://www.toofr.com/" },
+      { name: "Email Format", url: "https://email-format.com/" }
+    ]},
+    { name: "Domain Name", children: [
+      { name: "ViewDNS", url: "https://viewdns.info/" },
+      { name: "DNSDumpster", url: "https://dnsdumpster.com/" },
+      { name: "SecurityTrails", url: "https://securitytrails.com/" },
+      { name: "URLVoid", url: "https://www.urlvoid.com/" },
+      { name: "VirusTotal", url: "https://www.virustotal.com/" },
+      { name: "SpyOnWeb", url: "https://spyonweb.com/" }
+    ]},
+    { name: "IP & MAC Address", children: [
+      { name: "AbuseIPDB", url: "https://www.abuseipdb.com/" },
+      { name: "GreyNoise", url: "https://viz.greynoise.io/" },
+      { name: "IPVoid", url: "https://www.ipvoid.com/" },
+      { name: "ZoomEye", url: "https://www.zoomeye.org/" },
+      { name: "FOFA", url: "https://fofa.info/" },
+      { name: "Censys", url: "https://censys.io/" }
+    ]},
+    { name: "Images / Videos / Docs", children: [
+      { name: "Yandex Images", url: "https://yandex.com/images/" },
+      { name: "PimEyes", url: "https://pimeyes.com/" },
+      { name: "FaceCheck.id", url: "https://facecheck.id/" },
+      { name: "Metadata2Go", url: "https://www.metadata2go.com/" },
+      { name: "ExifData", url: "https://exifdata.com/" },
+      { name: "InVID", url: "https://www.invid-project.eu/tools-and-services/invid-verification-plugin/" }
+    ]},
+    { name: "Social Networks", children: [
+      { name: "Social Searcher", url: "https://www.social-searcher.com/" },
+      { name: "Osintgram", url: "https://github.com/Datalux/Osintgram" },
+      { name: "TweetDeck", url: "https://tweetdeck.twitter.com/" },
+      { name: "Twint", url: "https://github.com/twintproject/twint" },
+      { name: "Sowsearch", url: "https://www.sowsearch.info/" }
+    ]},
+    { name: "Instant Messaging", children: [
+      { name: "TGStat", url: "https://tgstat.com/" },
+      { name: "Discord.id", url: "https://discord.id/" },
+      { name: "WhatsApp", url: "https://wa.me/" },
+      { name: "Kik.me", url: "https://kik.me/" }
+    ]},
+    { name: "People Search Engines", children: [
+      { name: "Pipl", url: "https://pipl.com/" },
+      { name: "Spokeo", url: "https://www.spokeo.com/" },
+      { name: "WhitePages", url: "https://www.whitepages.com/" },
+      { name: "BeenVerified", url: "https://www.beenverified.com/" },
+      { name: "ThatsThem", url: "https://thatsthem.com/" }
+    ]},
+    { name: "Telephone Numbers", children: [
+      { name: "Sync.me", url: "https://sync.me/" },
+      { name: "SpyDialer", url: "https://www.spydialer.com/" },
+      { name: "ReversePhoneLookup", url: "https://www.reversephonelookup.com/" },
+      { name: "Numlookup", url: "https://www.numlookup.com/" }
+    ]},
+    { name: "Public Records", children: [
+      { name: "BRB Public Records", url: "https://www.brbpub.com/" },
+      { name: "SearchSystems", url: "https://publicrecords.searchsystems.net/" },
+      { name: "Black Book Online", url: "https://www.blackbookonline.info/" }
+    ]},
+    { name: "Business Records", children: [
+      { name: "OpenCorporates", url: "https://opencorporates.com/" },
+      { name: "Crunchbase", url: "https://www.crunchbase.com/" },
+      { name: "Glassdoor", url: "https://www.glassdoor.com/" },
+      { name: "SEC EDGAR", url: "https://www.sec.gov/edgar" }
+    ]},
+    { name: "Transportation", children: [
+      { name: "FlightRadar24", url: "https://www.flightradar24.com/" },
+      { name: "ADSBExchange", url: "https://globe.adsbexchange.com/" },
+      { name: "MarineTraffic", url: "https://www.marinetraffic.com/" },
+      { name: "VesselFinder", url: "https://www.vesselfinder.com/" }
+    ]},
+    { name: "Geolocation Tools / Maps", children: [
+      { name: "SunCalc", url: "https://www.suncalc.org/" },
+      { name: "Mapillary", url: "https://www.mapillary.com/" },
+      { name: "Google Earth Pro", url: "https://www.google.com/earth/versions/" },
+      { name: "Wikimapia", url: "https://wikimapia.org/" },
+      { name: "GeoGuessr", url: "https://www.geoguessr.com/" }
+    ]},
+    { name: "Search Engines", children: [
+      { name: "DuckDuckGo", url: "https://duckduckgo.com/" },
+      { name: "Startpage", url: "https://www.startpage.com/" },
+      { name: "Yandex", url: "https://yandex.com/" },
+      { name: "Bing", url: "https://www.bing.com/" },
+      { name: "Google Dorking", url: "https://www.exploit-db.com/google-hacking-database" }
+    ]},
+    { name: "Online Communities", children: [
+      { name: "Reddit Search", url: "https://www.reddit.com/search" },
+      { name: "4chan Archive", url: "https://archived.moe/" },
+      { name: "HackerNews", url: "https://news.ycombinator.com/" }
+    ]},
+    { name: "Archives", children: [
+      { name: "Wayback Machine", url: "https://web.archive.org/" },
+      { name: "Archive.today", url: "https://archive.ph/" },
+      { name: "CachedView", url: "https://cachedview.nl/" },
+      { name: "TimeTravel", url: "http://timetravel.mementoweb.org/" }
+    ]},
+    { name: "Language Translation", children: [
+      { name: "DeepL", url: "https://www.deepl.com/translator" },
+      { name: "Google Translate", url: "https://translate.google.com/" },
+      { name: "Yandex Translate", url: "https://translate.yandex.com/" }
+    ]},
+    { name: "Mobile OSINT", children: [
+      { name: "MobSF", url: "https://github.com/MobSF/Mobile-Security-Framework-MobSF" },
+      { name: "APKLab", url: "https://github.com/APKLab/APKLab" },
+      { name: "Frida", url: "https://frida.re/" }
+    ]},
+    { name: "Disinformation / Verification", children: [
+      { name: "FactCheck.org", url: "https://www.factcheck.org/" },
+      { name: "Snopes", url: "https://www.snopes.com/" },
+      { name: "Bellingcat", url: "https://www.bellingcat.com/" },
+      { name: "First Draft", url: "https://firstdraftnews.org/" }
+    ]},
+    { name: "Blockchain & Crypto", children: [
+      { name: "Blockchain.com", url: "https://www.blockchain.com/explorer" },
+      { name: "Etherscan", url: "https://etherscan.io/" },
+      { name: "WalletExplorer", url: "https://www.walletexplorer.com/" },
+      { name: "Chainalysis", url: "https://www.chainalysis.com/" }
+    ]},
+    { name: "Encoding / Decoding", children: [
+      { name: "CyberChef", url: "https://gchq.github.io/CyberChef/" },
+      { name: "Base64 Decode", url: "https://www.base64decode.org/" },
+      { name: "Dcode", url: "https://www.dcode.fr/" },
+      { name: "Quipqiup", url: "https://quipqiup.com/" }
+    ]},
+    { name: "AI Tools", children: [
+      { name: "Hugging Face", url: "https://huggingface.co/" },
+      { name: "OpenAI Playground", url: "https://platform.openai.com/playground" },
+      { name: "Perplexity", url: "https://www.perplexity.ai/" }
+    ]},
+    { name: "Malicious File Analysis", children: [
+      { name: "Hybrid Analysis", url: "https://www.hybrid-analysis.com/" },
+      { name: "Any.run", url: "https://any.run/" },
+      { name: "Joe Sandbox", url: "https://www.joesandbox.com/" },
+      { name: "Cuckoo", url: "https://cuckoosandbox.org/" }
+    ]},
+    { name: "Cyber Threat Intelligence", children: [
+      { name: "MISP", url: "https://www.misp-project.org/" },
+      { name: "AlienVault OTX", url: "https://otx.alienvault.com/" },
+      { name: "ThreatMiner", url: "https://www.threatminer.org/" },
+      { name: "MalwareBazaar", url: "https://bazaar.abuse.ch/" }
+    ]},
+    { name: "OpSec", children: [
+      { name: "ProtonVPN", url: "https://protonvpn.com/" },
+      { name: "Tor Browser", url: "https://www.torproject.org/" },
+      { name: "Tails OS", url: "https://tails.boum.org/" },
+      { name: "Whonix", url: "https://www.whonix.org/" }
+    ]},
+    { name: "Documentation / Evidence", children: [
+      { name: "Hunchly", url: "https://www.hunch.ly/" },
+      { name: "Obsidian", url: "https://obsidian.md/" },
+      { name: "CherryTree", url: "https://www.giuspen.com/cherrytree/" }
+    ]},
+    { name: "Training", children: [
+      { name: "OSINT Dojo", url: "https://www.osintdojo.com/" },
+      { name: "Trace Labs", url: "https://www.tracelabs.org/" },
+      { name: "Bellingcat Guides", url: "https://www.bellingcat.com/category/resources/how-tos/" },
+      { name: "SANS OSINT", url: "https://www.sans.org/cyber-security-courses/open-source-intelligence-gathering/" }
+    ]}
+  ]
+};
+
+const svg = d3.select("#fwSvg");
+const margin = { top: 40, right: 320, bottom: 40, left: 260 };
+const width = 1600;
+const height = 1000;
+
+svg.attr("width", width).attr("height", height);
+const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+const tree = d3.tree().size([height - margin.top - margin.bottom, width - margin.left - margin.right - 200]);
+
+let root = d3.hierarchy(TREE_DATA);
+let i = 0;
+const duration = 300;
+
+root.x0 = (height - margin.top - margin.bottom) / 2;
+root.y0 = 0;
+
+root.children.forEach(collapse);
+update(root);
+
+function collapse(d) {
+  if (d.children) {
+    d._children = d.children;
+    d._children.forEach(collapse);
+    d.children = null;
+  }
+}
+
+function update(source) {
+  const treeData = tree(root);
+  const nodes = treeData.descendants();
+  const links = treeData.links();
+
+  nodes.forEach(d => { d.y = d.depth * 260; });
+
+  // ─── LINKS ───
+  const link = g.selectAll("path.link").data(links, d => d.target.id);
+
+  const linkEnter = link.enter().insert("path", "g")
+    .attr("class", "link")
+    .attr("fill", "none")
+    .attr("stroke", "#8ba3c8")
+    .attr("stroke-width", 2)
+    .attr("stroke-linecap", "round")
+    .attr("stroke-opacity", 1)
+    .attr("d", d => {
+      const o = { x: source.x0, y: source.y0 };
+      return diagonal({ source: o, target: o });
+    });
+
+  linkEnter.merge(link)
+    .attr("fill", "none")
+    .attr("stroke", "#8ba3c8")
+    .attr("stroke-width", 2)
+    .attr("stroke-linecap", "round")
+    .attr("stroke-opacity", 1)
+    .transition().duration(duration)
+    .attr("d", diagonal);
+
+  link.exit().transition().duration(duration)
+    .attr("d", d => {
+      const o = { x: source.x, y: source.y };
+      return diagonal({ source: o, target: o });
+    })
+    .remove();
+
+  // ─── NODES ───
+  const node = g.selectAll("g.node").data(nodes, d => d.id || (d.id = ++i));
+
+  const nodeEnter = node.enter().append("g")
+    .attr("class", "node")
+    .attr("transform", d => `translate(${source.y0},${source.x0})`)
+    .on("click", (event, d) => {
+      if (d.data.url) {
+        window.open(d.data.url, "_blank");
+        return;
+      }
+      if (d.children) {
+        d._children = d.children;
+        d.children = null;
+      } else {
+        d.children = d._children;
+        d._children = null;
+      }
+      update(d);
+    });
+
+  nodeEnter.append("circle")
+    .attr("r", 1e-6)
+    .attr("fill", d => d.data.url ? "#0a0b0e" : (d._children ? "#ff3b3b" : "#0a0b0e"))
+    .attr("stroke", d => d.data.url ? "#4a5260" : "#c8d4e0")
+    .attr("stroke-width", d => d.data.url ? 1 : 2);
+
+  nodeEnter.append("text")
+    .attr("dy", ".35em")
+    .attr("x", d => d.children || d._children ? -14 : 14)
+    .attr("text-anchor", d => d.children || d._children ? "end" : "start")
+    .text(d => d.data.name)
+    .style("fill", d => d.data.url ? "#8892a0" : "#fff")
+    .style("font-size", d => d.data.url ? "12px" : "13px")
+    .style("font-weight", d => d.data.url ? "500" : "700")
+    .style("font-family", "Inter, sans-serif")
+    .style("cursor", "pointer");
+
+  const nodeUpdate = node.merge(nodeEnter);
+
+  nodeUpdate.transition().duration(duration)
+    .attr("transform", d => `translate(${d.y},${d.x})`);
+
+  nodeUpdate.select("circle")
+    .attr("r", 6)
+    .attr("fill", d => d.data.url ? "#0a0b0e" : (d._children ? "#ff3b3b" : "#0a0b0e"))
+    .attr("stroke", d => d.data.url ? "#4a5260" : "#c8d4e0")
+    .attr("stroke-width", d => d.data.url ? 1 : 2);
+
+  nodeUpdate.select("text")
+    .style("fill", d => d.data.url ? "#8892a0" : "#fff")
+    .style("font-weight", d => d.data.url ? "500" : "700");
+
+  const nodeExit = node.exit().transition().duration(duration)
+    .attr("transform", d => `translate(${source.y},${source.x})`)
+    .remove();
+
+  nodeExit.select("circle").attr("r", 1e-6);
+  nodeExit.select("text").style("fill-opacity", 1e-6);
+
+  nodes.forEach(d => { d.x0 = d.x; d.y0 = d.y; });
+}
+
+function diagonal(d) {
+  return `M${d.source.y},${d.source.x}C${(d.source.y + d.target.y) / 2},${d.source.x} ${(d.source.y + d.target.y) / 2},${d.target.x} ${d.target.y},${d.target.x}`;
+}
+
+function filterTree() {
+  const q = document.getElementById('fwSearch').value.toLowerCase().trim();
+  if (!q) {
+    root = d3.hierarchy(TREE_DATA);
+    root.x0 = (height - margin.top - margin.bottom) / 2;
+    root.y0 = 0;
+    i = 0;
+    root.children.forEach(collapse);
+    g.selectAll("*").remove();
+    update(root);
+    return;
+  }
+  function expandAll(d) {
+    if (d._children) { d.children = d._children; d._children = null; }
+    if (d.children) d.children.forEach(expandAll);
+  }
+  expandAll(root);
+  g.selectAll("*").remove();
+  i = 0;
+  update(root);
+}
+</script>
+</body>
+</html>

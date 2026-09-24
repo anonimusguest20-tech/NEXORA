@@ -6,68 +6,59 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body data-section="home">
-<div class="app-layout">
+<div class="app">
 
-  <aside class="side">
-    <div class="side-brand">
-      <div class="brand-top">NEXORA</div>
-      <div class="brand-tag">SEARCH BEYOND SURFACE</div>
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">NEXORA</div>
+      <div class="sb-sub">SEARCH BEYOND SURFACE</div>
     </div>
-    <nav class="side-nav">
-      <a class="s-item active" data-section="home"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg></span> Home</a>
-      <a class="s-item" data-section="search"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></span> Search</a>
-
-      <p class="s-title">DATA</p>
-      <a class="s-item" data-section="people"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></span> People</a>
-      <a class="s-item" data-section="users"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20c0-3.5 3.1-6 7-6s7 2.5 7 6M17 20c0-2.5 2-4 5-4"/></svg></span> Users</a>
-      <a class="s-item" data-section="email"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span> Email</a>
-      <a class="s-item" data-section="phone"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 17v3a2 2 0 0 1-2.2 2 19 19 0 0 1-8.6-3.1 19 19 0 0 1-5.8-5.8A19 19 0 0 1 2.3 4.4 2 2 0 0 1 4.3 2h3a2 2 0 0 1 2 1.7 12 12 0 0 0 .7 2.6 2 2 0 0 1-.5 2.1L8.4 9.5a16 16 0 0 0 6 6l1.1-1.1a2 2 0 0 1 2.1-.5 12 12 0 0 0 2.6.7A2 2 0 0 1 22 17z"/></svg></span> Phone</a>
-      <a class="s-item" data-section="domains"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg></span> Domains</a>
-      <a class="s-item" data-section="social"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></span> Social</a>
-      <a class="s-item" data-section="images"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></span> Images</a>
-      <a class="s-item" data-section="ip"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-6 8-13a8 8 0 1 0-16 0c0 7 8 13 8 13z"/><circle cx="12" cy="9" r="3"/></svg></span> Locations</a>
-      <a class="s-item" data-section="discord"><span class="s-ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.4A19.8 19.8 0 0 0 15.4 3l-.3.5c1.7.4 2.5 1 3.3 1.6a13.5 13.5 0 0 0-12.8 0c.8-.6 1.7-1.2 3.3-1.6L8.6 3A19.8 19.8 0 0 0 3.7 4.4C.4 9.5-.6 14.5.1 19.4a19.9 19.9 0 0 0 6.1 3l1.3-2c-.7-.3-1.4-.6-2-1l.5-.4a14 14 0 0 0 12 0l.5.4c-.6.4-1.3.7-2 1l1.3 2a19.9 19.9 0 0 0 6.1-3c.8-5.7-.8-10.6-3.6-15zM8.5 15.5c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2zm7 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2z"/></svg></span> Discord</a>
-      <a class="s-item" data-section="breaches"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v6c0 1.7 4 3 9 3s9-1.3 9-3V5M3 11v6c0 1.7 4 3 9 3s9-1.3 9-3v-6"/></svg></span> Data Breach</a>
-
-      <p class="s-title">TOOLS</p>
-      <a class="s-item" data-section="tools"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 6.3a4 4 0 0 1-5.6 5.6l-6 6a2 2 0 0 0 2.8 2.8l6-6a4 4 0 0 1 5.6-5.6l-3 3"/></svg></span> Tools</a>
-      <a class="s-item" data-section="reports"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg></span> Reports</a>
-
-      <p class="s-title">ACCOUNT</p>
-      <a class="s-item" href="/song"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span> Song</a>
-      <a class="s-item" href="/piani"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg></span> Piani</a>
+    <nav class="sb-nav">
+      <a class="sb-item active" data-sec="home"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg></span> Home</a>
+      <a class="sb-item" data-sec="search"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></span> Search</a>
+      <div class="sb-title">DATA</div>
+      <a class="sb-item" data-sec="people"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></span> People</a>
+      <a class="sb-item" data-sec="users"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20c0-3.5 3.1-6 7-6s7 2.5 7 6M17 20c0-2.5 2-4 5-4"/></svg></span> Users</a>
+      <a class="sb-item" data-sec="email"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span> Email</a>
+      <a class="sb-item" data-sec="phone"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 17v3a2 2 0 0 1-2.2 2 19 19 0 0 1-8.6-3.1 19 19 0 0 1-5.8-5.8A19 19 0 0 1 2.3 4.4 2 2 0 0 1 4.3 2h3a2 2 0 0 1 2 1.7 12 12 0 0 0 .7 2.6 2 2 0 0 1-.5 2.1L8.4 9.5a16 16 0 0 0 6 6l1.1-1.1a2 2 0 0 1 2.1-.5 12 12 0 0 0 2.6.7A2 2 0 0 1 22 17z"/></svg></span> Phone</a>
+      <a class="sb-item" data-sec="domains"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg></span> Domains</a>
+      <a class="sb-item" data-sec="social"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></span> Social</a>
+      <a class="sb-item" data-sec="images"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></span> Images</a>
+      <a class="sb-item" data-sec="ip"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-6 8-13a8 8 0 1 0-16 0c0 7 8 13 8 13z"/><circle cx="12" cy="9" r="3"/></svg></span> IP</a>
+      <a class="sb-item" data-sec="discord"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 17s-2-1-3-2c0-4 2-8 4-9 1 0 2 .5 2.5 1 .5-.5 1.5-1 2.5-1 2 1 4 5 4 9-1 1-3 2-3 2"/><path d="M9 13.5c0 1 .5 1.5 1.5 1.5M13.5 13.5c0 1 .5 1.5 1.5 1.5"/><ellipse cx="9.5" cy="11.5" rx="0.8" ry="1"/><ellipse cx="14.5" cy="11.5" rx="0.8" ry="1"/><path d="M4.5 6C6 4.5 8 3.5 12 3.5S18 4.5 19.5 6"/></svg></span> Discord</a>
+      <a class="sb-item" data-sec="breaches"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v6c0 1.7 4 3 9 3s9-1.3 9-3V5M3 11v6c0 1.7 4 3 9 3s9-1.3 9-3v-6"/></svg></span> Breach</a>
+      <div class="sb-title">TOOLS</div>
+      <a class="sb-item" href="/framework"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="2"/><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><path d="M12 12L6 6M12 12L18 6M12 12L6 18M12 12L18 18"/></svg></span> Framework (Easy)</a>
+      <a class="sb-item" href="/song"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span> Song</a>
+      <a class="sb-item" href="/piani"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg></span> Piani</a>
     </nav>
-    <div class="side-foot">
-      <div class="sf-icon">🌐</div>
-      <div class="sf-text"><p class="sf-title">Open source</p><p class="sf-sub">Better internet. Safer people.</p></div>
-    </div>
   </aside>
 
-  <main class="app-main">
+  <main class="main">
     <div class="topbar">
-      <a class="discord-btn" href="https://discord.gg/https://discord.gg/8tj7Y6aQU9" target="_blank"><svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.4A19.8 19.8 0 0 0 15.4 3l-.3.5c1.7.4 2.5 1 3.3 1.6a13.5 13.5 0 0 0-12.8 0c.8-.6 1.7-1.2 3.3-1.6L8.6 3A19.8 19.8 0 0 0 3.7 4.4C.4 9.5-.6 14.5.1 19.4a19.9 19.9 0 0 0 6.1 3l1.3-2c-.7-.3-1.4-.6-2-1l.5-.4a14 14 0 0 0 12 0l.5.4c-.6.4-1.3.7-2 1l1.3 2a19.9 19.9 0 0 0 6.1-3c.8-5.7-.8-10.6-3.6-15zM8.5 15.5c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2zm7 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2z"/></svg> Discord Server</a>
-      <div class="top-right">
-        <span class="credits-badge">⚡ {{ remaining }} credits</span>
-        <a href="/pricing" class="link-min">Piani</a>
-        <a href="/logout" class="link-min">Logout</a>
+      <a class="discord-btn" href="https://discord.gg/8tj7Y6aQU9" target="_blank">💬 Discord Server</a>
+      <div class="topbar-right">
+        <span class="credits">⚡ {{ remaining }} credits</span>
+        <a href="/piani" class="tb-link">Piani</a>
+        <a href="/logout" class="tb-link">Logout</a>
       </div>
     </div>
 
-    <div class="top-credits">by <a href="https://discord.com/users/1550193822770663504" target="_blank" class="credit-link">@eld</a> &amp; <a href="https://discord.com/users/739454865784307742" target="_blank" class="credit-link">@patch</a></div>
+    <div class="credits-row">by <a href="https://discord.com/users/1550193822770663504" target="_blank">@eld</a> &amp; <a href="https://discord.com/users/739454865784307742" target="_blank">@patch</a></div>
 
-    <section class="hero" id="heroSection">
-      <div class="globe-wrap">
-        <div class="globe-canvas" id="globeCanvas"></div>
+    <section class="hero">
+      <div class="globe-box">
+        <div class="globe" id="globe"></div>
 
-        <div class="planet-label lab-left-1"><span class="label-text">PEOPLE</span><div class="label-line"></div><span class="label-dot"></span></div>
-        <div class="planet-label lab-left-2"><span class="label-text">DOMAINS</span><div class="label-line"></div><span class="label-dot"></span></div>
-        <div class="planet-label lab-left-3"><span class="label-text">SOCIAL</span><div class="label-line"></div><span class="label-dot"></span></div>
-        <div class="planet-label lab-left-4"><span class="label-text">LEAKS</span><div class="label-line"></div><span class="label-dot"></span></div>
+        <div class="lbl lbl-l1"><span class="lbl-text">PEOPLE</span><span class="lbl-line"></span><span class="lbl-dot"></span></div>
+        <div class="lbl lbl-l2"><span class="lbl-text">DOMAINS</span><span class="lbl-line"></span><span class="lbl-dot"></span></div>
+        <div class="lbl lbl-l3"><span class="lbl-text">SOCIAL</span><span class="lbl-line"></span><span class="lbl-dot"></span></div>
+        <div class="lbl lbl-l4"><span class="lbl-text">LEAKS</span><span class="lbl-line"></span><span class="lbl-dot"></span></div>
 
-        <div class="planet-label lab-right-1"><span class="label-dot"></span><div class="label-line"></div><span class="label-text">DATA</span></div>
-        <div class="planet-label lab-right-2"><span class="label-dot"></span><div class="label-line"></div><span class="label-text">CONNECTIONS</span></div>
-        <div class="planet-label lab-right-3"><span class="label-dot"></span><div class="label-line"></div><span class="label-text">INTELLIGENCE</span></div>
-        <div class="planet-label lab-right-4"><span class="label-dot"></span><div class="label-line"></div><span class="label-text">A SAFER WEB</span></div>
+        <div class="lbl lbl-r1"><span class="lbl-dot"></span><span class="lbl-line"></span><span class="lbl-text">DATA</span></div>
+        <div class="lbl lbl-r2"><span class="lbl-dot"></span><span class="lbl-line"></span><span class="lbl-text">CONNECTIONS</span></div>
+        <div class="lbl lbl-r3"><span class="lbl-dot"></span><span class="lbl-line"></span><span class="lbl-text">INTELLIGENCE</span></div>
+        <div class="lbl lbl-r4"><span class="lbl-dot"></span><span class="lbl-line"></span><span class="lbl-text">A SAFER WEB</span></div>
 
         <div class="hero-center">
           <h1 class="hero-title" id="heroTitle">NEXORA</h1>
@@ -75,406 +66,370 @@
           <p class="hero-desc" id="heroDesc">Open source intelligence tools to search, analyze and connect information from across the web.</p>
         </div>
       </div>
+      <div class="quote">"Information<br>reveals patterns."</div>
+    </section>
 
-      <div class="quote-right">"Information<br>reveals patterns."</div>
-
-      <div class="search-main fade-elem">
+    <section class="search-sec" id="searchSec" style="display:none">
+      <div class="search-bar">
         <span class="search-ico">🔍</span>
-        <input id="query" placeholder="Search for a name, email, username, phone, domain, IP...">
+        <input id="searchInput" placeholder="Search...">
         <button onclick="doLookup()">→</button>
       </div>
-
-      <div class="chips-hero fade-elem" id="chipsRow"></div>
+      <div class="chips" id="chipsRow"></div>
     </section>
 
-    <section class="modules-grid fade-elem" id="modulesGrid"></section>
-
-    <section class="stats-bar fade-elem">
-      <div class="stat"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v13.5M4 19.5a2 2 0 0 1 2-2h14M6 4v13.5"/></svg></div><div><div class="stat-num">300+</div><div class="stat-label">Data Sources</div></div></div>
-      <div class="stat"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg></div><div><div class="stat-num">50+</div><div class="stat-label">OSINT Tools</div></div></div>
-      <div class="stat"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h8l-1 8 10-12h-8z"/></svg></div><div><div class="stat-num">Global</div><div class="stat-label">Faster Research</div></div></div>
-      <div class="stat stat-quote">Same information.<br>A more transparent world.<div class="line"></div></div>
+    <section class="result-sec" id="resultPanel" style="display:none">
+      <p class="result-active">Modulo attivo: <b id="typeLabel">users</b></p>
+      <div id="result" class="result-body"></div>
     </section>
 
-    
+    <section class="welcome">
+      <p>Welcome on <b>NEXORA</b>, a 
+        <span class="osint" id="osintW">
+          <span class="osint-l" data-w="Open" data-d="Accessible public data">O</span>
+          <span class="osint-l" data-w="Source" data-d="From public databases">S</span>
+          <span class="osint-l" data-w="Intelligence" data-d="Actionable information">I</span>
+          <span class="osint-l" data-w="Network" data-d="Connected sources">N</span>
+          <span class="osint-l" data-w="Tools" data-d="Investigation instruments">T</span>
+        </span>
+        <b>TOOL</b> made for justice. Have fun!
+      </p>
+      <div class="osint-tip" id="osintTip"><div class="tip-w" id="tipW"></div><div class="tip-d" id="tipD"></div></div>
+    </section>
 
-    <section class="result-area fade-elem">
-      <p class="current-type">Modulo attivo: <b id="typeLabel">users</b></p>
-      <div id="result" class="result-panel"><p class="empty">In attesa di una ricerca...</p></div>
+    <section class="mods" id="modsGrid"></section>
+
+    <section class="stats">
+      <div class="stat"><b>300+</b><span>Data Sources</span></div>
+      <div class="stat"><b>50+</b><span>OSINT Tools</span></div>
+      <div class="stat"><b>Global</b><span>Faster Research</span></div>
+      <div class="stat quote-stat">Same information.<br>A more transparent world.</div>
     </section>
   </main>
 </div>
 
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script>
-(function initGlobe(){
-  const container = document.getElementById('globeCanvas');
-  if (!container || typeof THREE === 'undefined') return;
-  const width = 900, height = 560;
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, width/height, 0.1, 1000);
-  camera.position.set(0, 0, 3.6);
-  const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setSize(width, height);
-  renderer.setClearColor(0x000000, 0);
-  container.appendChild(renderer.domElement);
-  const globeGroup = new THREE.Group();
-  scene.add(globeGroup);
-  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
-  const dir = new THREE.DirectionalLight(0xffffff, 0.8);
-  dir.position.set(5, 3, 5);
-  scene.add(dir);
-  const loader = new THREE.TextureLoader();
-  const earthTex = loader.load('https://unpkg.com/three-globe/example/img/earth-dark.jpg');
-  globeGroup.add(new THREE.Mesh(new THREE.SphereGeometry(1, 64, 64), new THREE.MeshPhongMaterial({
-    map: earthTex, color: 0x8aa4c8, emissive: 0x0a1828, emissiveIntensity: 0.4,
-    shininess: 5, transparent: true, opacity: 0.15
-  })));
-  globeGroup.add(new THREE.Mesh(new THREE.SphereGeometry(1.06, 48, 48),
-    new THREE.MeshBasicMaterial({color:0x2a6da8, transparent:true, opacity:0.08, side:THREE.BackSide})));
-  const cities = [[40.71,-74.00],[51.50,-0.12],[35.68,139.69],[48.85,2.35],[-33.86,151.20],[37.77,-122.41],[55.75,37.61],[-23.55,-46.63],[1.35,103.81],[25.20,55.27],[19.07,72.87],[-6.20,106.84],[52.52,13.40],[-34.60,-58.38],[30.04,31.23],[13.75,100.50],[-1.29,36.82],[19.43,-99.13],[28.61,77.21],[39.90,116.40]];
-  function latLonToVec3(lat, lon, r){const phi=(90-lat)*Math.PI/180, theta=(lon+180)*Math.PI/180;return new THREE.Vector3(-r*Math.sin(phi)*Math.cos(theta), r*Math.cos(phi), r*Math.sin(phi)*Math.sin(theta));}
-  function makeArc(a,b){const s=latLonToVec3(a[0],a[1],1.005), e=latLonToVec3(b[0],b[1],1.005);const m=s.clone().add(e).multiplyScalar(0.5);const d=s.distanceTo(e);m.normalize().multiplyScalar(1+d*0.35);return new THREE.QuadraticBezierCurve3(s,m,e);}
-  const arcList = [];
-  for (let i=0;i<20;i++){const a=cities[Math.floor(Math.random()*cities.length)];const b=cities[Math.floor(Math.random()*cities.length)];if(a===b){i--;continue;}const curve=makeArc(a,b);const pts=curve.getPoints(80);const geo=new THREE.BufferGeometry().setFromPoints(pts);const line=new THREE.Line(geo, new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0.15}));globeGroup.add(line);const dot=new THREE.Mesh(new THREE.SphereGeometry(0.012,8,8), new THREE.MeshBasicMaterial({color:0xffffff, transparent:true}));globeGroup.add(dot);arcList.push({curve,dot,line,t:Math.random(),speed:0.0015+Math.random()*0.003});}
-  let isDragging=false, prevX=0, prevY=0, targetRotX=0.15, targetRotY=0;
-  globeGroup.rotation.x=0.15;
-  function onDown(e){isDragging=true;const p=e.touches?e.touches[0]:e;prevX=p.clientX;prevY=p.clientY;renderer.domElement.style.cursor='grabbing';}
-  function onMove(e){if(!isDragging)return;const p=e.touches?e.touches[0]:e;targetRotY+=(p.clientX-prevX)*0.005;targetRotX+=(p.clientY-prevY)*0.005;targetRotX=Math.max(-0.9,Math.min(0.9,targetRotX));prevX=p.clientX;prevY=p.clientY;if(e.cancelable)e.preventDefault();}
-  function onUp(){isDragging=false;renderer.domElement.style.cursor='grab';}
-  renderer.domElement.style.cursor='grab';
-  renderer.domElement.addEventListener('mousedown',onDown);
-  window.addEventListener('mousemove',onMove);
-  window.addEventListener('mouseup',onUp);
-  renderer.domElement.addEventListener('touchstart',onDown,{passive:false});
-  window.addEventListener('touchmove',onMove,{passive:false});
-  window.addEventListener('touchend',onUp);
-  let t=0;
-  function animate(){requestAnimationFrame(animate);t+=0.016;if(!isDragging)targetRotY+=0.0025;globeGroup.rotation.y+=(targetRotY-globeGroup.rotation.y)*0.08;globeGroup.rotation.x+=(targetRotX-globeGroup.rotation.x)*0.08;arcList.forEach(a=>{a.t+=a.speed;if(a.t>1)a.t=0;const p=a.curve.getPoint(a.t);a.dot.position.copy(p);const fade=Math.sin(a.t*Math.PI);a.dot.material.opacity=0.15+0.85*fade;a.line.material.opacity=0.05+0.25*fade;});renderer.render(scene,camera);}
-  animate();
-})();
-
 const ICONS = {
-  'users':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>',
-  'email':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
-  'phone':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 17v3a2 2 0 0 1-2.2 2 19 19 0 0 1-8.6-3.1 19 19 0 0 1-5.8-5.8A19 19 0 0 1 2.3 4.4 2 2 0 0 1 4.3 2h3a2 2 0 0 1 2 1.7 12 12 0 0 0 .7 2.6 2 2 0 0 1-.5 2.1L8.4 9.5a16 16 0 0 0 6 6l1.1-1.1a2 2 0 0 1 2.1-.5 12 12 0 0 0 2.6.7A2 2 0 0 1 22 17z"/></svg>',
-  'domains':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>',
-  'social':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>',
-  'images':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>',
-  'breaches':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v6c0 1.7 4 3 9 3s9-1.3 9-3V5M3 11v6c0 1.7 4 3 9 3s9-1.3 9-3v-6"/></svg>',
-  'ip':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-6 8-13a8 8 0 1 0-16 0c0 7 8 13 8 13z"/><circle cx="12" cy="9" r="3"/></svg>',
-  'tools':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 6.3a4 4 0 0 1-5.6 5.6l-6 6a2 2 0 0 0 2.8 2.8l6-6a4 4 0 0 1 5.6-5.6l-3 3"/></svg>',
-  'reports':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>',
-  'auto':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8z"/></svg>',
-  'deep':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>',
-  'fast':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h8l-1 8 10-12h-8z"/></svg>',
-  'compare':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 20V10M10 20V4M16 20v-8M22 20V8"/></svg>'
+  users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>',
+  email:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
+  phone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 17v3a2 2 0 0 1-2.2 2 19 19 0 0 1-8.6-3.1 19 19 0 0 1-5.8-5.8A19 19 0 0 1 2.3 4.4 2 2 0 0 1 4.3 2h3a2 2 0 0 1 2 1.7 12 12 0 0 0 .7 2.6 2 2 0 0 1-.5 2.1L8.4 9.5a16 16 0 0 0 6 6l1.1-1.1a2 2 0 0 1 2.1-.5 12 12 0 0 0 2.6.7A2 2 0 0 1 22 17z"/></svg>',
+  domains:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>',
+  social:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>',
+  images:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>',
+  breaches:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v6c0 1.7 4 3 9 3s9-1.3 9-3V5M3 11v6c0 1.7 4 3 9 3s9-1.3 9-3v-6"/></svg>',
+  ip:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-6 8-13a8 8 0 1 0-16 0c0 7 8 13 8 13z"/><circle cx="12" cy="9" r="3"/></svg>',
+  discord:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.4A19.8 19.8 0 0 0 15.4 3l-.3.5c1.7.4 2.5 1 3.3 1.6a13.5 13.5 0 0 0-12.8 0c.8-.6 1.7-1.2 3.3-1.6L8.6 3A19.8 19.8 0 0 0 3.7 4.4C.4 9.5-.6 14.5.1 19.4a19.9 19.9 0 0 0 6.1 3l1.3-2c-.7-.3-1.4-.6-2-1l.5-.4a14 14 0 0 0 12 0l.5.4c-.6.4-1.3.7-2 1l1.3 2a19.9 19.9 0 0 0 6.1-3c.8-5.7-.8-10.6-3.6-15z"/></svg>'
 };
 
-const SECTIONS={
-  home:{title:'NEXORA',tag:'INTELLIGENCE FOR A MORE TRANSPARENT WEB',desc:'Open source intelligence tools to search, analyze and connect information from across the web.',placeholder:'Search for a name, email, username, phone, domain, IP...',lookup:'users',chips:['All','People','Usernames','Email','Phone','Domains','Images'],cards:[
-    {i:'👤',t:'People Search',d:'Find and link public information about individuals.',m:'users'},
-    {i:'✉',t:'Email Lookup',d:'Discover accounts, leaks and related data.',m:'email'},
-    {i:'📞',t:'Phone Lookup',d:'Track phone numbers and related profiles.',m:'phone'},
-    {i:'@',t:'Username Search',d:'Find profiles across social networks and platforms.',m:'users'},
-    {i:'🌐',t:'Domain & IP',d:'Analyze domains, IPs and infrastructure.',m:'domains'},
-    {i:'🖼',t:'Image Search',d:'Find similar images and online matches.',m:'images'},
-    {i:'💾',t:'Data Breaches',d:'Search exposed data from public sources.',m:'breaches'},
-    {i:'🔗',t:'Social Intelligence',d:'Map connections and online activity.',m:'social'}]},
-  email:{title:'EMAIL',tag:'EMAIL INTELLIGENCE',desc:'Discover linked accounts, data breaches and reputation of an email address.',placeholder:'Enter an email (e.g. user@example.com)...',lookup:'email',chips:['All','Accounts','Breaches','Reputation'],cards:[
-    {i:'🔗',t:'Linked Accounts',d:'Find services registered with this email.',m:'email'},
-    {i:'💾',t:'Breaches',d:'Check if the email appeared in data leaks.',m:'breaches'},
-    {i:'⭐',t:'Reputation',d:'Assess trust and suspicious indicators.',m:'email'},
-    {i:'🌐',t:'Domain Info',d:'Analyze the email domain MX records.',m:'domains'}]},
-  phone:{title:'PHONE',tag:'PHONE NUMBER INTELLIGENCE',desc:'Track phone numbers, carrier details, region and related accounts.',placeholder:'Enter a phone number (e.g. +393501234567)...',lookup:'phone',chips:['All','Carrier','Region','Accounts'],cards:[
-    {i:'📡',t:'Carrier',d:'Identify the mobile operator.',m:'phone'},
-    {i:'📍',t:'Region',d:'Geographic location of the number.',m:'phone'},
-    {i:'🔗',t:'Linked Accounts',d:'Find services using this number.',m:'phone'},
-    {i:'💬',t:'Messaging Apps',d:'WhatsApp, Telegram, Signal presence.',m:'phone'}]},
-  users:{title:'USERS',tag:'USERNAME INTELLIGENCE',desc:'Search a username across dozens of social networks and platforms.',placeholder:'Enter a username (e.g. johndoe)...',lookup:'users',chips:['All','Social','Gaming','Dev','Media'],cards:[
-    {i:'💬',t:'Social Networks',d:'Twitter, Instagram, Facebook, TikTok.',m:'users'},
-    {i:'🎮',t:'Gaming',d:'Steam, Twitch, Discord, Roblox.',m:'users'},
-    {i:'💻',t:'Developer',d:'GitHub, GitLab, Stack Overflow.',m:'users'},
-    {i:'🎬',t:'Media',d:'YouTube, Vimeo, Pinterest.',m:'users'}]},
-  people:{title:'PEOPLE',tag:'SEARCH FOR INDIVIDUALS',desc:'Find and link public information about individuals across the web.',placeholder:'Enter full name, username or email...',lookup:'users',chips:['All','Names','Usernames','Emails','Phones'],cards:[
-    {i:'👤',t:'Full Name',d:'Search across public records.',m:'users'},
-    {i:'🔑',t:'Username',d:'Find profiles across social networks.',m:'users'},
-    {i:'✉',t:'Email',d:'Discover linked accounts.',m:'email'},
-    {i:'📞',t:'Phone',d:'Track related profiles.',m:'phone'}]},
-  domains:{title:'DOMAINS',tag:'DOMAIN & DNS INTELLIGENCE',desc:'Analyze domains, subdomains, DNS records and infrastructure.',placeholder:'Enter a domain (e.g. example.com)...',lookup:'domains',chips:['All','DNS','WHOIS','Subdomains'],cards:[
-    {i:'📋',t:'DNS Records',d:'A, AAAA, MX, TXT, CNAME lookup.',m:'domains'},
-    {i:'📝',t:'WHOIS',d:'Registration and ownership data.',m:'domains'},
-    {i:'🌳',t:'Subdomains',d:'Enumerate subdomains of the target.',m:'domains'},
-    {i:'🛡',t:'Security',d:'SSL, headers and vulnerabilities.',m:'domains'}]},
-  social:{title:'SOCIAL',tag:'SOCIAL INTELLIGENCE',desc:'Map social connections, followers and online activity.',placeholder:'Enter a username or profile URL...',lookup:'social',chips:['All','Twitter','Instagram','TikTok','LinkedIn'],cards:[
-    {i:'🐦',t:'Twitter/X',d:'Analyze tweets, followers and mentions.',m:'social'},
-    {i:'📸',t:'Instagram',d:'Public posts and mutual connections.',m:'social'},
-    {i:'🎵',t:'TikTok',d:'Videos and engagement analysis.',m:'social'},
-    {i:'💼',t:'LinkedIn',d:'Professional network mapping.',m:'social'}]},
-  images:{title:'IMAGES',tag:'REVERSE IMAGE SEARCH',desc:'Find similar images and matches across the web.',placeholder:'Enter an image URL...',lookup:'images',chips:['All','Reverse','Faces','EXIF'],cards:[
-    {i:'🔍',t:'Reverse Search',d:'Find where an image appears online.',m:'images'},
-    {i:'👤',t:'Face Match',d:'Search faces across databases.',m:'images'},
-    {i:'📷',t:'EXIF Data',d:'Extract metadata from images.',m:'images'},
-    {i:'🌍',t:'Geolocation',d:'Estimate location from photo.',m:'images'}]},
-  ip:{title:'LOCATIONS',tag:'IP GEOLOCATION',desc:'Locate IP addresses, servers and network infrastructure.',placeholder:'Enter an IP address (e.g. 8.8.8.8)...',lookup:'ip',chips:['All','IPv4','IPv6','ASN'],cards:[
-    {i:'🗺',t:'GeoIP',d:'Country, city, coordinates.',m:'ip'},
-    {i:'🏢',t:'ASN',d:'Autonomous System and ISP.',m:'ip'},
-    {i:'🔌',t:'Port Scan',d:'Open ports and services.',m:'ip'},
-    {i:'🚨',t:'Threat Intel',d:'Malicious activity reports.',m:'ip'}]},
-  discord:{title:'DISCORD',tag:'DISCORD ID INTELLIGENCE',desc:'Estrai tutte le informazioni pubbliche da un ID Discord.',placeholder:'Inserisci un Discord ID (es. 123456789012345678)...',lookup:'discord',chips:['All','User','Badges','Guilds'],cards:[
-    {i:'👤',t:'User Info',d:'Username, avatar, banner, colore.',m:'discord'},
-    {i:'🎂',t:'Account Age',d:'Data di creazione account.',m:'discord'},
-    {i:'🏅',t:'Badges',d:'Emblemi e flags pubbliche.',m:'discord'},
-    {i:'🏠',t:'Mutual Guilds',d:'Server in comune col bot.',m:'discord'}]},
-  breaches:{title:'DATA BREACH',tag:'BREACH INTELLIGENCE',desc:'Search exposed data from public breaches and leaks.',placeholder:'Enter an email or phone...',lookup:'breaches',chips:['All','Emails','Phones','Passwords'],cards:[
-    {i:'📧',t:'Email Breaches',d:'Check exposed accounts.',m:'breaches'},
-    {i:'🔐',t:'Passwords',d:'Search leaked credentials.',m:'breaches'},
-    {i:'📞',t:'Phone Leaks',d:'Numbers in public dumps.',m:'breaches'},
-    {i:'🆔',t:'Identity Leaks',d:'Names, addresses, IDs.',m:'breaches'}]},
-  tools:{title:'TOOLS',tag:'UTILITIES & HELPERS',desc:'Extra utilities to enhance your OSINT workflow.',placeholder:'Search a tool...',lookup:'users',chips:['All','Encoding','Hashing','Network'],cards:[
-    {i:'🔢',t:'Hash Generator',d:'MD5, SHA1, SHA256.',m:'tools'},
-    {i:'📡',t:'Ping / Traceroute',d:'Network diagnostics.',m:'tools'},
-    {i:'🔐',t:'Base64',d:'Encode and decode strings.',m:'tools'},
-    {i:'🌐',t:'URL Expander',d:'Expand shortened URLs.',m:'tools'}]},
-  reports:{title:'REPORTS',tag:'INVESTIGATION REPORTS',desc:'Generate and export detailed OSINT reports.',placeholder:'Search a report...',lookup:'users',chips:['All','Recent','Exported','Shared'],cards:[
-    {i:'📄',t:'New Report',d:'Start a new investigation.',m:'reports'},
-    {i:'📂',t:'My Reports',d:'Access your saved reports.',m:'reports'},
-    {i:'📤',t:'Exports',d:'PDF, JSON, CSV exports.',m:'reports'},
-    {i:'🤝',t:'Shared',d:'Reports shared with your team.',m:'reports'}]},
-  search:{title:'SEARCH',tag:'UNIVERSAL SEARCH',desc:'Search across every module with one query.',placeholder:'Enter anything...',lookup:'users',chips:['All','Auto-detect'],cards:[
-    {i:'✨',t:'Auto Detect',d:'Rileva il tipo e sceglie il modulo.',m:'auto'},
-    {i:'🔎',t:'Deep Search',d:'Cerca su tutti i moduli disponibili.',m:'deep'},
-    {i:'⚡',t:'Fast Query',d:'Un solo modulo, risultato istantaneo.',m:'fast'},
-    {i:'📊',t:'Compare',d:'Confronta email, phone e username.',m:'compare'}]}
+const SECTIONS = {
+  home:{title:'NEXORA',tag:'INTELLIGENCE FOR A MORE TRANSPARENT WEB',desc:'Open source intelligence tools to search, analyze and connect information from across the web.',ph:'Search for a name, email, username, phone, domain, IP...',lookup:'users',chips:['All','People','Usernames','Email','Phone','Domains','Images'],cards:[
+    {t:'People Search',d:'Find public information about individuals.',i:'users',m:'users'},
+    {t:'Email Lookup',d:'Discover accounts and data.',i:'email',m:'email'},
+    {t:'Phone Lookup',d:'Track phone numbers and profiles.',i:'phone',m:'phone'},
+    {t:'Username Search',d:'Find profiles across social networks.',i:'users',m:'users'},
+    {t:'Domain & IP',d:'Analyze domains and infrastructure.',i:'domains',m:'domains'},
+    {t:'Image Search',d:'Find similar images online.',i:'images',m:'images'},
+    {t:'Data Breaches',d:'Search exposed data sources.',i:'breaches',m:'breaches'},
+    {t:'Social Intelligence',d:'Map connections and online activity.',i:'social',m:'social'}]},
+  email:{title:'EMAIL',tag:'EMAIL INTELLIGENCE',desc:'Discover linked accounts, data breaches and reputation of an email address.',ph:'Enter an email (e.g. user@example.com)...',lookup:'email',chips:['All','Accounts','Breaches','Reputation'],cards:[
+    {t:'Linked Accounts',d:'Find services registered with this email.',i:'email',m:'email'},
+    {t:'Breaches',d:'Check if the email appeared in data leaks.',i:'breaches',m:'breaches'},
+    {t:'Reputation',d:'Assess trust and suspicious indicators.',i:'email',m:'email'},
+    {t:'Domain Info',d:'Analyze the email domain MX records.',i:'domains',m:'domains'}]},
+  phone:{title:'PHONE',tag:'PHONE NUMBER INTELLIGENCE',desc:'Track phone numbers, carrier details, region and related accounts.',ph:'Enter a phone number (e.g. +393501234567)...',lookup:'phone',chips:['All','Carrier','Region','Accounts'],cards:[
+    {t:'Carrier',d:'Identify the mobile operator.',i:'phone',m:'phone'},
+    {t:'Region',d:'Geographic location of the number.',i:'phone',m:'phone'},
+    {t:'Linked Accounts',d:'Find services using this number.',i:'phone',m:'phone'},
+    {t:'Messaging Apps',d:'WhatsApp, Telegram, Signal.',i:'phone',m:'phone'}]},
+  users:{title:'USERS',tag:'USERNAME INTELLIGENCE',desc:'Search a username across dozens of social networks and platforms.',ph:'Enter a username (e.g. johndoe)...',lookup:'users',chips:['All','Social','Gaming','Dev','Media'],cards:[
+    {t:'Social Networks',d:'Twitter, Instagram, Facebook, TikTok.',i:'users',m:'users'},
+    {t:'Gaming',d:'Steam, Twitch, Discord, Roblox.',i:'users',m:'users'},
+    {t:'Developer',d:'GitHub, GitLab, Stack Overflow.',i:'users',m:'users'},
+    {t:'Media',d:'YouTube, Vimeo, Pinterest.',i:'users',m:'users'}]},
+  people:{title:'PEOPLE',tag:'SEARCH FOR INDIVIDUALS',desc:'Find and link public information about individuals across the web.',ph:'Enter full name, username or email...',lookup:'users',chips:['All','Names','Usernames','Emails','Phones'],cards:[
+    {t:'Full Name',d:'Search across public records.',i:'users',m:'users'},
+    {t:'Username',d:'Find profiles across social networks.',i:'users',m:'users'},
+    {t:'Email',d:'Discover linked accounts.',i:'email',m:'email'},
+    {t:'Phone',d:'Track related profiles.',i:'phone',m:'phone'}]},
+  domains:{title:'DOMAINS',tag:'DOMAIN & DNS INTELLIGENCE',desc:'Analyze domains, subdomains, DNS records and infrastructure.',ph:'Enter a domain (e.g. example.com)...',lookup:'domains',chips:['All','DNS','WHOIS','Subdomains'],cards:[
+    {t:'DNS Records',d:'A, AAAA, MX, TXT, CNAME lookup.',i:'domains',m:'domains'},
+    {t:'WHOIS',d:'Registration and ownership data.',i:'domains',m:'domains'},
+    {t:'Subdomains',d:'Enumerate subdomains.',i:'domains',m:'domains'},
+    {t:'Security',d:'SSL, headers and vulnerabilities.',i:'domains',m:'domains'}]},
+  social:{title:'SOCIAL',tag:'SOCIAL INTELLIGENCE',desc:'Map social connections, followers and online activity.',ph:'Enter a username...',lookup:'social',chips:['All','Twitter','Instagram','TikTok','LinkedIn'],cards:[
+    {t:'Twitter/X',d:'Analyze tweets and followers.',i:'social',m:'social'},
+    {t:'Instagram',d:'Public posts and connections.',i:'social',m:'social'},
+    {t:'TikTok',d:'Videos and engagement analysis.',i:'social',m:'social'},
+    {t:'LinkedIn',d:'Professional network mapping.',i:'social',m:'social'}]},
+  images:{title:'IMAGES',tag:'REVERSE IMAGE SEARCH',desc:'Find similar images and matches across the web.',ph:'Enter an image URL...',lookup:'images',chips:['All','Reverse','Faces','EXIF'],cards:[
+    {t:'Reverse Search',d:'Find where an image appears online.',i:'images',m:'images'},
+    {t:'Face Match',d:'Search faces across databases.',i:'images',m:'images'},
+    {t:'EXIF Data',d:'Extract metadata from images.',i:'images',m:'images'},
+    {t:'Geolocation',d:'Estimate location from photo.',i:'images',m:'images'}]},
+  ip:{title:'IP',tag:'IP GEOLOCATION',desc:'Locate IP addresses, servers and network infrastructure.',ph:'Enter an IP address (e.g. 8.8.8.8)...',lookup:'ip',chips:['All','IPv4','IPv6','ASN'],cards:[
+    {t:'GeoIP',d:'Country, city, coordinates.',i:'ip',m:'ip'},
+    {t:'ASN',d:'Autonomous System and ISP.',i:'ip',m:'ip'},
+    {t:'Port Scan',d:'Open ports and services.',i:'ip',m:'ip'},
+    {t:'Threat Intel',d:'Malicious activity reports.',i:'ip',m:'ip'}]},
+  discord:{title:'DISCORD',tag:'DISCORD ID INTELLIGENCE',desc:'Extract all public data from a Discord ID.',ph:'Enter a Discord ID...',lookup:'discord',chips:['All','User','Badges','Guilds'],cards:[
+    {t:'User Info',d:'Username, avatar, banner.',i:'discord',m:'discord'},
+    {t:'Account Age',d:'Account creation date.',i:'discord',m:'discord'},
+    {t:'Badges',d:'Public badges and flags.',i:'discord',m:'discord'},
+    {t:'Mutual Guilds',d:'Servers shared with the bot.',i:'discord',m:'discord'}]},
+  breaches:{title:'BREACH',tag:'BREACH INTELLIGENCE',desc:'Search exposed data from public breaches and leaks.',ph:'Enter an email or phone...',lookup:'breaches',chips:['All','Emails','Phones','Passwords'],cards:[
+    {t:'Email Breaches',d:'Check exposed accounts.',i:'breaches',m:'breaches'},
+    {t:'Passwords',d:'Search leaked credentials.',i:'breaches',m:'breaches'},
+    {t:'Phone Leaks',d:'Numbers in public dumps.',i:'breaches',m:'breaches'},
+    {t:'Identity Leaks',d:'Names, addresses, IDs.',i:'breaches',m:'breaches'}]},
+  search:{title:'SEARCH',tag:'UNIVERSAL SEARCH',desc:'Search across every module with one query.',ph:'Enter anything...',lookup:'users',chips:['All','Auto-detect'],cards:[
+    {t:'Auto Detect',d:'Automatically pick best module.',i:'users',m:'users'},
+    {t:'Deep Search',d:'Multiple modules at once.',i:'users',m:'users'},
+    {t:'Fast Query',d:'Single module, instant result.',i:'users',m:'users'},
+    {t:'Compare',d:'Cross-reference sources.',i:'users',m:'users'}]}
 };
 
-let currentLookup='users';
-function renderChips(s){document.getElementById('chipsRow').innerHTML=SECTIONS[s].chips.map((c,i)=>`<button class="chip ${i===0?'active':''}">${c}</button>`).join('');}
-function renderCards(s){
-  document.getElementById('modulesGrid').innerHTML = SECTIONS[s].cards.map(c => {
-    const icon = ICONS[c.m] || ICONS['users'];
-    return `<div class="module-card" onclick="handleCard('${c.m}')"><div class="mc-icon">${icon}</div><div class="mc-text"><h3>${c.t}</h3><p>${c.d}</p></div><div class="mc-arrow">›</div></div>`;
+let currentSec = 'home';
+let currentLookup = 'users';
+
+function renderChips(s){
+  const row = document.getElementById('chipsRow');
+  if (!row || !SECTIONS[s].chips) return;
+  row.innerHTML = SECTIONS[s].chips.map(function(c, i){
+    return '<button class="chip ' + (i===0?'active':'') + '">' + c + '</button>';
   }).join('');
 }
-function changeSection(s){
-  if(!SECTIONS[s])return;
-  
-  const cfg=SECTIONS[s];
-  document.body.setAttribute('data-section',s);
-  const hero=document.getElementById('heroSection');
-  hero.classList.add('fade-out');
-  setTimeout(()=>{
-    document.getElementById('heroTitle').textContent=cfg.title;
-    document.getElementById('heroTag').textContent=cfg.tag;
-    document.getElementById('heroDesc').textContent=cfg.desc;
-    document.getElementById('query').placeholder=cfg.placeholder;
-    currentLookup=cfg.lookup;
-    document.getElementById('typeLabel').textContent=cfg.lookup;
-    renderChips(s);renderCards(s);
-    hero.classList.remove('fade-out');hero.classList.add('fade-in');
-    setTimeout(()=>hero.classList.remove('fade-in'),450);
-  },250);
+
+function renderCards(s){
+  const grid = document.getElementById('modsGrid');
+  if (!grid) return;
+  grid.innerHTML = SECTIONS[s].cards.map(function(c){
+    var icon = ICONS[c.i] || ICONS.users;
+    return '<div class="mod" onclick="setLookup(\'' + c.m + '\')"><div class="mod-ic">' + icon + '</div><div class="mod-tx"><h3>' + c.t + '</h3><p>' + c.d + '</p></div><div class="mod-ar">›</div></div>';
+  }).join('');
 }
-function setLookup(t){currentLookup=t;document.getElementById('typeLabel').textContent=t;document.getElementById('result').innerHTML='<p class="empty">In attesa di una ricerca...</p>';}
-function handleCard(m){if(['auto','deep','fast','compare'].includes(m)){runMultiSearch(m);}else{setLookup(m);}}
-document.querySelectorAll('.s-item').forEach(el=>{el.addEventListener('click',()=>{document.querySelectorAll('.s-item').forEach(x=>x.classList.remove('active'));el.classList.add('active');changeSection(el.dataset.section);});});
-document.getElementById('chipsRow').addEventListener('click',e=>{if(!e.target.classList.contains('chip'))return;document.querySelectorAll('#chipsRow .chip').forEach(x=>x.classList.remove('active'));e.target.classList.add('active');});
+
+function setLookup(m){
+  currentLookup = m;
+  var tl = document.getElementById('typeLabel');
+  if (tl) tl.textContent = m;
+}
+
+function changeSection(s){
+  if (!SECTIONS[s] || s === currentSec) return;
+  currentSec = s;
+  var cfg = SECTIONS[s];
+  document.querySelectorAll('.sb-item').forEach(function(x){ x.classList.remove('active'); });
+  var it = document.querySelector('.sb-item[data-sec="' + s + '"]');
+  if (it) it.classList.add('active');
+  var ht = document.getElementById('heroTitle');
+  var hg = document.getElementById('heroTag');
+  var hd = document.getElementById('heroDesc');
+  var si = document.getElementById('searchInput');
+  var g = document.getElementById('globe');
+  var hc = document.querySelector('.hero-center');
+  if (hc) { hc.style.transition = 'opacity 0.4s ease'; hc.style.opacity = '0'; }
+  if (g) { g.style.transition = 'opacity 0.4s ease, transform 0.4s ease'; g.style.opacity = '0'; g.style.transform = 'translate(-50%,-50%) translateY(20px)'; }
+  var labels = document.querySelectorAll('.lbl');
+  labels.forEach(function(l){
+    l.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+    l.style.opacity = '0';
+    l.style.transform = 'translateY(calc(-50% + 20px))';
+  });
+
+  setTimeout(function(){
+    if (ht) ht.textContent = cfg.title;
+    if (hg) hg.textContent = cfg.tag;
+    if (hd) hd.textContent = cfg.desc;
+    if (si) si.placeholder = cfg.ph;
+    currentLookup = cfg.lookup;
+    var tl = document.getElementById('typeLabel');
+    if (tl) tl.textContent = cfg.lookup;
+    renderChips(s);
+    renderCards(s);
+    var rp = document.getElementById('resultPanel');
+    if (rp) rp.style.display = 'none';
+    var ss = document.getElementById('searchSec');
+    if (ss) ss.style.display = (s === 'home') ? 'none' : 'block';
+    if (hc) hc.style.opacity = '1';
+    if (g) { g.style.opacity = '1'; g.style.transform = 'translate(-50%,-50%) translateY(0)'; }
+    labels.forEach(function(l){
+      l.style.opacity = '1';
+      l.style.transform = 'translateY(-50%)';
+    });
+  }, 400);
+}
+
+document.querySelectorAll('.sb-item').forEach(function(el){
+  el.addEventListener('click', function(ev){
+    if (el.getAttribute('href')) return;
+    ev.preventDefault();
+    var s = el.dataset.sec;
+    if (s) changeSection(s);
+  });
+});
 
 async function doLookup(){
-  const q=document.getElementById('query').value.trim();
-  if(!q)return;
-  const el=document.getElementById('result');
-  el.innerHTML='<p class="loading">🔎 Ricerca in corso...</p>';
-  const r=await fetch('/api/lookup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:currentLookup,query:q})});
-  const d=await r.json();
-  if(d.upgrade){el.innerHTML='<div class="upgrade-msg">'+d.error+'<br><br><a href="/pricing">Vai ai piani →</a></div>';return;}
-  renderResult(d);
-}
-async function runMultiSearch(mode){
-  const q=document.getElementById('query').value.trim();
-  if(!q){document.getElementById('result').innerHTML='<p class="empty">Inserisci una query per usare '+mode+' search.</p>';return;}
-  const el=document.getElementById('result');
-  el.innerHTML='<p class="loading">🔎 '+mode.toUpperCase()+' search in corso...</p>';
-  const r=await fetch('/api/search-multi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q, mode:mode})});
-  const d=await r.json();
-  renderResult(d);
-}
-function renderResult(data){
-  const el=document.getElementById('result');
-  if(data.error){el.innerHTML='<div class="panel-error">⚠ '+data.error+'</div>';return;}
-
-    if(data.user_id){
-    let html='<div class="results-header">Discord ID: <b>'+data.user_id+'</b></div>';
-
-    // Avatar + Banner
-    html+='<div style="display:flex;gap:20px;justify-content:center;align-items:center;flex-wrap:wrap;margin:20px 0">';
-    if(data.avatar_url){
-      html+='<div style="text-align:center"><div class="sites-title" style="margin:0 0 10px">Avatar</div><img src="'+data.avatar_url+'" style="width:128px;height:128px;border-radius:50%;border:2px solid '+(data.accent_hex||'#1a1c22')+'"></div>';
-    }
-    if(data.banner_url){
-      html+='<div style="text-align:center"><div class="sites-title" style="margin:0 0 10px">Banner</div><img src="'+data.banner_url+'" style="max-width:400px;height:128px;border-radius:12px;border:1px solid '+(data.accent_hex||'#1a1c22')+';object-fit:cover"></div>';
-    }
-    html+='</div>';
-
-    // Info base
-    const info=[];
-    if(data.username)info.push(['Username',data.username]);
-    if(data.global_name)info.push(['Display Name',data.global_name]);
-    if(data.discriminator&&data.discriminator!=='0')info.push(['Tag','#'+data.discriminator]);
-    if(data.bot)info.push(['Bot','Sì']);
-    if(data.system)info.push(['System','Sì']);
-    if(data.account_created)info.push(['Creato il',data.account_created]);
-    if(data.account_age_years)info.push(['Età',data.account_age_years+' anni ('+data.account_age_days+' giorni)']);
-    if(data.unix_timestamp)info.push(['Unix',data.unix_timestamp]);
-    if(data.accent_hex)info.push(['Accent',data.accent_hex]);
-    if(info.length){html+='<div class="info-grid">';info.forEach(p=>{html+='<div class="info-cell"><span class="info-key">'+p[0]+'</span><span class="info-val">'+p[1]+'</span></div>';});html+='</div>';}
-
-    // Link profilo
-    html+='<div style="text-align:center;margin:20px 0"><a href="'+data.profile_url+'" target="_blank" style="background:#5865f2;color:#fff;padding:12px 24px;border-radius:999px;text-decoration:none;font-weight:600">Apri profilo Discord →</a></div>';
-
-    // Badges
-    if(data.badges&&data.badges.length){
-      html+='<div class="sites-title">🏅 Badges ('+data.badges.length+')</div><div class="sites-grid">';
-      data.badges.forEach(b=>{html+='<div class="site-card"><div class="site-icon">🏅</div><div class="site-name">'+b+'</div></div>';});
-      html+='</div>';
-    } else {
-      html+='<div class="sites-title">🏅 Badges</div><div class="info-cell"><span class="info-key">Badges</span><span class="info-val" style="color:#666">Nessuna badge pubblica (o bot non in server comune)</span></div>';
-    }
-
-    // Server in comune
-    if(data.mutual_guilds&&data.mutual_guilds.length){
-      html+='<div class="sites-title">🏠 Server in comune ('+data.mutual_guilds.length+')</div><div class="sites-grid">';
-      data.mutual_guilds.forEach(g=>{
-        html+='<div class="site-card" style="text-align:left;align-items:flex-start">';
-        html+='<div style="font-weight:600;color:#fff;font-size:13px;margin-bottom:6px">🏠 '+g.name+'</div>';
-        if(g.nick)html+='<div style="font-size:11px;color:#888;margin-bottom:4px">Nickname: '+g.nick+'</div>';
-        if(g.roles&&g.roles.length)html+='<div style="font-size:11px;color:#888;margin-bottom:4px">Ruoli: '+g.roles.length+'</div>';
-        if(g.joined_at)html+='<div style="font-size:11px;color:#888">Entrato: '+new Date(g.joined_at).toLocaleDateString()+'</div>';
-        if(g.premium_since)html+='<div style="font-size:11px;color:#ffd700">⭐ Booster dal '+new Date(g.premium_since).toLocaleDateString()+'</div>';
-        html+='</div>';
-      });
-      html+='</div>';
-    } else {
-      html+='<div class="sites-title">🏠 Server in comune</div><div class="info-cell"><span class="info-key">Server</span><span class="info-val" style="color:#666">Nessuno (invita il bot in un tuo server)</span></div>';
-    }
-
-    // Nota
-    html+='<div class="info-cell" style="margin-top:24px"><span class="info-key">⚠ Nota</span><span class="info-val" style="color:#888;font-size:12px">Email, telefono, IP e connessioni non sono accessibili da bot token (solo user token, contro i ToS).</span></div>';
-
-    document.getElementById('result').innerHTML = html;
-    return;
-  }
-  let html='<div class="results-header">Risultati per <b>'+(data.email||data.number||data.username||data.query||'query')+'</b></div>';
-  const info=[];
-  if(data.email)info.push(['Email',data.email]);
-  if(data.reputation)info.push(['Reputazione',data.reputation]);
-  if(data.number)info.push(['Numero',data.number]);
-  if(data.operator)info.push(['Operatore',data.operator]);
-  if(data.region)info.push(['Regione',data.region]);
-  if(data.country)info.push(['Paese',data.country]);
-  if(data.type)info.push(['Tipo',data.type]);
-  if(data.international)info.push(['Intl',data.international]);
-  if(data.e164)info.push(['E.164',data.e164]);
-  if(data.mx_records)info.push(['MX',data.mx_records]);
-  if(data.ip)info.push(['IP',data.ip]);
-  if(data.city)info.push(['Città',data.city]);
-  if(data.isp)info.push(['ISP',data.isp]);
-  if(info.length){html+='<div class="info-grid">';info.forEach(p=>{html+='<div class="info-cell"><span class="info-key">'+p[0]+'</span><span class="info-val">'+p[1]+'</span></div>';});html+='</div>';}
-  if(data.breaches&&data.breaches.length){
-    html+='<div class="sites-title">💾 Violazioni ('+data.breaches.length+')</div><div class="sites-grid">';
-    data.breaches.forEach(b=>{html+='<div class="site-card breach"><div class="site-icon">💾</div><div class="site-name">'+b+'</div></div>';});
-    html+='</div>';
-  } else if(data.breaches&&data.breaches.length===0){
-    html+='<div class="info-cell" style="margin-top:16px"><span class="info-key">Breach</span><span class="info-val" style="color:#4ade80">Nessuna violazione ✓</span></div>';
-  }
-  if(data.found&&data.found.length){
-    html+='<div class="sites-title">Profili trovati ('+data.found.length+')</div><div class="sites-grid">';
-    data.found.forEach(f=>{html+='<a class="site-card" href="'+f.url+'" target="_blank"><div class="site-icon">🌐</div><div class="site-name">'+f.site+'</div><div class="site-url">Apri →</div></a>';});
-    html+='</div>';
-  }
-  el.innerHTML=html;
-}
-function buyPlan(p){
-  fetch('/api/checkout/'+p,{method:'POST'}).then(r=>r.json()).then(d=>{
-    if(d.url)window.location.href=d.url;
-    else alert('Stripe non configurato. Contatta admin.');
-  });
-}
-document.getElementById('query').addEventListener('keydown',e=>{if(e.key==='Enter')doLookup();});
-renderChips('home');renderCards('home');
-</script>
-
-<!-- AUTO MUSIC PLAYER (nascosto) -->
-<div id="nexoraAutoPlayer" style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none"></div>
-<button id="nexoraMusicToggle" class="music-toggle" title="Play / Pausa musica">🎵</button>
-
-<script src="https://www.youtube.com/iframe_api"></script>
-<script>
-(function(){
-  const PLAYLIST_ID = "PLcL3BVYhxFZA";
-  let bgPlayer = null;
-  let started = false;
-
-  window.onYouTubeIframeAPIReady = function(){
-    bgPlayer = new YT.Player('nexoraAutoPlayer', {
-      height: '1', width: '1',
-      playerVars: {
-        listType: 'playlist',
-        list: PLAYLIST_ID,
-        autoplay: 1,
-        controls: 0,
-        disablekb: 1,
-        modestbranding: 1,
-        rel: 0,
-        iv_load_policy: 3,
-        playsinline: 1
-      },
-      events: {
-        'onReady': function(e){
-          // Prova autoplay (funziona perché l'utente ha appena cliccato login)
-          e.target.setVolume(40);
-          e.target.playVideo();
-          started = true;
-        },
-        'onStateChange': function(e){
-          if (e.data === YT.PlayerState.ENDED){
-            e.target.playVideoAt(0);
-          }
-        },
-        'onError': function(){
-          try {
-            const next = (bgPlayer.getPlaylistIndex() + 1) % bgPlayer.getPlaylist().length;
-            bgPlayer.playVideoAt(next);
-          } catch(err){}
-        }
-      }
+  var i = document.getElementById('searchInput');
+  if (!i) return;
+  var q = i.value.trim();
+  if (!q) return;
+  var rp = document.getElementById('resultPanel');
+  var r = document.getElementById('result');
+  if (rp) rp.style.display = 'block';
+  if (r) r.innerHTML = '<p class="loading">🔎 Ricerca in corso...</p>';
+  try {
+    var resp = await fetch('/api/lookup', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({type: currentLookup, query: q})
     });
-  };
-
-  // Toggle play/pausa col bottone
-  document.addEventListener('click', function(ev){
-    if (ev.target.closest('#nexoraMusicToggle')){
-      if (!bgPlayer) return;
-      const state = bgPlayer.getPlayerState();
-      if (state === 1) {
-        bgPlayer.pauseVideo();
-        document.getElementById('nexoraMusicToggle').innerText = '🔇';
-      } else {
-        bgPlayer.playVideo();
-        document.getElementById('nexoraMusicToggle').innerText = '🎵';
-      }
+    var d = await resp.json();
+    if (d.upgrade) {
+      if (r) r.innerHTML = '<div class="upgrade-msg">' + d.error + '<br><br><a href="/piani">Vai ai piani →</a></div>';
+      return;
     }
+    renderResult(d);
+  } catch(e) {
+    if (r) r.innerHTML = '<div class="panel-error">⚠ ' + e.message + '</div>';
+  }
+}
+
+function renderResult(data){
+  var r = document.getElementById('result');
+  if (!r) return;
+  if (data.error) { r.innerHTML = '<div class="panel-error">⚠ ' + data.error + '</div>'; return; }
+  var h = '<div class="results-head">Risultati per <b>' + (data.email || data.number || data.username || data.query || 'query') + '</b></div>';
+  var info = [];
+  if (data.email) info.push(['Email', data.email]);
+  if (data.reputation) info.push(['Reputazione', data.reputation]);
+  if (data.number) info.push(['Numero', data.number]);
+  if (data.operator) info.push(['Operatore', data.operator]);
+  if (data.region) info.push(['Regione', data.region]);
+  if (data.country) info.push(['Paese', data.country]);
+  if (data.type) info.push(['Tipo', data.type]);
+  if (data.ip) info.push(['IP', data.ip]);
+  if (data.city) info.push(['Città', data.city]);
+  if (data.isp) info.push(['ISP', data.isp]);
+  if (data.username) info.push(['Username', data.username]);
+  if (info.length) {
+    h += '<div class="info-grid">';
+    info.forEach(function(p){ h += '<div class="info-cell"><span class="info-k">' + p[0] + '</span><span class="info-v">' + p[1] + '</span></div>'; });
+    h += '</div>';
+  }
+  if (data.breaches && data.breaches.length) {
+    h += '<div class="sites-title">💾 Violazioni (' + data.breaches.length + ')</div><div class="sites-grid">';
+    data.breaches.forEach(function(b){ h += '<div class="site-card breach"><div class="site-name">' + b + '</div></div>'; });
+    h += '</div>';
+  }
+  if (data.found && data.found.length) {
+    h += '<div class="sites-title">Profili trovati (' + data.found.length + ')</div><div class="sites-grid">';
+    data.found.forEach(function(f){ h += '<a class="site-card" href="' + f.url + '" target="_blank"><div class="site-name">' + f.site + '</div><div class="site-url">Apri →</div></a>'; });
+    h += '</div>';
+  }
+  r.innerHTML = h;
+}
+
+var si2 = document.getElementById('searchInput');
+if (si2) si2.addEventListener('keydown', function(e){ if (e.key === 'Enter') doLookup(); });
+
+renderChips('home');
+renderCards('home');
+
+/* GLOBO 3D */
+(function(){
+  var c = document.getElementById('globe');
+  if (!c || typeof THREE === 'undefined') return;
+  var W = 900, H = 560;
+  var scene = new THREE.Scene();
+  var cam = new THREE.PerspectiveCamera(45, W/H, 0.1, 1000);
+  cam.position.set(0, 0, 3.6);
+  var r = new THREE.WebGLRenderer({antialias:true, alpha:true});
+  r.setPixelRatio(Math.min(devicePixelRatio, 2));
+  r.setSize(W, H);
+  r.setClearColor(0x000000, 0);
+  c.appendChild(r.domElement);
+  var grp = new THREE.Group();
+  scene.add(grp);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+  var dl = new THREE.DirectionalLight(0xffffff, 0.8);
+  dl.position.set(5, 3, 5);
+  scene.add(dl);
+  var tex = new THREE.TextureLoader().load('https://unpkg.com/three-globe/example/img/earth-dark.jpg');
+  grp.add(new THREE.Mesh(new THREE.SphereGeometry(1, 64, 64), new THREE.MeshPhongMaterial({
+    map: tex, color: 0x8aa4c8, emissive: 0x0a1828, emissiveIntensity: 0.4,
+    shininess: 5, transparent: true, opacity: 0.15
+  })));
+  grp.add(new THREE.Mesh(new THREE.SphereGeometry(1.06, 48, 48),
+    new THREE.MeshBasicMaterial({color:0x2a6da8, transparent:true, opacity:0.08, side:THREE.BackSide})));
+  var cities = [[40.71,-74.00],[51.50,-0.12],[35.68,139.69],[48.85,2.35],[-33.86,151.20],[37.77,-122.41],[55.75,37.61],[-23.55,-46.63],[1.35,103.81],[25.20,55.27],[19.07,72.87],[-6.20,106.84],[52.52,13.40],[-34.60,-58.38],[30.04,31.23],[13.75,100.50],[-1.29,36.82],[19.43,-99.13],[28.61,77.21],[39.90,116.40]];
+  var v3 = function(la,lo,rr){ var p=(90-la)*Math.PI/180, t=(lo+180)*Math.PI/180; return new THREE.Vector3(-rr*Math.sin(p)*Math.cos(t), rr*Math.cos(p), rr*Math.sin(p)*Math.sin(t)); };
+  var arcs = [];
+  for (var i=0;i<20;i++){
+    var a = cities[Math.floor(Math.random()*cities.length)];
+    var b = cities[Math.floor(Math.random()*cities.length)];
+    if (a===b){i--;continue;}
+    var s = v3(a[0],a[1],1.005), e = v3(b[0],b[1],1.005);
+    var m = s.clone().add(e).multiplyScalar(0.5);
+    var d = s.distanceTo(e);
+    m.normalize().multiplyScalar(1+d*0.35);
+    var curve = new THREE.QuadraticBezierCurve3(s, m, e);
+    var pts = curve.getPoints(80);
+    var geo = new THREE.BufferGeometry().setFromPoints(pts);
+    var line = new THREE.Line(geo, new THREE.LineBasicMaterial({color:0xffffff, transparent:true, opacity:0.15}));
+    grp.add(line);
+    var dot = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 8), new THREE.MeshBasicMaterial({color:0xffffff, transparent:true}));
+    grp.add(dot);
+    arcs.push({curve:curve, dot:dot, line:line, t: Math.random(), speed: 0.0015+Math.random()*0.003});
+  }
+  var drag=false, px=0, py=0, trX=0.15, trY=0;
+  grp.rotation.x = 0.15;
+  r.domElement.style.cursor = 'grab';
+  r.domElement.addEventListener('mousedown', function(ev){ drag=true; px=ev.clientX; py=ev.clientY; });
+  window.addEventListener('mousemove', function(ev){ if(!drag)return; trY+=(ev.clientX-px)*0.005; trX+=(ev.clientY-py)*0.005; trX=Math.max(-0.9,Math.min(0.9,trX)); px=ev.clientX; py=ev.clientY; });
+  window.addEventListener('mouseup', function(){ drag=false; });
+  var t = 0;
+  function loop(){
+    requestAnimationFrame(loop);
+    t += 0.016;
+    if (!drag) trY += 0.0025;
+    grp.rotation.y += (trY-grp.rotation.y)*0.08;
+    grp.rotation.x += (trX-grp.rotation.x)*0.08;
+    arcs.forEach(function(a){
+      a.t += a.speed;
+      if (a.t > 1) a.t = 0;
+      var p = a.curve.getPoint(a.t);
+      a.dot.position.copy(p);
+      var fade = Math.sin(a.t*Math.PI);
+      a.dot.material.opacity = 0.15 + 0.85*fade;
+      a.line.material.opacity = 0.05 + 0.25*fade;
+    });
+    r.render(scene, cam);
+  }
+  loop();
+})();
+
+/* OSINT tooltip */
+(function(){
+  var w = document.getElementById('osintW');
+  var tip = document.getElementById('osintTip');
+  var tw = document.getElementById('tipW');
+  var td = document.getElementById('tipD');
+  if (!w) return;
+  w.querySelectorAll('.osint-l').forEach(function(el){
+    el.addEventListener('mouseenter', function(){
+      var rr = el.getBoundingClientRect();
+      var pr = tip.parentElement.getBoundingClientRect();
+      tw.textContent = el.dataset.w;
+      td.textContent = el.dataset.d;
+      tip.style.left = (rr.left-pr.left+rr.width/2) + 'px';
+      tip.style.top = (rr.top-pr.top+rr.height+12) + 'px';
+      tip.classList.add('on');
+    });
+    el.addEventListener('mouseleave', function(){ tip.classList.remove('on'); });
   });
-
-  // Se dopo 2 secondi non è partito, mostra hint
-  setTimeout(() => {
-    if (bgPlayer && bgPlayer.getPlayerState && bgPlayer.getPlayerState() !== 1) {
-      document.getElementById('nexoraMusicToggle').innerText = '▶️';
-    }
-  }, 2000);
 })();
 </script>
-
+<script src="/static/music.js"></script>
 </body>
 </html>
