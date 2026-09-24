@@ -681,10 +681,6 @@ def piani():
                         "modules": v['modules'], "popular": (k == 'elite')}
     return render_template('piani.html', plans=plans)
 
-@app.route('/player_bg')
-def player_bg():
-    return render_template('player_bg.html')
-
 @app.route('/ai')
 @login_required
 def ai_page():
@@ -738,11 +734,6 @@ def api_ai_chat():
 @login_required
 def framework():
     return render_template('framework.html')
-
-@app.route('/song')
-@login_required
-def song():
-    return render_template('song.html')
 
 @app.route('/pricing')
 def pricing():
