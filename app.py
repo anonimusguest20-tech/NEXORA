@@ -505,28 +505,30 @@ def login():
     return render_template('login.html')
 
 def send_verify_email(to_email, code):
-    smtp_server = os.getenv('SMTP_SERVER', 'smtp-relay.brevo.com')
-    smtp_port = int(os.getenv('SMTP_PORT', 587))
-    smtp_login = os.getenv('SMTP_LOGIN', os.getenv('SMTP_EMAIL', ''))
-    smtp_pass = os.getenv('SMTP_PASSWORD', '')
-    from_email = os.getenv('FROM_EMAIL', smtp_login)
-    if not smtp_login or not smtp_pass:
-        print("SMTP non configurato. Codice:", code, flush=True)
+    api_key = os.getenv('BREVO_API_KEY', '')
+    from_email = os.getenv('FROM_EMAIL', 'noreply@nexora.cc')
+    if not api_key:
+        print("BREVO_API_KEY non configurata. Codice:", code, flush=True)
         return
-    msg = MIMEText("Il tuo codice di verifica NEXORA e: " + code)
-    msg['Subject'] = 'NEXORA - Codice di verifica'
-    msg['From'] = from_email
-    msg['To'] = to_email
-    # Porta 465 = SSL, altre porte (587, 2525) = STARTTLS
-    if smtp_port == 465:
-        with smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=30) as s:
-            s.login(smtp_login, smtp_pass)
-            s.send_message(msg)
-    else:
-        with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as s:
-            s.starttls()
-            s.login(smtp_login, smtp_pass)
-            s.send_message(msg)
+    payload = {
+        "sender": {"email": from_email, "name": "NEXORA"},
+        "to": [{"email": to_email}],
+        "subject": "NEXORA - Codice di verifica",
+        "htmlContent": "<html><body style='font-family:sans-serif;background:#050608;color:#fff;padding:40px;'><h2 style='color:#fff;'>Il tuo codice NEXORA</h2><p style='color:#aaa;'>Inserisci questo codice per verificare la tua email:</p><h1 style='color:#5865f2;font-size:42px;letter-spacing:8px;'>" + code + "</h1><p style='color:#666;font-size:12px;'>Il codice e valido per 10 minuti.</p></body></html>"
+    }
+    try:
+        r = requests.post(
+            "https://api.brevo.com/v3/smtp/email",
+            headers={"api-key": api_key, "Content-Type": "application/json", "accept": "application/json"},
+            json=payload,
+            timeout=30
+        )
+        if r.status_code in (200, 201):
+            print("EMAIL INVIATA A", to_email, "CODICE:", code, flush=True)
+        else:
+            print("ERRORE BREVO:", r.status_code, r.text[:300], flush=True)
+    except Exception as e:
+        print("ERRORE EMAIL:", str(e), flush=True)
 
 
 
