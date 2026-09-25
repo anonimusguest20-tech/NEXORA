@@ -505,27 +505,29 @@ def login():
     return render_template('login.html')
 
 def send_verify_email(to_email, code):
-    smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
-    smtp_port = int(os.getenv('SMTP_PORT', 465))
+    smtp_server = os.getenv('SMTP_SERVER', 'smtp-relay.brevo.com')
+    smtp_port = int(os.getenv('SMTP_PORT', 587))
     smtp_login = os.getenv('SMTP_LOGIN', os.getenv('SMTP_EMAIL', ''))
     smtp_pass = os.getenv('SMTP_PASSWORD', '')
     from_email = os.getenv('FROM_EMAIL', smtp_login)
     if not smtp_login or not smtp_pass:
         print("SMTP non configurato. Codice:", code, flush=True)
         return
-    msg = MIMEText("Il tuo codice di verifica NEXORA è: " + code)
+    msg = MIMEText("Il tuo codice di verifica NEXORA e: " + code)
     msg['Subject'] = 'NEXORA - Codice di verifica'
     msg['From'] = from_email
     msg['To'] = to_email
-    if smtp_port == 587:
-        with smtplib.SMTP(smtp_server, smtp_port) as s:
-            s.starttls()
+    # Porta 465 = SSL, altre porte (587, 2525) = STARTTLS
+    if smtp_port == 465:
+        with smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=30) as s:
             s.login(smtp_login, smtp_pass)
             s.send_message(msg)
     else:
-        with smtplib.SMTP_SSL(smtp_server, smtp_port) as s:
+        with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as s:
+            s.starttls()
             s.login(smtp_login, smtp_pass)
             s.send_message(msg)
+
 
 
 @app.route('/register', methods=['GET','POST'])
