@@ -475,177 +475,36 @@ def index(): return render_template('index.html')
 @app.route('/logout')
 @login_required
 def logout(): logout_user(); return redirect(url_for('index'))
-def generate_nexora_id():
-    import random, string
-    while True:
-        part1 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
-        part2 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
-        nid = f"NEX-{part1}-{part2}"
-        if not db.session.query(User).filter_by(nexora_id=nid).first():
-            return nid
 
-
-@app.route('/login', methods=['GET','POST'])
-def login():
-    if request.method == 'POST':
-        email = request.form['email'].strip().lower()
-        pwd = request.form['password']
-        nid = request.form.get('nexora_id', '').strip()
-        u = db.session.query(User).filter_by(email=email, password=pwd).first()
-        if not u:
-            flash('Credenziali errate.')
-            return render_template('login.html')
-        # Se non è admin, serve anche l'ID
-        if not u.is_admin:
-            if not nid or nid != u.nexora_id:
-                flash('NEXORA ID errato o mancante.')
-                return render_template('login.html')
-        login_user(u, remember=True)
-        return redirect(url_for('dashboard'))
-    return render_template('login.html')
-
-def send_verify_email(to_email, code):
-    api_key = os.getenv('BREVO_API_KEY', '')
-    from_email = os.getenv('FROM_EMAIL', 'noreply@nexora.cc')
-    if not api_key:
-        print("BREVO_API_KEY non configurata. Codice:", code, flush=True)
-        return
-    payload = {
-        "sender": {"email": from_email, "name": "NEXORA"},
-        "to": [{"email": to_email}],
-        "subject": "NEXORA - Codice di verifica",
-        "htmlContent": "<html><body style='font-family:sans-serif;background:#050608;color:#fff;padding:40px;'><h2 style='color:#fff;'>Il tuo codice NEXORA</h2><p style='color:#aaa;'>Inserisci questo codice per verificare la tua email:</p><h1 style='color:#5865f2;font-size:42px;letter-spacing:8px;'>" + code + "</h1><p style='color:#666;font-size:12px;'>Il codice e valido per 10 minuti.</p></body></html>"
-    }
-    try:
-        r = requests.post(
-            "https://api.brevo.com/v3/smtp/email",
-            headers={"api-key": api_key, "Content-Type": "application/json", "accept": "application/json"},
-            json=payload,
-            timeout=30
-        )
-        if r.status_code in (200, 201):
-            print("EMAIL INVIATA A", to_email, "CODICE:", code, flush=True)
-        else:
-            print("ERRORE BREVO:", r.status_code, r.text[:300], flush=True)
-    except Exception as e:
-        print("ERRORE EMAIL:", str(e), flush=True)
-
-
-
-@app.route('/register', methods=['GET','POST'])
-def register():
-    if request.method == 'POST':
-        email = request.form['email'].strip().lower()
-        if db.session.query(User).filter_by(email=email).first():
-            flash('Email già registrata. Prova ad accedere.')
-            return redirect(url_for('login'))
-        code6 = ''.join(random.choices(string.digits, k=6))
-        db.session.query(VerifyCode).filter_by(email=email).delete()
-        db.session.add(VerifyCode(email=email, code=code6))
-        db.session.commit()
-        try:
-            send_verify_email(email, code6)
-            print("EMAIL INVIATA A", email, "CODICE:", code6, flush=True)
-        except Exception as e:
-            print("Errore invio email:", e, flush=True)
-            flash('Errore invio email: ' + str(e))
-            return redirect(url_for('register'))
-        session['pending_email'] = email
-        session.permanent = True
-        return redirect(url_for('verify'))
-    return render_template('register.html')
-
-
-@app.route('/verify', methods=['GET','POST'])
-def verify():
-    email = session.get('pending_email')
-    if not email:
-        return redirect(url_for('register'))
-    if request.method == 'POST':
-        code_in = request.form.get('code', '').strip()
-        vc = db.session.query(VerifyCode).filter_by(email=email).order_by(VerifyCode.id.desc()).first()
-        if vc and vc.code == code_in:
-            session['verified_email'] = email
-            db.session.delete(vc)
-            db.session.commit()
-            return redirect(url_for('complete_registration'))
-        flash('Codice errato.')
-    return render_template('verify.html', email=email)
-
-
-@app.route('/complete', methods=['GET','POST'])
-def complete_registration():
-    email = session.get('verified_email')
-    if not email:
-        return redirect(url_for('register'))
-    if request.method == 'POST':
-        username = request.form['username'].strip()
-        password = request.form['password']
-        if len(username) < 3 or len(username) > 20:
-            flash('Username 3-20 caratteri.')
-        elif not username.replace('_','').isalnum():
-            flash('Solo lettere, numeri e _')
-        elif db.session.query(User).filter_by(username=username).first():
-            flash('Username già preso.')
-        elif len(password) < 6:
-            flash('Password minimo 6 caratteri.')
-        else:
-            is_admin = email in ADMIN_EMAILS
-            assigned_plan = 'ultimate' if is_admin else PLAN_EMAILS.get(email, 'free')
-            nid = generate_nexora_id()
-            u = User(email=email, password=password, username=username,
-                     verified=True, is_admin=is_admin, plan=assigned_plan,
-                     nexora_id=nid)
-            db.session.add(u)
-            db.session.commit()
-            session.pop('pending_email', None)
-            session.pop('verified_email', None)
-            login_user(u, remember=True)
-            session.permanent = True
-            return redirect(url_for('show_nexora_id'))
-    return render_template('complete_registration.html', email=email)
-
-
-def generate_nexora_id():
-    while True:
-        part1 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
-        part2 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
-        nid = "NEX-" + part1 + "-" + part2
-        if not db.session.query(User).filter_by(nexora_id=nid).first():
-            return nid
-
-
-@app.route('/welcome')
-@login_required
-def show_nexora_id():
-    return render_template('show_id.html', nexora_id=current_user.nexora_id, username=current_user.username)
-
-
-@app.route('/dashboard')
-@login_required
-def dashboard():
-    plan_db = db.session.query(PlanConfig).filter_by(key=current_user.plan).first()
-    if plan_db:
-        plan = {"name":plan_db.name,"price":plan_db.price,"daily_limit":plan_db.daily_limit,
-                "modules":plan_db.modules.split(","),"popular":plan_db.popular}
-    else:
-        plan = PLANS.get(current_user.plan, PLANS['free'])
-    since = datetime.utcnow() - timedelta(hours=30)
-    used = db.session.query(LookupLog).filter(LookupLog.user_id==current_user.id, LookupLog.created_at>=since).count()
-    remaining = "∞" if current_user.is_admin else max(0, plan['daily_limit']-used)
-    return render_template('dashboard.html', user=current_user, plan=plan, remaining=remaining, plans=PLANS)
 @app.route('/api/lookup', methods=['POST'])
 @login_required
 def api_lookup():
     data = request.get_json()
-    ltype = data.get('type'); query = data.get('query','').strip()
-    if not query: return jsonify({"error":"Query vuota"}), 400
+    ltype = data.get('type')
+    query = data.get('query','').strip()
+    if not query:
+        return jsonify({"error":"Query vuota"}), 400
     ok, msg = check_lookup(current_user, ltype)
-    if not ok: return jsonify({"error":msg,"upgrade":True}), 403
+    if not ok:
+        return jsonify({"error": msg, "upgrade": True}), 403
     fn = LOOKUP_MAP.get(ltype)
-    if not fn: return jsonify({"error":"Tipo non valido"}), 400
-    result = fn(query); log_lookup(current_user, ltype, query)
+    if not fn:
+        return jsonify({"error":"Tipo non valido"}), 400
+    result = fn(query)
+    log_lookup(current_user, ltype, query)
+
+    # Calcola remaining aggiornato
+    plan = PLANS.get(current_user.plan, PLANS['free'])
+    since = datetime.utcnow() - timedelta(hours=30)
+    used = db.session.query(LookupLog).filter(
+        LookupLog.user_id == current_user.id,
+        LookupLog.created_at >= since
+    ).count()
+    remaining = "∞" if current_user.is_admin else max(0, plan['daily_limit'] - used)
+    result["_remaining"] = remaining
     return jsonify(result)
+
+
 @app.route('/api/search-multi', methods=['POST'])
 @login_required
 def api_search_multi():
@@ -778,6 +637,91 @@ def api_ai_chat():
 @login_required
 def framework():
     return render_template('framework.html')
+
+@app.route('/register', methods=['GET','POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form['email'].strip().lower()
+        username = request.form['username'].strip()
+        password = request.form['password']
+        if db.session.query(User).filter_by(email=email).first():
+            flash('Email gia registrata.')
+            return redirect(url_for('register'))
+        if db.session.query(User).filter_by(username=username).first():
+            flash('Username gia preso.')
+            return redirect(url_for('register'))
+        if len(username) < 3 or len(username) > 20:
+            flash('Username 3-20 caratteri.')
+            return redirect(url_for('register'))
+        if not username.replace('_','').isalnum():
+            flash('Solo lettere, numeri e _')
+            return redirect(url_for('register'))
+        if len(password) < 6:
+            flash('Password minimo 6 caratteri.')
+            return redirect(url_for('register'))
+        is_admin = email in ADMIN_EMAILS
+        assigned_plan = 'ultimate' if is_admin else PLAN_EMAILS.get(email, 'free')
+        nid = generate_nexora_id()
+        u = User(email=email, password=password, username=username,
+                 verified=True, is_admin=is_admin, plan=assigned_plan,
+                 nexora_id=nid)
+        db.session.add(u)
+        db.session.commit()
+        login_user(u, remember=True)
+        session.permanent = True
+        return redirect(url_for('show_nexora_id'))
+    return render_template('register.html')
+
+
+def generate_nexora_id():
+    import random, string
+    while True:
+        part1 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        part2 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        nid = "NEX-" + part1 + "-" + part2
+        if not db.session.query(User).filter_by(nexora_id=nid).first():
+            return nid
+
+
+@app.route('/welcome')
+@login_required
+def show_nexora_id():
+    return render_template('show_id.html', nexora_id=current_user.nexora_id, username=current_user.username)
+
+
+@app.route('/login', methods=['GET','POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email'].strip().lower()
+        pwd = request.form['password']
+        nid = request.form.get('nexora_id', '').strip()
+        u = db.session.query(User).filter_by(email=email, password=pwd).first()
+        if not u:
+            flash('Credenziali errate.')
+            return render_template('login.html')
+        if not u.is_admin:
+            if not nid or nid != u.nexora_id:
+                flash('NEXORA ID errato o mancante.')
+                return render_template('login.html')
+        remember = request.form.get('remember') == 'on'
+        login_user(u, remember=remember)
+        session.permanent = remember
+        return redirect(url_for('dashboard'))
+    return render_template('login.html')
+
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    plan = PLANS.get(current_user.plan, PLANS['free'])
+    since = datetime.utcnow() - timedelta(hours=30)
+    used = db.session.query(LookupLog).filter(
+        LookupLog.user_id == current_user.id,
+        LookupLog.created_at >= since
+    ).count()
+    remaining = "inf" if current_user.is_admin else max(0, plan['daily_limit'] - used)
+    return render_template('dashboard.html', user=current_user, plan=plan, remaining=remaining, plans=PLANS)
+
 
 @app.route('/pricing')
 def pricing():
