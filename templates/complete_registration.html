@@ -1,14 +1,111 @@
 <!DOCTYPE html>
-<html lang="it"><head><meta charset="UTF-8"><title>Completa — NEXORA</title>
-<link rel="stylesheet" href="/static/style.css"></head>
-<body class="auth">
-<form method="POST" class="auth-form">
-  <div class="brand-icon big">N</div>
-  <h2>Crea il tuo profilo</h2>
-  <p style="color:#888;font-size:13px;margin-bottom:16px">Email verificata: <b style="color:#fff">{{ email }}</b></p>
-  {% with m = get_flashed_messages() %}{% if m %}<p style="color:#ff3b3b">{{ m[0] }}</p>{% endif %}{% endwith %}
-  <input name="username" type="text" placeholder="Scegli un username" minlength="3" maxlength="20" required autofocus>
-  <input name="password" type="password" placeholder="Scegli una password" minlength="6" required>
-  <button type="submit">Crea account</button>
-</form>
-</body></html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"><title>Completa — NEXORA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#050608;
+  color:#fff;
+  font-family:'Inter',sans-serif;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background-image:
+    radial-gradient(circle at 50% 40%, rgba(200,220,255,0.04), transparent 50%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 40px);
+}
+.card {
+  background:#0a0b0e;
+  border:1px solid #1a1d24;
+  border-radius:24px;
+  padding:48px 40px 40px;
+  max-width:440px;
+  width:100%;
+  text-align:center;
+}
+.logo-circle {
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  background:rgba(20,22,28,0.9);
+  border:1px solid #1f242c;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto 24px;
+}
+.logo-circle svg { width:28px; height:28px; stroke:#8892a0; }
+h1 { font-size:26px; font-weight:800; margin-bottom:8px; letter-spacing:-0.3px; }
+.sub { color:#888; font-size:14px; margin-bottom:6px; }
+.email { color:#fff; font-weight:600; font-size:14px; margin-bottom:32px; word-break:break-all; }
+.label { display:block; text-align:left; font-size:12px; font-weight:600; color:#ccc; margin-bottom:8px; }
+input {
+  width:100%;
+  background:#14161c;
+  border:1px solid #1f242c;
+  color:#fff;
+  padding:14px 16px;
+  border-radius:10px;
+  font-size:14px;
+  font-family:inherit;
+  outline:none;
+  margin-bottom:20px;
+  transition:border-color 0.2s;
+}
+input:focus { border-color:#5865f2; }
+.btn {
+  width:100%;
+  background:#5865f2;
+  color:#fff;
+  border:none;
+  padding:14px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:14px;
+  cursor:pointer;
+  font-family:inherit;
+}
+.btn:hover { background:#4752c4; }
+.error {
+  background:rgba(255,60,60,0.08);
+  border:1px solid rgba(255,60,60,0.3);
+  color:#ff8080;
+  padding:12px 14px;
+  border-radius:10px;
+  font-size:13px;
+  margin-bottom:20px;
+  text-align:left;
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-circle">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+      <circle cx="11" cy="11" r="7"/>
+      <path d="M21 21l-4-4"/>
+    </svg>
+  </div>
+  <h1>Create your profile</h1>
+  <p class="sub">Email verificata:</p>
+  <p class="email">{{ email }}</p>
+
+  {% with msgs = get_flashed_messages() %}{% if msgs %}<div class="error">{{ msgs[0] }}</div>{% endif %}{% endwith %}
+
+  <form method="POST">
+    <label class="label">Username</label>
+    <input name="username" type="text" placeholder="il_tuo_username" minlength="3" maxlength="20" required autofocus>
+
+    <label class="label">Password</label>
+    <input name="password" type="password" placeholder="Minimo 6 caratteri" minlength="6" required>
+
+    <button type="submit" class="btn">Create account →</button>
+  </form>
+</div>
+</body>
+</html>

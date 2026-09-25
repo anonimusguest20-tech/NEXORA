@@ -798,3 +798,28 @@ a { color:inherit; text-decoration:none; }
   transition: all 0.2s;
 }
 .info-cell:hover { border-color: #2a2f3a !important; }
+
+.map-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(90deg, rgba(255,60,60,0.08), transparent);
+  border: 1px solid rgba(255,60,60,0.3);
+  color: #fff;
+  padding: 16px 22px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+  margin: 12px 0;
+}
+.map-link:hover {
+  border-color: #ff3b3b;
+  background: linear-gradient(90deg, rgba(255,60,60,0.15), transparent);
+  transform: translateX(4px);
+}
+.map-link .arrow {
+  margin-left: auto;
+  color: #ff3b3b;
+}

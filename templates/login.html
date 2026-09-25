@@ -2,56 +2,201 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8"><title>Login — NEXORA</title>
-<link rel="stylesheet" href="/static/style.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#050608;
+  color:#fff;
+  font-family:'Inter',sans-serif;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background-image:
+    radial-gradient(circle at 50% 40%, rgba(200,220,255,0.04), transparent 50%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 40px);
+}
+.card {
+  background:#0a0b0e;
+  border:1px solid #1a1d24;
+  border-radius:24px;
+  padding:48px 40px 40px;
+  max-width:440px;
+  width:100%;
+  text-align:center;
+}
+.logo-circle {
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  background:rgba(20,22,28,0.9);
+  border:1px solid #1f242c;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto 24px;
+}
+.logo-circle svg { width:28px; height:28px; stroke:#8892a0; }
+h1 {
+  font-size:26px;
+  font-weight:800;
+  margin-bottom:8px;
+  letter-spacing:-0.3px;
+}
+.sub {
+  color:#888;
+  font-size:14px;
+  margin-bottom:32px;
+}
+.label {
+  display:block;
+  text-align:left;
+  font-size:12px;
+  font-weight:600;
+  color:#ccc;
+  margin-bottom:8px;
+}
+input[type="email"], input[type="password"], input[type="text"] {
+  width:100%;
+  background:#14161c;
+  border:1px solid #1f242c;
+  color:#fff;
+  padding:14px 16px;
+  border-radius:10px;
+  font-size:14px;
+  font-family:inherit;
+  outline:none;
+  margin-bottom:20px;
+  transition:border-color 0.2s;
+}
+input:focus { border-color:#5865f2; }
+.remember-row {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  text-align:left;
+  margin-bottom:20px;
+  font-size:13px;
+  color:#888;
+}
+.remember-row input { width:auto; margin:0; }
+.btn-continue {
+  width:100%;
+  background:#5865f2;
+  color:#fff;
+  border:none;
+  padding:14px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:14px;
+  cursor:pointer;
+  font-family:inherit;
+  transition:background 0.2s;
+}
+.btn-continue:hover { background:#4752c4; }
+.divider {
+  display:flex;
+  align-items:center;
+  gap:14px;
+  color:#666;
+  font-size:12px;
+  margin:24px 0;
+}
+.divider::before, .divider::after {
+  content:'';
+  flex:1;
+  height:1px;
+  background:#1f242c;
+}
+.social-row {
+  display:flex;
+  gap:12px;
+  margin-bottom:24px;
+}
+.social-btn {
+  flex:1;
+  background:transparent;
+  border:1px solid #1f242c;
+  color:#fff;
+  padding:12px;
+  border-radius:10px;
+  font-weight:600;
+  font-size:13px;
+  cursor:pointer;
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-family:inherit;
+  transition:border-color 0.2s;
+}
+.social-btn:hover { border-color:#5865f2; }
+.bottom {
+  color:#888;
+  font-size:13px;
+}
+.bottom a { color:#5865f2; text-decoration:none; font-weight:600; }
+.error {
+  background:rgba(255,60,60,0.08);
+  border:1px solid rgba(255,60,60,0.3);
+  color:#ff8080;
+  padding:12px 14px;
+  border-radius:10px;
+  font-size:13px;
+  margin-bottom:20px;
+  text-align:left;
+}
+</style>
 </head>
-<body class="auth-page">
-
-<div class="auth-left">
-  <div class="auth-brand">
-    <div class="auth-logo">
-      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="ngrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#e8eef5"/>
-            <stop offset="100%" stop-color="#7a8896"/>
-          </linearGradient>
-        </defs>
-        <circle cx="100" cy="100" r="88" fill="none" stroke="#1a1d24" stroke-width="0.5"/>
-        <circle cx="100" cy="100" r="88" fill="none" stroke="#2a2f3a" stroke-width="0.3" stroke-dasharray="2 4"/>
-        <path d="M55 140 L55 60 L145 140 L145 60" fill="none" stroke="url(#ngrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="55" cy="60" r="4" fill="#fff" opacity="0.6"/>
-        <circle cx="145" cy="140" r="4" fill="#fff" opacity="0.6"/>
-      </svg>
-    </div>
-    <h1 class="auth-wordmark">NEXORA</h1>
-    <p class="auth-tagline">SEARCH BEYOND SURFACE</p>
-    <p class="auth-desc">Intelligence for a more transparent web.</p>
+<body>
+<div class="card">
+  <div class="logo-circle">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+      <circle cx="11" cy="11" r="7"/>
+      <path d="M21 21l-4-4"/>
+    </svg>
   </div>
-  <div class="auth-foot">
-    <div class="auth-stats">
-      <div><b>300+</b><span>Data Sources</span></div>
-      <div><b>50+</b><span>OSINT Tools</span></div>
-      <div><b>24/7</b><span>Global Access</span></div>
-    </div>
-  </div>
-</div>
+  <h1>Welcome back</h1>
+  <p class="sub">Sign in to your NEXORA account.</p>
 
-<div class="auth-right">
-  <form method="POST" class="auth-box">
-    <h2>Bentornato</h2>
-    <p class="auth-sub">Accedi al tuo account NEXORA</p>
-    {% with m = get_flashed_messages() %}{% if m %}<div class="auth-error">{{ m[0] }}</div>{% endif %}{% endwith %}
-    <label class="auth-label">Email</label>
+  {% with msgs = get_flashed_messages() %}{% if msgs %}<div class="error">{{ msgs[0] }}</div>{% endif %}{% endwith %}
+
+  <form method="POST">
+    <label class="label">Email</label>
     <input name="email" type="email" placeholder="nome@esempio.com" required autofocus>
-    <label class="auth-label">Password</label>
-    <input name="password" type="password" placeholder="••••••••" required>
-    <label class="auth-label">NEXORA ID <span style="color:#555;font-weight:400;text-transform:none;letter-spacing:0">(non richiesto per admin)</span></label>
-    <input name="nexora_id" type="text" placeholder="NEX-XXXX-XXXX" style="text-transform:uppercase" maxlength="13">
-    <button type="submit" class="auth-btn">Accedi →</button>
-    <p class="auth-bottom">Non hai un account? <a href="/register">Registrati ora</a></p>
-  </form>
-</div>
 
+    <label class="label">Password</label>
+    <input name="password" type="password" placeholder="••••••••" required>
+
+    <label class="label">NEXORA ID <span style="color:#666;font-weight:400">(opzionale)</span></label>
+    <input name="nexora_id" type="text" placeholder="NEX-XXXX-XXXX" maxlength="13" style="text-transform:uppercase">
+
+    <div class="remember-row">
+      <input type="checkbox" name="remember" id="remember" checked>
+      <label for="remember">Ricordami su questo dispositivo</label>
+    </div>
+
+    <button type="submit" class="btn-continue">Sign in →</button>
+  </form>
+
+  <div class="divider">or continue with</div>
+
+  <div class="social-row">
+    <a href="/login" class="social-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#fff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#fff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Google
+    </a>
+    <a href="/login" class="social-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#5865f2"><path d="M20.3 4.4A19.8 19.8 0 0 0 15.4 3l-.3.5c1.7.4 2.5 1 3.3 1.6a13.5 13.5 0 0 0-12.8 0c.8-.6 1.7-1.2 3.3-1.6L8.6 3A19.8 19.8 0 0 0 3.7 4.4C.4 9.5-.6 14.5.1 19.4a19.9 19.9 0 0 0 6.1 3l1.3-2c-.7-.3-1.4-.6-2-1l.5-.4a14 14 0 0 0 12 0l.5.4c-.6.4-1.3.7-2 1l1.3 2a19.9 19.9 0 0 0 6.1-3c.8-5.7-.8-10.6-3.6-15z"/></svg>
+      Discord
+    </a>
+  </div>
+
+  <p class="bottom">Don't have an account? <a href="/register">Sign up</a></p>
+</div>
 </body>
 </html>

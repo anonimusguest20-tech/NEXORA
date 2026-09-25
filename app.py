@@ -2,8 +2,9 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, f
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from datetime import datetime, timedelta
-import os, requests, phonenumbers, hashlib, subprocess, random, string
+import os, requests, smtplib, phonenumbers, hashlib, subprocess, random, string
 from phonenumbers import carrier, geocoder, timezone as pn_timezone
+from email.mime.text import MIMEText
 from dotenv import load_dotenv
 
 import random, string
@@ -17,6 +18,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+login_manager.remember_cookie_duration = timedelta(days=30)
+login_manager.session_protection = 'basic'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
+app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
+app.config['REMEMBER_COOKIE_SECURE'] = False
+app.config['REMEMBER_COOKIE_HTTPONLY'] = True
+app.config['REMEMBER_COOKIE_SAMESITE'] = 'Lax'
 ADMIN_EMAILS = ['admin@nexora.local', 'anonimus.guest20@gmail.com', 'amico@nexora.local']
 
 PLAN_EMAILS = {
@@ -80,6 +88,44 @@ def check_lookup(user, ltype):
     return True, None
 def log_lookup(user, ltype, query):
     db.session.add(LookupLog(user_id=user.id, type=ltype, query=query)); db.session.commit()
+def lookup_phone_advanced(number):
+    try:
+        import phonenumbers
+        from phonenumbers import carrier, geocoder
+        p = phonenumbers.parse(number, None)
+        if not phonenumbers.is_valid_number(p):
+            return {"error": "Numero non valido"}
+        result = {
+            "number": number,
+            "operator": carrier.name_for_number(p, "it") or None,
+            "region": geocoder.description_for_number(p, "it") or None,
+            "country": phonenumbers.region_code_for_number(p),
+        }
+        region_name = result.get("region") or "Italy"
+        try:
+            import requests
+            geo_api_url = "https://nominatim.openstreetmap.org/search?q=" + region_name + ",Italy&format=json&limit=1"
+            geo_response = requests.get(geo_api_url, headers={"User-Agent": "NEXORA-OSINT-Tool"}, timeout=10).json()
+            if geo_response:
+                lat = geo_response[0]['lat']
+                lon = geo_response[0]['lon']
+                result["latitude"] = lat
+                result["longitude"] = lon
+                result["google_maps_link"] = "https://www.google.com/maps?q=" + lat + "," + lon
+        except Exception as e:
+            result["geo_error"] = str(e)
+        return result
+    except Exception as e:
+        return {"error": str(e)}
+
+
+
+
+
+
+
+
+
 def lookup_phone(number):
     try:
         p = phonenumbers.parse(number, None)
@@ -95,10 +141,8 @@ def lookup_phone(number):
             "international": phonenumbers.format_number(p, phonenumbers.PhoneNumberFormat.INTERNATIONAL),
             "national": phonenumbers.format_number(p, phonenumbers.PhoneNumberFormat.NATIONAL),
             "e164": phonenumbers.format_number(p, phonenumbers.PhoneNumberFormat.E164),
-            "country_name": None,
-            "location": None,
-            "line_type": None,
-            "sources": []
+            "country_name": None, "location": None, "line_type": None,
+            "sources": [], "links": []
         }
         # Veriphone
         vk = os.getenv("VERIPHONE_KEY", "")
@@ -147,15 +191,29 @@ def lookup_phone(number):
                         if d.get("line_type"): result["line_type"] = d["line_type"]
                         result["sources"].append("numverify")
             except: pass
-        # Link diretti
+        # Nominatim geocoding → Google Maps link
+        try:
+            region_query = result.get("location") or result.get("region") or result.get("country_name") or "Italy"
+            geo = requests.get("https://nominatim.openstreetmap.org/search",
+                               params={"q": region_query + ", Italy", "format": "json", "limit": 1},
+                               headers={"User-Agent": "NEXORA-OSINT"}, timeout=10).json()
+            if geo:
+                lat = geo[0]["lat"]; lon = geo[0]["lon"]
+                result["latitude"] = lat
+                result["longitude"] = lon
+                result["google_maps_link"] = "https://www.google.com/maps?q=" + lat + "," + lon
+        except: pass
+        # Link diretti per verifica manuale
         digits = number.replace("+", "").replace(" ", "").replace("-", "")
         result["links"] = [
-            {"name": "WhatsApp", "url": f"https://wa.me/{digits}"},
-            {"name": "Telegram", "url": f"https://t.me/+{digits}"},
-            {"name": "Truecaller", "url": f"https://www.truecaller.com/search/it/{digits}"},
-            {"name": "Sync.me", "url": f"https://sync.me/search/?number={digits}"},
-            {"name": "Facebook", "url": "https://www.facebook.com/login/identify"},
-            {"name": "Google", "url": "https://accounts.google.com/signin/recovery"}
+            {"name": "Truecaller", "url": "https://www.truecaller.com/search/it/" + digits, "desc": "Trova nome proprietario"},
+            {"name": "Sync.me", "url": "https://sync.me/search/?number=" + digits, "desc": "Nome da rubrica social"},
+            {"name": "Numlookup", "url": "https://www.numlookup.com/?phone=" + digits, "desc": "Lookup internazionale"},
+            {"name": "SpyDialer", "url": "https://www.spydialer.com/default.aspx?phone=" + digits, "desc": "Reverse phone USA"},
+            {"name": "WhatsApp", "url": "https://wa.me/" + digits, "desc": "Verifica se ha WhatsApp"},
+            {"name": "Telegram", "url": "https://t.me/+" + digits, "desc": "Verifica se ha Telegram"},
+            {"name": "Facebook", "url": "https://www.facebook.com/login/identify", "desc": "Recupero account Facebook"},
+            {"name": "Google", "url": "https://accounts.google.com/signin/recovery", "desc": "Recupero account Google"}
         ]
         return result
     except Exception as e:
@@ -163,16 +221,12 @@ def lookup_phone(number):
 
 
 def lookup_email(email):
-    result = {"email": email, "breaches": [], "sites_registered": [], "sources": []}
+    result = {"email": email, "breaches": [], "sites_registered": [], "sources": [], "profiles": []}
     domain = email.split("@")[-1]
-
-    # MX
     try:
         dns = requests.get("https://dns.google/resolve?name=" + domain + "&type=MX", timeout=10).json()
         result["mx_records"] = len(dns.get("Answer", []))
     except: pass
-
-    # EmailRep
     try:
         r = requests.get("https://emailrep.io/" + email, headers={"User-Agent":"NEXORA"}, timeout=10)
         if r.status_code == 200:
@@ -182,10 +236,8 @@ def lookup_email(email):
             result["profiles"] = d.get("profiles", [])
             result["sources"].append("emailrep")
     except: pass
-
-    # Holehe - cerca su 120+ siti
+    # Holehe - account collegati
     try:
-        import subprocess
         res = subprocess.run(["holehe", email, "--only-used", "--no-color"],
                              capture_output=True, text=True, timeout=180)
         for line in res.stdout.splitlines():
@@ -196,10 +248,8 @@ def lookup_email(email):
         result["sources"].append("holehe")
     except Exception as e:
         result["holehe_error"] = str(e)
-
     # Gravatar
     try:
-        import hashlib
         h = hashlib.md5(email.lower().encode()).hexdigest()
         gr = requests.get("https://gravatar.com/" + h + ".json", timeout=10)
         if gr.status_code == 200:
@@ -212,7 +262,6 @@ def lookup_email(email):
             }
             result["sources"].append("gravatar")
     except: pass
-
     # GitHub
     try:
         gh = requests.get("https://api.github.com/search/users?q=" + email + "+in:email",
@@ -223,8 +272,7 @@ def lookup_email(email):
                 result["github"] = [{"login":u["login"],"url":u["html_url"]} for u in data.get("items",[])[:10]]
                 result["sources"].append("github")
     except: pass
-
-    # XposedOrNot per breach
+    # Breach via XposedOrNot
     try:
         xon = requests.get("https://api.xposedornot.com/v1/check-email/" + email, timeout=15)
         if xon.status_code == 200:
@@ -235,59 +283,68 @@ def lookup_email(email):
                     result["breaches"] = bl[0] if isinstance(bl[0], list) else bl
                     result["sources"].append("xposedornot")
     except: pass
-
-    # Hudson Rock (infostealer)
+    # Hudson Rock
     try:
         hr = requests.get("https://cavalier.hudsonrock.com/api/json/v2/osint-tools/search-by-email",
                           params={"email": email}, timeout=15)
         if hr.status_code == 200:
             hd = hr.json()
-            if hd.get("data") and hd["data"].get("employees"):
+            if hd.get("data"):
                 result["hudsonrock"] = hd["data"]
                 result["sources"].append("hudsonrock")
     except: pass
-
-    # IBM X-Force
-    try:
-        xf = requests.get("https://exchange.xforce.ibmcloud.com/api/breaches",
-                         params={"email": email}, timeout=10)
-        if xf.status_code == 200:
-            result["xforce"] = xf.json().get("breaches", [])
-    except: pass
-
     return result
 
 
 def lookup_ip(ip):
-    try: return requests.get(f"http://ip-api.com/json/{ip}", timeout=10).json()
-    except Exception as e: return {"error":str(e)}
+    try:
+        r = requests.get("http://ip-api.com/json/" + ip + "?fields=status,message,country,countryCode,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,reverse,mobile,proxy,hosting,query", timeout=10)
+        if r.status_code != 200:
+            return {"error": "API " + str(r.status_code)}
+        d = r.json()
+        if d.get("status") != "success":
+            return {"error": d.get("message", "IP non valido")}
+        result = {
+            "ip": d.get("query"), "country": d.get("country"), "country_code": d.get("countryCode"),
+            "region": d.get("regionName"), "city": d.get("city"), "zip": d.get("zip"),
+            "latitude": d.get("lat"), "longitude": d.get("lon"), "timezone": d.get("timezone"),
+            "isp": d.get("isp"), "org": d.get("org"), "asn": d.get("as"), "as_name": d.get("asname"),
+            "reverse": d.get("reverse"), "mobile": d.get("mobile"), "proxy": d.get("proxy"),
+            "hosting": d.get("hosting"), "sources": ["ip-api.com"]
+        }
+        if result["latitude"] and result["longitude"]:
+            result["google_maps_link"] = "https://www.google.com/maps?q=" + str(result["latitude"]) + "," + str(result["longitude"])
+        return result
+    except Exception as e:
+        return {"error": str(e)}
+
+
 def lookup_username(username):
     sites = {
-        "GitHub": f"https://github.com/{username}",
-        "Twitter": f"https://twitter.com/{username}",
-        "Instagram": f"https://instagram.com/{username}",
-        "Reddit": f"https://reddit.com/user/{username}",
-        "TikTok": f"https://tiktok.com/@{username}",
-        "YouTube": f"https://youtube.com/@{username}",
-        "Twitch": f"https://twitch.tv/{username}",
-        "Steam": f"https://steamcommunity.com/id/{username}",
-        "Pinterest": f"https://pinterest.com/{username}",
-        "Telegram": f"https://t.me/{username}",
-        "SoundCloud": f"https://soundcloud.com/{username}",
-        "Spotify": f"https://open.spotify.com/user/{username}",
-        "Medium": f"https://medium.com/@{username}",
-        "Dev.to": f"https://dev.to/{username}",
-        "Behance": f"https://behance.net/{username}",
-        "Dribbble": f"https://dribbble.com/{username}",
-        "Flickr": f"https://flickr.com/people/{username}",
-        "Vimeo": f"https://vimeo.com/{username}",
-        "GitLab": f"https://gitlab.com/{username}",
-        "BitBucket": f"https://bitbucket.org/{username}",
-        "Mastodon": f"https://mastodon.social/@{username}",
-        "Bluesky": f"https://bsky.app/profile/{username}.bsky.social",
-        "Facebook": f"https://facebook.com/{username}",
-        "LinkedIn": f"https://linkedin.com/in/{username}",
-        "Keybase": f"https://keybase.io/{username}"
+        "GitHub": "https://github.com/" + username,
+        "Twitter": "https://twitter.com/" + username,
+        "Instagram": "https://instagram.com/" + username,
+        "Reddit": "https://reddit.com/user/" + username,
+        "TikTok": "https://tiktok.com/@" + username,
+        "YouTube": "https://youtube.com/@" + username,
+        "Twitch": "https://twitch.tv/" + username,
+        "Steam": "https://steamcommunity.com/id/" + username,
+        "Pinterest": "https://pinterest.com/" + username,
+        "Telegram": "https://t.me/" + username,
+        "SoundCloud": "https://soundcloud.com/" + username,
+        "Spotify": "https://open.spotify.com/user/" + username,
+        "Medium": "https://medium.com/@" + username,
+        "Dev.to": "https://dev.to/" + username,
+        "Behance": "https://behance.net/" + username,
+        "Dribbble": "https://dribbble.com/" + username,
+        "Flickr": "https://flickr.com/people/" + username,
+        "Vimeo": "https://vimeo.com/" + username,
+        "GitLab": "https://gitlab.com/" + username,
+        "BitBucket": "https://bitbucket.org/" + username,
+        "Mastodon": "https://mastodon.social/@" + username,
+        "Keybase": "https://keybase.io/" + username,
+        "Facebook": "https://facebook.com/" + username,
+        "LinkedIn": "https://linkedin.com/in/" + username
     }
     found = []
     for site, url in sites.items():
@@ -312,8 +369,7 @@ def lookup_domain(d):
         ns = requests.get("https://dns.google/resolve?name=" + d + "&type=NS", timeout=10).json()
         result["ns_records"] = [x.get("data") for x in ns.get("Answer", [])]
         result["sources"].append("dns.google")
-    except Exception:
-        pass
+    except: pass
     try:
         r = requests.get("https://crt.sh/?q=%25." + d + "&output=json", timeout=15)
         if r.status_code == 200:
@@ -325,66 +381,34 @@ def lookup_domain(d):
                         subs.add(name)
             result["subdomains"] = list(subs)[:30]
             result["sources"].append("crt.sh")
-    except Exception:
-        pass
+    except: pass
     return result
 
 
 def lookup_breaches(query):
-    result = {"query": query, "breaches": [], "breach_details": [], "sources": []}
-
-    # XposedOrNot (email + password)
+    result = {"query": query, "breaches": [], "sources": []}
     try:
-        r = requests.get(f"https://api.xposedornot.com/v1/check-email/{query}", timeout=15)
+        r = requests.get("https://api.xposedornot.com/v1/check-email/" + query, timeout=15)
         if r.status_code == 200:
             d = r.json()
             if d.get("status") == "success":
                 raw = d.get("breaches", [])
                 flat = []
                 for item in raw:
-                    if isinstance(item, list):
-                        flat.extend(item)
-                    else:
-                        flat.append(item)
+                    if isinstance(item, list): flat.extend(item)
+                    else: flat.append(item)
                 result["breaches"] = flat
                 result["sources"].append("xposedornot")
-        elif r.status_code == 404:
-            pass
-        elif r.status_code == 429:
-            result["note"] = "Rate limit, riprova tra poco"
-    except Exception as e:
-        result["xon_error"] = str(e)
-
-    # Dettagli extra da XposedOrNot
-    if result["breaches"]:
-        try:
-            r2 = requests.get("https://api.xposedornot.com/v1/breach-analytics",
-                              params={"email": query}, timeout=15)
-            if r2.status_code == 200:
-                d2 = r2.json()
-                result["breach_details"] = d2.get("Breaches_Details", [])
-        except Exception:
-            pass
-
-    # Hudson Rock (infostealer, funziona anche con telefoni)
+    except: pass
     try:
-        r3 = requests.get(f"https://cavalier.hudsonrock.com/api/json/v2/osint-tools/search-by-username",
-                          params={"username": query}, timeout=15)
-        if r3.status_code == 200:
-            d3 = r3.json()
-            if d3.get("data"):
-                result["hudsonrock"] = []
-                for item in d3["data"][:10]:
-                    result["hudsonrock"].append({
-                        "stealer": item.get("stealer_family"),
-                        "computer": item.get("computer_name"),
-                        "ip": item.get("ip"),
-                        "date": item.get("date_compromised")
-                    })
+        hr = requests.get("https://cavalier.hudsonrock.com/api/json/v2/osint-tools/search-by-email",
+                          params={"email": query}, timeout=15)
+        if hr.status_code == 200:
+            hd = hr.json()
+            if hd.get("data"):
+                result["hudsonrock"] = hd["data"]
                 result["sources"].append("hudsonrock")
-    except Exception:
-        pass
-
+    except: pass
     return result
 
 
@@ -392,80 +416,27 @@ def lookup_discord(user_id):
     token = os.getenv("DISCORD_BOT_TOKEN", "")
     if not token:
         return {"error": "DISCORD_BOT_TOKEN non configurato"}
-    headers = {"Authorization": f"Bot {token}"}
+    headers = {"Authorization": "Bot " + token}
     result = {"user_id": user_id, "sources": []}
-
-    # Dati base utente
     try:
-        r = requests.get(f"https://discord.com/api/v9/users/{user_id}", headers=headers, timeout=10)
+        r = requests.get("https://discord.com/api/v9/users/" + user_id, headers=headers, timeout=10)
         if r.status_code == 404:
             return {"error": "Utente non trovato."}
         if r.status_code == 401:
             return {"error": "Token Discord non valido."}
         if r.status_code != 200:
-            return {"error": f"API Discord errore {r.status_code}"}
+            return {"error": "API Discord " + str(r.status_code)}
         d = r.json()
         result["username"] = d.get("username")
         result["global_name"] = d.get("global_name")
         result["discriminator"] = d.get("discriminator")
         result["bot"] = d.get("bot", False)
-        result["system"] = d.get("system", False)
         if d.get("avatar"):
             ext = "gif" if d["avatar"].startswith("a_") else "png"
-            result["avatar_url"] = f"https://cdn.discordapp.com/avatars/{user_id}/{d['avatar']}.{ext}?size=1024"
-            result["avatar_animated"] = d["avatar"].startswith("a_")
-        result["profile_url"] = f"https://discord.com/users/{user_id}"
+            result["avatar_url"] = "https://cdn.discordapp.com/avatars/" + user_id + "/" + d["avatar"] + "." + ext + "?size=512"
         result["sources"].append("discord-api")
     except Exception as e:
-        return {"error": f"Errore: {str(e)}"}
-
-    # Server in comune + dati completi dal member object
-    try:
-        rg = requests.get("https://discord.com/api/v9/users/@me/guilds", headers=headers, timeout=10)
-        if rg.status_code == 200:
-            mutual = []
-            full_data_taken = False
-            for g in rg.json()[:50]:
-                gm = requests.get(f"https://discord.com/api/v9/guilds/{g['id']}/members/{user_id}",
-                                  headers=headers, timeout=5)
-                if gm.status_code == 200:
-                    m = gm.json()
-                    u = m.get("user", {})
-                    entry = {
-                        "name": g["name"],
-                        "id": g["id"],
-                        "nick": m.get("nick"),
-                        "roles": m.get("roles", []),
-                        "joined_at": m.get("joined_at"),
-                        "premium_since": m.get("premium_since"),
-                        "deaf": m.get("deaf", False),
-                        "mute": m.get("mute", False),
-                        "flags": m.get("flags", 0),
-                    }
-                    # Avatar per-server
-                    if m.get("avatar"):
-                        ext = "gif" if m["avatar"].startswith("a_") else "png"
-                        entry["guild_avatar"] = f"https://cdn.discordapp.com/guilds/{g['id']}/users/{user_id}/avatars/{m['avatar']}.{ext}?size=256"
-                    mutual.append(entry)
-
-                    # Salva dati completi solo una volta (banner, accent, badges)
-                    if not full_data_taken:
-                        if u.get("banner"):
-                            ext = "gif" if u["banner"].startswith("a_") else "png"
-                            result["banner_url"] = f"https://cdn.discordapp.com/banners/{user_id}/{u['banner']}.{ext}?size=1024"
-                        if "accent_color" in u and u["accent_color"] is not None:
-                            result["accent_color"] = u["accent_color"]
-                            result["accent_hex"] = "#{:06x}".format(u["accent_color"])
-                        if "public_flags" in u:
-                            result["public_flags"] = u.get("public_flags", 0)
-                        full_data_taken = True
-            result["mutual_guilds"] = mutual
-            if full_data_taken:
-                result["sources"].append("guild-member")
-    except Exception:
-        pass
-
-    # Data creazione account
+        return {"error": str(e)}
     try:
         ts = ((int(user_id) >> 22) + 1420070400000) / 1000
         import datetime
@@ -474,34 +445,25 @@ def lookup_discord(user_id):
         age_days = (datetime.datetime.utcnow() - created).days
         result["account_age_days"] = age_days
         result["account_age_years"] = round(age_days / 365, 1)
-        result["account_age_months"] = round(age_days / 30, 1)
-        result["unix_timestamp"] = int(ts)
-    except Exception:
-        pass
-
-    # Badges
+    except: pass
     flag_map = {
-        1 << 0: "Discord Employee", 1 << 1: "Partnered Server Owner",
-        1 << 2: "HypeSquad Events", 1 << 3: "Bug Hunter Level 1",
-        1 << 6: "HypeSquad Bravery", 1 << 7: "HypeSquad Brilliance",
-        1 << 8: "HypeSquad Balance", 1 << 9: "Early Supporter",
-        1 << 14: "Bug Hunter Level 2", 1 << 16: "Verified Bot",
-        1 << 17: "Early Verified Bot Developer", 1 << 18: "Moderator Programs Alumni",
-        1 << 19: "Discord Certified Moderator", 1 << 22: "Active Developer",
+        1 << 0: "Discord Employee", 1 << 1: "Partnered Server Owner", 1 << 2: "HypeSquad Events",
+        1 << 3: "Bug Hunter Level 1", 1 << 6: "HypeSquad Bravery", 1 << 7: "HypeSquad Brilliance",
+        1 << 8: "HypeSquad Balance", 1 << 9: "Early Supporter", 1 << 14: "Bug Hunter Level 2",
+        1 << 16: "Verified Bot", 1 << 17: "Early Verified Bot Developer",
+        1 << 18: "Moderator Programs Alumni", 1 << 19: "Discord Certified Moderator",
+        1 << 22: "Active Developer"
     }
     badges = []
     flags = result.get("public_flags", 0)
     for bit, name in flag_map.items():
-        if flags & bit:
-            badges.append(name)
+        if flags & bit: badges.append(name)
     result["badges"] = badges
-    result["raw_flags"] = flags
-
     return result
 
 
 LOOKUP_MAP = {
-    'phone': lookup_phone, 'email': lookup_email, 'ip': lookup_ip,
+    'phone': lookup_phone_advanced, 'email': lookup_email, 'ip': lookup_ip,
     'username': lookup_username, 'users': lookup_username,
     'domains': lookup_domain, 'social': lookup_username,
     'breaches': lookup_breaches, 'images': lookup_username,
@@ -522,41 +484,6 @@ def generate_nexora_id():
         if not db.session.query(User).filter_by(nexora_id=nid).first():
             return nid
 
-@app.route('/register', methods=['GET','POST'])
-def register():
-    if request.method == 'POST':
-        email = request.form['email'].strip().lower()
-        pwd = request.form['password']
-        username = request.form['username'].strip()
-        if db.session.query(User).filter_by(email=email).first():
-            flash('Email già registrata.')
-            return redirect(url_for('register'))
-        if db.session.query(User).filter_by(username=username).first():
-            flash('Username già preso.')
-            return redirect(url_for('register'))
-        if len(username) < 3 or len(username) > 20:
-            flash('Username 3-20 caratteri.')
-            return redirect(url_for('register'))
-        if not username.replace('_','').isalnum():
-            flash('Solo lettere, numeri e _')
-            return redirect(url_for('register'))
-        is_admin = email in ADMIN_EMAILS
-        assigned_plan = 'ultimate' if is_admin else PLAN_EMAILS.get(email, 'free')
-        nid = generate_nexora_id()
-        u = User(email=email, password=pwd, username=username,
-                 verified=True, is_admin=is_admin, plan=assigned_plan,
-                 nexora_id=nid)
-        db.session.add(u)
-        db.session.commit()
-        login_user(u, remember=True)
-        # Reindirizza alla pagina che mostra l'ID
-        return redirect(url_for('show_nexora_id'))
-    return render_template('register.html')
-
-@app.route('/welcome')
-@login_required
-def show_nexora_id():
-    return render_template('show_id.html', nexora_id=current_user.nexora_id, username=current_user.username)
 
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -576,6 +503,119 @@ def login():
         login_user(u, remember=True)
         return redirect(url_for('dashboard'))
     return render_template('login.html')
+
+def send_verify_email(to_email, code):
+    smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
+    smtp_port = int(os.getenv('SMTP_PORT', 465))
+    smtp_login = os.getenv('SMTP_LOGIN', os.getenv('SMTP_EMAIL', ''))
+    smtp_pass = os.getenv('SMTP_PASSWORD', '')
+    from_email = os.getenv('FROM_EMAIL', smtp_login)
+    if not smtp_login or not smtp_pass:
+        print("SMTP non configurato. Codice:", code, flush=True)
+        return
+    msg = MIMEText("Il tuo codice di verifica NEXORA è: " + code)
+    msg['Subject'] = 'NEXORA - Codice di verifica'
+    msg['From'] = from_email
+    msg['To'] = to_email
+    if smtp_port == 587:
+        with smtplib.SMTP(smtp_server, smtp_port) as s:
+            s.starttls()
+            s.login(smtp_login, smtp_pass)
+            s.send_message(msg)
+    else:
+        with smtplib.SMTP_SSL(smtp_server, smtp_port) as s:
+            s.login(smtp_login, smtp_pass)
+            s.send_message(msg)
+
+
+@app.route('/register', methods=['GET','POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form['email'].strip().lower()
+        if db.session.query(User).filter_by(email=email).first():
+            flash('Email già registrata. Prova ad accedere.')
+            return redirect(url_for('login'))
+        code6 = ''.join(random.choices(string.digits, k=6))
+        db.session.query(VerifyCode).filter_by(email=email).delete()
+        db.session.add(VerifyCode(email=email, code=code6))
+        db.session.commit()
+        try:
+            send_verify_email(email, code6)
+            print("EMAIL INVIATA A", email, "CODICE:", code6, flush=True)
+        except Exception as e:
+            print("Errore invio email:", e, flush=True)
+            flash('Errore invio email: ' + str(e))
+            return redirect(url_for('register'))
+        session['pending_email'] = email
+        session.permanent = True
+        return redirect(url_for('verify'))
+    return render_template('register.html')
+
+
+@app.route('/verify', methods=['GET','POST'])
+def verify():
+    email = session.get('pending_email')
+    if not email:
+        return redirect(url_for('register'))
+    if request.method == 'POST':
+        code_in = request.form.get('code', '').strip()
+        vc = db.session.query(VerifyCode).filter_by(email=email).order_by(VerifyCode.id.desc()).first()
+        if vc and vc.code == code_in:
+            session['verified_email'] = email
+            db.session.delete(vc)
+            db.session.commit()
+            return redirect(url_for('complete_registration'))
+        flash('Codice errato.')
+    return render_template('verify.html', email=email)
+
+
+@app.route('/complete', methods=['GET','POST'])
+def complete_registration():
+    email = session.get('verified_email')
+    if not email:
+        return redirect(url_for('register'))
+    if request.method == 'POST':
+        username = request.form['username'].strip()
+        password = request.form['password']
+        if len(username) < 3 or len(username) > 20:
+            flash('Username 3-20 caratteri.')
+        elif not username.replace('_','').isalnum():
+            flash('Solo lettere, numeri e _')
+        elif db.session.query(User).filter_by(username=username).first():
+            flash('Username già preso.')
+        elif len(password) < 6:
+            flash('Password minimo 6 caratteri.')
+        else:
+            is_admin = email in ADMIN_EMAILS
+            assigned_plan = 'ultimate' if is_admin else PLAN_EMAILS.get(email, 'free')
+            nid = generate_nexora_id()
+            u = User(email=email, password=password, username=username,
+                     verified=True, is_admin=is_admin, plan=assigned_plan,
+                     nexora_id=nid)
+            db.session.add(u)
+            db.session.commit()
+            session.pop('pending_email', None)
+            session.pop('verified_email', None)
+            login_user(u, remember=True)
+            session.permanent = True
+            return redirect(url_for('show_nexora_id'))
+    return render_template('complete_registration.html', email=email)
+
+
+def generate_nexora_id():
+    while True:
+        part1 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        part2 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        nid = "NEX-" + part1 + "-" + part2
+        if not db.session.query(User).filter_by(nexora_id=nid).first():
+            return nid
+
+
+@app.route('/welcome')
+@login_required
+def show_nexora_id():
+    return render_template('show_id.html', nexora_id=current_user.nexora_id, username=current_user.username)
+
 
 @app.route('/dashboard')
 @login_required

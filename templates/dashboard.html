@@ -299,89 +299,94 @@ function renderResult(data){
   var r = document.getElementById('result');
   if (!r) return;
   if (data.error) { r.innerHTML = '<div class="panel-error">⚠ ' + data.error + '</div>'; return; }
-
   var h = '';
 
-  // ─── PHONE ───
-  if (data.number && data.operator !== undefined) {
+  // ═══ PHONE ═══
+  if (data.number){
     h += '<div class="results-head">Risultati per <b>' + data.number + '</b></div>';
     var info = [];
-    if (data.operator) info.push(['Operatore', data.operator]);
-    if (data.country_name) info.push(['Paese', data.country_name]);
-    if (data.region) info.push(['Regione', data.region]);
+    info.push(['Numero', data.number]);
+    info.push(['Operatore', data.operator || 'Sconosciuto']);
+    info.push(['Paese', data.country_name || data.country || 'N/D']);
+    info.push(['Regione', data.region || 'Sconosciuta']);
     if (data.location) info.push(['Località', data.location]);
-    if (data.type) info.push(['Tipo', data.type]);
+    info.push(['Tipo', data.type || 'N/D']);
     if (data.line_type) info.push(['Linea', data.line_type]);
-    if (data.international) info.push(['Intl', data.international]);
+    if (data.international) info.push(['Formato Intl', data.international]);
     if (data.e164) info.push(['E.164', data.e164]);
-    if (data.timezone) info.push(['Timezone', data.timezone.join(', ')]);
-    if (info.length) {
-      h += '<div class="info-grid">';
-      info.forEach(function(p){ h += '<div class="info-cell"><span class="info-k">' + p[0] + '</span><span class="info-v">' + p[1] + '</span></div>'; });
-      h += '</div>';
+    if (data.timezone && data.timezone.length) info.push(['Timezone', data.timezone.join(', ')]);
+    h += '<div class="info-grid">';
+    info.forEach(function(p){ h += '<div class="info-cell"><span class="info-k">' + p[0] + '</span><span class="info-v">' + p[1] + '</span></div>'; });
+    h += '</div>';
+    if (data.google_maps_link){
+      h += '<div class="sites-title">📍 Posizione</div>';
+      h += '<a class="map-link" href="' + data.google_maps_link + '" target="_blank"><span>🗺</span> Apri su Google Maps <span class="arrow">→</span></a>';
     }
-    if (data.links && data.links.length) {
-      h += '<div class="sites-title">Verifica manuale</div><div class="sites-grid">';
+    if (data.links && data.links.length){
+      h += '<div class="sites-title">🔗 Verifica operatore e proprietario</div><div class="sites-grid">';
       data.links.forEach(function(l){
-        h += '<a class="site-card" href="' + l.url + '" target="_blank"><div class="site-name">' + l.name + '</div><div class="site-url">Apri →</div></a>';
+        h += '<a class="site-card" href="' + l.url + '" target="_blank">';
+        h += '<div class="site-name">' + l.name + '</div>';
+        h += '<div class="site-url">' + (l.desc || 'Apri') + ' →</div>';
+        h += '</a>';
       });
       h += '</div>';
     }
   }
-  // ─── USERNAME ───
-  else if (data.username && data.found !== undefined) {
+  // ═══ USERNAME ═══
+  else if (data.username && data.found !== undefined){
     h += '<div class="results-head">Profili trovati per <b>' + data.username + '</b> (' + data.found.length + '/' + data.total_checked + ')</div>';
-    if (data.found.length) {
+    if (data.found.length){
       h += '<div class="sites-grid">';
       data.found.forEach(function(f){
-        h += '<a class="site-card" href="' + f.url + '" target="_blank"><div class="site-name">' + f.site + '</div><div class="site-url">Apri →</div></a>';
+        h += '<a class="site-card" href="' + f.url + '" target="_blank"><div class="site-name">' + f.site + '</div><div class="site-url">Apri profilo →</div></a>';
       });
       h += '</div>';
     } else {
-      h += '<div class="info-cell"><span class="info-k">Profili</span><span class="info-v" style="color:#888">Nessun profilo pubblico trovato</span></div>';
+      h += '<div class="info-cell"><span class="info-k">Profili</span><span class="info-v" style="color:#888">Nessun profilo trovato</span></div>';
     }
   }
-  // ─── DOMAIN ───
-  else if (data.domain) {
+  // ═══ DOMAIN ═══
+  else if (data.domain){
     h += '<div class="results-head">Risultati per <b>' + data.domain + '</b></div>';
     var dinfo = [];
     if (data.a_records && data.a_records.length) dinfo.push(['A Records', data.a_records.join(', ')]);
     if (data.mx_records && data.mx_records.length) dinfo.push(['MX', data.mx_records.length + ' record']);
     if (data.ns_records && data.ns_records.length) dinfo.push(['NS', data.ns_records.join(', ')]);
-    if (dinfo.length) {
+    if (dinfo.length){
       h += '<div class="info-grid">';
       dinfo.forEach(function(p){ h += '<div class="info-cell"><span class="info-k">' + p[0] + '</span><span class="info-v">' + p[1] + '</span></div>'; });
       h += '</div>';
     }
-    if (data.subdomains && data.subdomains.length) {
+    if (data.subdomains && data.subdomains.length){
       h += '<div class="sites-title">Subdomains (' + data.subdomains.length + ')</div><div class="sites-grid">';
       data.subdomains.forEach(function(s){ h += '<div class="site-card"><div class="site-name">' + s + '</div></div>'; });
       h += '</div>';
     }
   }
-  // ─── DISCORD ───
-  else if (data.user_id) {
+  // ═══ DISCORD ═══
+  else if (data.user_id){
     h += '<div class="results-head">Discord ID: <b>' + data.user_id + '</b></div>';
     var iinfo = [];
     if (data.username) iinfo.push(['Username', data.username]);
     if (data.global_name) iinfo.push(['Display', data.global_name]);
     if (data.account_created) iinfo.push(['Creato', data.account_created]);
     if (data.account_age_years) iinfo.push(['Età', data.account_age_years + ' anni']);
-    if (iinfo.length) {
+    if (iinfo.length){
       h += '<div class="info-grid">';
       iinfo.forEach(function(p){ h += '<div class="info-cell"><span class="info-k">' + p[0] + '</span><span class="info-v">' + p[1] + '</span></div>'; });
       h += '</div>';
     }
     if (data.avatar_url) h += '<div style="text-align:center;margin:20px 0"><img src="' + data.avatar_url + '" style="width:128px;height:128px;border-radius:50%;border:2px solid #1a1c22"></div>';
-    if (data.badges && data.badges.length) {
+    if (data.badges && data.badges.length){
       h += '<div class="sites-title">Badges</div><div class="sites-grid">';
       data.badges.forEach(function(b){ h += '<div class="site-card"><div class="site-name">' + b + '</div></div>'; });
       h += '</div>';
     }
   }
-  // ─── IP ───
-  else if (data.ip || data.query) {
-    h += '<div class="results-head">Risultati per <b>' + (data.query || data.ip) + '</b></div>';
+  // ═══ IP ═══
+  else if (data.ip || data.isp){
+    h += '<div class="results-head">Risultati per <b>' + (data.ip || data.query || '') + '</b></div>';
     var pinfo = [];
     if (data.country) pinfo.push(['Paese', data.country]);
     if (data.region) pinfo.push(['Regione', data.region]);
@@ -389,82 +394,75 @@ function renderResult(data){
     if (data.zip) pinfo.push(['CAP', data.zip]);
     if (data.isp) pinfo.push(['ISP', data.isp]);
     if (data.org) pinfo.push(['Org', data.org]);
-    if (data.as) pinfo.push(['AS', data.as]);
+    if (data.asn) pinfo.push(['ASN', data.asn]);
     if (data.timezone) pinfo.push(['Timezone', data.timezone]);
-    if (data.latitude) pinfo.push(['Lat/Lon', data.latitude + ', ' + data.longitude]);
-    if (pinfo.length) {
+    if (data.latitude) pinfo.push(['Coordinate', data.latitude + ', ' + data.longitude]);
+    if (data.reverse) pinfo.push(['Reverse', data.reverse]);
+    if (pinfo.length){
       h += '<div class="info-grid">';
       pinfo.forEach(function(p){ h += '<div class="info-cell"><span class="info-k">' + p[0] + '</span><span class="info-v">' + p[1] + '</span></div>'; });
       h += '</div>';
     }
+    if (data.google_maps_link){
+      h += '<div class="sites-title">📍 Posizione</div>';
+      h += '<a class="map-link" href="' + data.google_maps_link + '" target="_blank"><span>🗺</span> Apri su Google Maps <span class="arrow">→</span></a>';
+    }
   }
-  // ─── EMAIL / BREACH ───
+  // ═══ EMAIL / BREACH ═══
   else {
     var email = data.email || data.query || '';
     h += '<div class="results-head">Risultati per <b>' + email + '</b></div>';
-
-    // Info generali
     var einfo = [];
     if (data.email) einfo.push(['Email', data.email]);
     if (data.domain) einfo.push(['Dominio', data.domain]);
-    if (data.mx_records) einfo.push(['MX Records', data.mx_records + ' trovati']);
+    if (data.mx_records) einfo.push(['MX Records', data.mx_records]);
     if (data.reputation) einfo.push(['Reputazione', data.reputation]);
-    if (einfo.length) {
+    if (data.suspicious !== undefined) einfo.push(['Sospetto', data.suspicious ? 'Sì' : 'No']);
+    if (einfo.length){
       h += '<div class="info-grid">';
       einfo.forEach(function(p){ h += '<div class="info-cell"><span class="info-k">' + p[0] + '</span><span class="info-v">' + p[1] + '</span></div>'; });
       h += '</div>';
     }
-
-    // Violazioni
-    if (data.breaches && data.breaches.length) {
-      h += '<div class="sites-title">⚠ Violazioni trovate (' + data.breaches.length + ')</div><div class="sites-grid">';
-      data.breaches.forEach(function(b){
-        h += '<div class="site-card breach"><div class="site-icon-badge">💾</div><div class="site-name">' + b + '</div><div class="site-url" style="color:#ff8080">Violazione</div></div>';
-      });
+    // Breach
+    if (data.breaches && data.breaches.length){
+      h += '<div class="sites-title">⚠ Violazioni (' + data.breaches.length + ')</div><div class="sites-grid">';
+      data.breaches.forEach(function(b){ h += '<div class="site-card breach"><div class="site-name">' + b + '</div><div class="site-url" style="color:#ff8080">Violazione</div></div>'; });
       h += '</div>';
-    } else if (data.breaches && data.breaches.length === 0) {
-      h += '<div class="success-banner"><span>✓</span> Nessuna violazione trovata per questa email</div>';
+    } else if (data.breaches && data.breaches.length === 0){
+      h += '<div class="success-banner"><span>✓</span> Nessuna violazione trovata</div>';
     }
-
+    // Gravatar
+    if (data.gravatar){
+      var g = data.gravatar;
+      h += '<div class="sites-title">Gravatar</div><div class="sites-grid">';
+      if (g.profileUrl) h += '<a class="site-card" href="' + g.profileUrl + '" target="_blank"><div class="site-name">' + (g.displayName || g.username || 'Profilo') + '</div><div class="site-url">Apri →</div></a>';
+      (g.accounts || []).forEach(function(a){ h += '<a class="site-card" href="' + a.url + '" target="_blank"><div class="site-name">' + a.shortname + '</div><div class="site-url">' + a.username + '</div></a>'; });
+      h += '</div>';
+    }
+    // GitHub
+    if (data.github && data.github.length){
+      h += '<div class="sites-title">GitHub</div><div class="sites-grid">';
+      data.github.forEach(function(u){ h += '<a class="site-card" href="' + u.url + '" target="_blank"><div class="site-name">@' + u.login + '</div><div class="site-url">Apri →</div></a>'; });
+      h += '</div>';
+    }
     // Siti collegati con icone
-    if (data.sites_registered && data.sites_registered.length) {
-      var icons = {
-        'firefox.com':'🦊','office365.com':'📧','replit.com':'💻','spotify.com':'🎵',
-        'github.com':'🐙','twitter.com':'🐦','instagram.com':'📸','reddit.com':'👽',
-        'tiktok.com':'🎵','twitch.tv':'🎮','pinterest.com':'📌','discord.com':'💬',
-        'adobe.com':'🎨','amazon.com':'📦','amazon.it':'📦','linkedin.com':'💼',
-        'yahoo.com':'💌','tumblr.com':'📓','snapchat.com':'👻','facebook.com':'👥',
-        'netflix.com':'🎬','dropbox.com':'📁','telegram.com':'✈'
-      };
-      var links = {
-        'firefox.com':'https://accounts.firefox.com/','office365.com':'https://login.microsoftonline.com/',
-        'replit.com':'https://replit.com/account','spotify.com':'https://www.spotify.com/account/overview/',
-        'github.com':'https://github.com/settings/profile','twitter.com':'https://twitter.com/account/begin_password_reset',
-        'instagram.com':'https://www.instagram.com/accounts/password/reset/','reddit.com':'https://www.reddit.com/password',
-        'tiktok.com':'https://www.tiktok.com/login/email/forget-password','twitch.tv':'https://www.twitch.tv/password_reset',
-        'pinterest.com':'https://www.pinterest.com/password/reset/','discord.com':'https://discord.com/login',
-        'adobe.com':'https://auth.services.adobe.com/en_US/forgotpassword.html','amazon.com':'https://www.amazon.com/ap/forgotpassword',
-        'amazon.it':'https://www.amazon.it/ap/forgotpassword','linkedin.com':'https://www.linkedin.com/checkpoint/rp/request-password-reset',
-        'yahoo.com':'https://login.yahoo.com/forgot','tumblr.com':'https://www.tumblr.com/forgot_password',
-        'snapchat.com':'https://accounts.snapchat.com/accounts/password_reset','facebook.com':'https://www.facebook.com/login/identify',
-        'netflix.com':'https://www.netflix.com/LoginHelp','dropbox.com':'https://www.dropbox.com/forgot_password'
-      };
-      h += '<div class="sites-title">🔗 Siti collegati (' + data.sites_registered.length + ')</div><div class="sites-grid">';
+    if (data.sites_registered && data.sites_registered.length){
+      var icons = {'firefox.com':'🦊','office365.com':'📧','replit.com':'💻','spotify.com':'🎵','github.com':'🐙','twitter.com':'🐦','instagram.com':'📸','reddit.com':'👽','tiktok.com':'🎵','twitch.tv':'🎮','pinterest.com':'📌','discord.com':'💬','adobe.com':'🎨','amazon.com':'📦','amazon.it':'📦','linkedin.com':'💼','yahoo.com':'💌','tumblr.com':'📓','snapchat.com':'👻','facebook.com':'👥','netflix.com':'🎬','dropbox.com':'📁'};
+      var links = {'firefox.com':'https://accounts.firefox.com/','office365.com':'https://login.microsoftonline.com/','replit.com':'https://replit.com/account','spotify.com':'https://www.spotify.com/account/overview/','github.com':'https://github.com/settings/profile','twitter.com':'https://twitter.com/account/begin_password_reset','instagram.com':'https://www.instagram.com/accounts/password/reset/','reddit.com':'https://www.reddit.com/password','tiktok.com':'https://www.tiktok.com/login/email/forget-password','twitch.tv':'https://www.twitch.tv/password_reset','pinterest.com':'https://www.pinterest.com/password/reset/','discord.com':'https://discord.com/login','adobe.com':'https://auth.services.adobe.com/en_US/forgotpassword.html','amazon.com':'https://www.amazon.com/ap/forgotpassword','amazon.it':'https://www.amazon.it/ap/forgotpassword','linkedin.com':'https://www.linkedin.com/checkpoint/rp/request-password-reset','yahoo.com':'https://login.yahoo.com/forgot','tumblr.com':'https://www.tumblr.com/forgot_password','snapchat.com':'https://accounts.snapchat.com/accounts/password_reset','facebook.com':'https://www.facebook.com/login/identify','netflix.com':'https://www.netflix.com/LoginHelp','dropbox.com':'https://www.dropbox.com/forgot_password'};
+      h += '<div class="sites-title">🔗 Account collegati (' + data.sites_registered.length + ')</div><div class="sites-grid">';
       data.sites_registered.forEach(function(s){
         var site = (typeof s === 'object') ? (s.site || 'unknown') : s;
-        if (site.length > 25) return;
+        if (site.length > 30) return;
         var icon = icons[site] || '🌐';
         var url = links[site] || ('https://' + site);
         h += '<a class="site-card" href="' + url + '" target="_blank">';
         h += '<div class="site-icon-badge">' + icon + '</div>';
         h += '<div class="site-name">' + site.replace(/\.(com|org|net|it|tv)$/,'') + '</div>';
-        h += '<div class="site-url">Verifica account →</div>';
-        h += '</a>';
+        h += '<div class="site-url">Verifica account →</div></a>';
       });
       h += '</div>';
     }
   }
-
   r.innerHTML = h;
 }
 
